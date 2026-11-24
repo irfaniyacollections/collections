@@ -1,0 +1,1934 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1f3a5f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="COLLECTIONS">
+  <title>COLLECTIONS</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;600;700&family=Inter:wght@400;600;700&display=swap">
+  <style>
+    :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f3f5f8;--card:#fff;--fg:#17202e;--mut:#5d6b80;--line:#dce2ea;--pri:#1f3a5f;--onpri:#fff;--acc:#d98a1c;--ok:#1d7a4d;--warn:#b4531a;--okbg:#e3f3ea;--warnbg:#fbeadf;--font:'Noto Sans Malayalam','Noto Sans Kannada','Inter',system-ui,sans-serif}
+    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1520;--card:#182131;--fg:#e8edf5;--mut:#9aa8bd;--line:#2a364b;--pri:#7fa6dc;--onpri:#0f1520;--acc:#f0b14d;--ok:#5fd09a;--warn:#f0a27a;--okbg:#17352a;--warnbg:#3a2418;color-scheme:dark}}
+    :root[data-theme="dark"]{--bg:#0f1520;--card:#182131;--fg:#e8edf5;--mut:#9aa8bd;--line:#2a364b;--pri:#7fa6dc;--onpri:#0f1520;--acc:#f0b14d;--ok:#5fd09a;--warn:#f0a27a;--okbg:#17352a;--warnbg:#3a2418;color-scheme:dark}
+    *{box-sizing:border-box}
+    html{scroll-padding-top:env(safe-area-inset-top,0px)}
+    body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--font);padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+    #app{max-width:560px;margin:0 auto;display:grid;gap:12px}
+    h1{font-size:21px;margin:0;line-height:1.3}h2{font-size:16px;margin:0}
+    .mut{color:var(--mut);font-size:13px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;display:grid;gap:12px;min-width:0}
+    label{display:grid;gap:4px;font-weight:600;font-size:13px}
+    input,select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%;min-width:0}
+    input:focus,select:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+    button{font:inherit;font-weight:600;padding:11px 16px;border-radius:8px;border:1px solid var(--pri);background:var(--pri);color:var(--onpri);cursor:pointer;transition:opacity .15s}
+    button:active{opacity:0.85}
+    button.sec{background:transparent;color:var(--pri)}button.dng{background:transparent;color:var(--warn);border-color:var(--warn)}
+    button.sm{padding:6px 10px;font-size:13px}
+    .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.tabs button{background:transparent;color:var(--pri)}.tabs button.on{background:var(--pri);color:var(--onpri)}
+    
+    /* Language Switcher Bar */
+    .lbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;font-size:12.5px;color:var(--mut)}
+    .lbar select{width:auto;padding:5px 10px;font-size:12.5px;font-weight:600;border-radius:8px;background:var(--card);color:var(--fg);border:1px solid var(--line)}
+
+    /* Sub-navigation menu bar */
+    .nav{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--card);padding:5px;border-radius:12px;border:1px solid var(--line);position:sticky;top:calc(6px + env(safe-area-inset-top,0px));z-index:20;box-shadow:0 2px 10px rgba(0,0,0,0.06)}
+    .nav button{background:transparent;color:var(--mut);border:none;padding:8px 2px;font-size:11.5px;line-height:1.2;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;min-width:0}
+    .nav button.on{background:var(--pri);color:var(--onpri);font-weight:700}
+    .nav .ic{font-size:16px;line-height:1}
+
+    /* Profile Info Grid (English default) */
+    .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--bg);padding:12px;border-radius:10px;border:1px solid var(--line);font-family:'Inter',system-ui,sans-serif}
+    .pitem{display:grid;gap:2px}
+    .pitem .pl{font-size:11.5px;color:var(--mut);font-weight:500}
+    .pitem .pv{font-weight:700;font-size:14px;color:var(--fg)}
+
+    .err{color:var(--warn);font-weight:600;font-size:13px}
+    .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .tile{border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0;background:var(--card)}
+    .tile .l{font-size:12px;color:var(--mut)}.tile .v{font:700 17px/1.3 Inter,sans-serif;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+    .tile.p .v{color:var(--warn)}.tile.r .v{color:var(--ok)}
+    .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+    .row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .batch{border-top:1px solid var(--line);padding-top:10px;display:grid;gap:6px}
+    .pill{font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--warnbg);color:var(--warn)}.pill.ok{background:var(--okbg);color:var(--ok)}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .mine{background:var(--okbg);border-radius:10px;padding:12px;border:1px solid rgba(29,122,77,0.2)}
+    .peer{border-top:1px dashed var(--line);padding-top:8px;display:grid;gap:2px}.peer.me{font-weight:600}
+    .t4{grid-template-columns:1fr 1fr}.tile.h .v{color:var(--acc)}
+    .ent{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:8px}
+    .pill.am{background:var(--bg);color:var(--acc);border:1px solid var(--acc)}
+    .sub{font-size:13px;color:var(--mut);margin:0}
+    a.btn{display:block;text-align:center;text-decoration:none;font-weight:600;padding:11px 16px;border-radius:8px;background:var(--ok);color:#fff}
+    .ctabs{display:flex;gap:6px;flex-wrap:wrap}.ctabs button{background:transparent;color:var(--pri);padding:7px 11px;font-size:13px}.ctabs button.on{background:var(--pri);color:var(--onpri)}
+    .vis{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px;display:grid;gap:4px}
+    .num{font-variant-numeric:tabular-nums}
+    .badge{font-size:11px;padding:2px 6px;border-radius:6px;background:var(--warnbg);color:var(--warn);font-weight:600}
+    .badge.ok{background:var(--okbg);color:var(--ok)}
+    .nbadge{background:var(--acc);color:#fff;font-size:10px;padding:1px 5px;border-radius:99px;margin-left:3px;font-weight:700}
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD-53Kz_6_8WfxXe3b76GyCu-alUaDfjFg",
+    authDomain: "collections-388ec.firebaseapp.com",
+    projectId: "collections-388ec",
+    storageBucket: "collections-388ec.firebasestorage.app",
+    messagingSenderId: "941364152647",
+    appId: "1:941364152647:web:bbb79a5c34e57a88f4a462"
+  };
+
+  const DATA_KEY = "collections_app_db_v1";
+  const SESSION_KEY = "collections_app_session_v1";
+  const LANG_KEY = "collections_app_lang_v1";
+  const BATCH_COUNT = 25;
+  const FIRST_COLLECTION = "കണ്യാല മൗല ആണ്ട് 2026";
+  const LEGACY_DEFAULT_HASH = "638e9604bc2749ed3a45fbe9e65f68260e088dc29405fc00319d418e80c783d5";
+
+  const I18N = {
+    ml: {
+      selectLang: "Select Language",
+      loading: "വിവരങ്ങൾ ലോഡ് ചെയ്യുന്നു…",
+      noCol: "ഇപ്പോൾ കാണാൻ കഴിയുന്ന കളക്ഷൻ ഇല്ല.",
+      curCol: "നിലവിലെ കളക്ഷൻ",
+      hiddenTag: " (മറച്ചത്)",
+      selectCol: "കളക്ഷൻ തിരഞ്ഞെടുക്കുക",
+      offer: "വാഗ്ദാനം",
+      paid: "നൽകിയത്",
+      pending: "ബാക്കി",
+      receivedCentral: "കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ചത്",
+      withLeaders: "ലീഡർമാരുടെ കയ്യിൽ",
+      withLeader: "ലീഡറുടെ കയ്യിൽ",
+      toPay: "ഇനി നൽകാനുള്ളത്",
+      loginSub: "ലോഗിൻ ചെയ്യുക",
+      member: "അംഗം",
+      batchLeader: "ബാച്ച് ലീഡർ",
+      admin: "അഡ്മിൻ",
+      choose: "തിരഞ്ഞെടുക്കുക",
+      batch: "ബാച്ച്",
+      batchNum: "ബാച്ച് നമ്പർ",
+      mobileNum: "മൊബൈൽ നമ്പർ",
+      username: "യൂസർ നെയിം",
+      password: "പാസ്‌വേഡ്",
+      repeatPassword: "പാസ്‌വേഡ് ആവർത്തിക്കുക",
+      firstSetupMsg: "ആദ്യ ഉപയോഗം: പുതിയ അഡ്മിൻ പാസ്‌വേഡ് സെറ്റ് ചെയ്യുക.",
+      newAdminPwLabel: "പുതിയ അഡ്മിൻ പാസ്‌വേഡ് (കുറഞ്ഞത് 6 അക്ഷരം)",
+      setPwAndLogin: "പാസ്‌വേഡ് സെറ്റ് ചെയ്ത് ലോഗിൻ ചെയ്യുക",
+      loginBtn: "ലോഗിൻ",
+      logoutBtn: "ലോഗൗട്ട്",
+      errPwMin6: "പാസ്‌വേഡിന് കുറഞ്ഞത് 6 അക്ഷരം വേണം.",
+      errPwMismatch: "രണ്ട് പാസ്‌വേഡും ഒരുപോലെയല്ല.",
+      errWrongPw: "പാസ്‌വേഡ് തെറ്റാണ്.",
+      errCheckLeader: "യൂസർ നെയിം, മൊബൈൽ, പാസ്‌വേഡ് എന്നിവ പരിശോധിക്കുക.",
+      errCheckMember: "ബാച്ച്, മൊബൈൽ നമ്പർ, പാസ്‌വേഡ് എന്നിവ പരിശോധിക്കുക.",
+      youTag: " (നിങ്ങൾ)",
+      completed: "പൂർണ്ണം",
+      welcome: "നമസ്കാരം, ",
+      toLeaderPage: "ലീഡർ പേജിലേക്ക്",
+      tabMyInfo: "എന്റെ വിവരം",
+      tabMyBatch: "എന്റെ ബാച്ച്",
+      tabGrandTotal: "ഗ്രാൻഡ് ടോട്ടൽ",
+      yourColInfo: "നിങ്ങളുടെ കളക്ഷൻ വിവരങ്ങൾ",
+      offerFullyPaid: "വാഗ്ദാനം പൂർണ്ണമായി നൽകി",
+      youNeedToPay: "നിങ്ങൾ ഇനി നൽകാനുള്ളത് ",
+      grandTotal: "ഗ്രാൻഡ് ടോട്ടൽ",
+      batchesAndMembers: (b, m) => `${b} ബാച്ചുകൾ · ആകെ ${m} അംഗങ്ങൾ`,
+      batchWiseInfo: "ബാച്ച് തിരിച്ചുള്ള വിവരങ്ങൾ",
+      yoursTag: " (നിങ്ങളുടേത്)",
+      yourBatchTag: " (നിങ്ങളുടെ ബാച്ച്)",
+      batchTotalInfo: b => `ബാച്ച് ${b} · ആകെ വിവരങ്ങൾ`,
+      totalMembersInBatch: n => `ബാച്ചിലെ ആകെ അംഗങ്ങൾ: ${n}`,
+      batchMembersList: b => `ബാച്ച് ${b} · അംഗങ്ങളുടെ ലിസ്റ്റ്`,
+      makeNewPledge: "പുതിയ വാഗ്ദാനം നൽകുക",
+      pledgeDescLeader: "വാഗ്ദാനം ചെയ്യുന്ന സംഖ്യ നൽകി ബട്ടൺ അമർത്തിയാൽ നിങ്ങളുടെ വിവരങ്ങളും തുകയും ബാച്ച് ലീഡറുടെ WhatsApp-ലേക്ക് സന്ദേശമായി അയയ്ക്കാൻ തുറന്നുവരും.",
+      pledgeDescNoLeader: "നിങ്ങളുടെ ബാച്ചിന് ഇതുവരെ ലീഡറെ നിശ്ചയിച്ചിട്ടില്ല.",
+      pledgeAmtLabel: "വാഗ്ദാനം ചെയ്യുന്ന സംഖ്യ (₹)",
+      pledgeAmtPh: "തുക നൽകുക (₹)",
+      pledgeWaBtn: "💬 വാഗ്ദാനം ചെയ്യുക (WhatsApp)",
+      errEnterPledgeAmt: "വാഗ്ദാനം ചെയ്യുന്ന സംഖ്യ നൽകുക.",
+      errNoLeaderWa: "നിങ്ങളുടെ ബാച്ചിന് ഇതുവരെ ലീഡറെയോ വാട്സ്ആപ്പ് നമ്പറോ നിശ്ചയിച്ചിട്ടില്ല.",
+      confirmLeaderPw: "സ്ഥിരീകരിക്കാൻ നിങ്ങളുടെ പാസ്‌വേഡ് നൽകുക",
+      confirmAdminPw: "സ്ഥിരീകരിക്കാൻ അഡ്മിൻ പാസ്‌വേഡ് നൽകുക",
+      confirmSaveBtn: "ഉറപ്പാണ്, സേവ് ചെയ്യുക",
+      goBackBtn: "തിരികെ പോകുക",
+      receivable: "കിട്ടാനുള്ളത്",
+      editBtn: "തിരുത്തുക",
+      searchMembers: "അംഗങ്ങളെ തിരയുക",
+      searchPh: scope => "പേര്, മൊബൈൽ, സ്ഥലം" + (scope ? "" : ", ബാച്ച്") + "…",
+      nothingFound: "ഒന്നും കണ്ടെത്തിയില്ല.",
+      first30Only: "ആദ്യത്തെ 30 ഫലങ്ങൾ മാത്രം. തിരച്ചിൽ കൂടുതൽ വ്യക്തമാക്കുക.",
+      addNewMemberBtn: "+ പുതിയ അംഗത്തെ ചേർക്കുക",
+      editMemberTitle: "അംഗത്തെ തിരുത്തുക",
+      newMemberTitle: "പുതിയ അംഗം",
+      appliesToCol: "വാഗ്ദാനം, ലഭിച്ച തുക എന്നിവ ബാധകമാകുന്നത്: ",
+      nameEnLabel: "പേര് (English)",
+      placeEnLabel: "സ്ഥലം (English)",
+      distEnLabel: "ജില്ല (English)",
+      offerRsLabel: "വാഗ്ദാനം (₹)",
+      receivedCentralRsLabel: "കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ചത് (₹)",
+      adminOnlyNote: e => `കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ചത്: ${e} (അഡ്മിൻ മാത്രം ചേർക്കും)`,
+      pwOnlyIfChange: "മാറ്റണമെങ്കിൽ മാത്രം",
+      loginPwPh: "ലോഗിൻ പാസ്‌വേഡ്",
+      errReqMemberFields: id => "പേര്, മൊബൈൽ" + (id ? "" : ", പാസ്‌വേഡ്") + " നൽകണം.",
+      errEnglishOnly: "പേര്, സ്ഥലം, ജില്ല എന്നിവ ഇംഗ്ലീഷിൽ (English) മാത്രമേ നൽകാൻ പാടുള്ളൂ.",
+      errDupMobileBatch: "ഈ ബാച്ചിൽ ഈ മൊബൈൽ നമ്പർ ഇതിനകം ഉണ്ട്.",
+      confirmEditMember: "മാറ്റങ്ങൾ സ്ഥിരീകരിക്കുക",
+      confirmNewMember: "പുതിയ അംഗത്തെ സ്ഥിരീകരിക്കുക",
+      saveBtn: "സേവ്",
+      cancelBtn: "റദ്ദാക്കുക",
+      removeBtn: "ഒഴിവാക്കുക",
+      confirmRemoveMember: "അംഗത്തെ ഒഴിവാക്കണോ?",
+      removedTag: "(ഒഴിവാക്കി)",
+      handedToAdmin: "അഡ്മിന് കൈമാറി",
+      viewMyMemberInfo: "👤 എന്റെ വ്യക്തിഗത വിവരങ്ങൾ (അംഗമായി) കാണുക",
+      howToViewAsMember: (b, m) => `അംഗമായി കാണാൻ: ബാച്ച് ${b}-ൽ നിങ്ങളുടെ മൊബൈൽ നമ്പറിൽ (${m}) ഒരു അംഗത്തെ ചേർക്കുക.`,
+      tabTotal: "ടോട്ടൽ",
+      tabAddCash: "ആഡ് ക്യാഷ്",
+      tabMembers: "അംഗങ്ങൾ",
+      tabBatches: "ബാച്ചുകൾ",
+      tabBatch: "ബാച്ച്",
+      tabHandover: "കൈമാറ്റം",
+      tabSettings: "സെറ്റിങ്",
+      yourBatchAccount: b => `നിങ്ങളുടെ ബാച്ച് (${b}) കണക്ക്`,
+      addReceivedCashTitle: "ലഭിച്ച തുക ചേർക്കുക (Add Cash)",
+      memberLabel: "അംഗം",
+      selectMemberOpt: "അംഗത്തെ തിരഞ്ഞെടുക്കുക",
+      amountLabel: "തുക",
+      noteLabel: "കുറിപ്പ്",
+      notePh: "കുറിപ്പ് (ഐച്ഛികം)",
+      addCashBtn: "തുക ചേർക്കുക",
+      addPledgeTitle: "വാഗ്ദാനം ചേർക്കുക (Add Pledge)",
+      addPledgeBtn: "വാഗ്ദാനം ചേർക്കുക",
+      confirmAddPledge: "വാഗ്ദാനം ചേർക്കണോ?",
+      willAddPledgeNote: (cur, nxt) => `നിലവിലെ വാഗ്ദാനം ${cur} → പുതിയ വാഗ്ദാനം ${nxt} ആയി മാറും.`,
+      errCashInput: "അംഗത്തെയും സാധുവായ തുകയും നൽകുക.",
+      confirmAddCash: "തുക ചേർക്കണോ?",
+      willRecordWithLeader: "ഈ തുക ലീഡറുടെ കയ്യിൽ എന്ന് രേഖപ്പെടുത്തും.",
+      cashRecordsTitle: "തുക രേഖകൾ",
+      noRecordsYet: "ഇതുവരെ രേഖകൾ ഇല്ല.",
+      confirmDelRecord: "ഈ രേഖ ഒഴിവാക്കണോ?",
+      batchMembersCount: (b, n) => `ബാച്ച് ${b} അംഗങ്ങൾ (${n})`,
+      noMembersYet: "ഇതുവരെ അംഗങ്ങളെ ചേർത്തിട്ടില്ല.",
+      batchesInfoTitle: "ബാച്ചുകളുടെ വിവരങ്ങൾ",
+      editLeaderTitle: "ലീഡറെ തിരുത്തുക",
+      newLeaderTitle: "പുതിയ ബാച്ച് ലീഡർ",
+      step1SelectBatch: "1. ബാച്ച് തിരഞ്ഞെടുക്കുക",
+      step2SelectMember: "2. ബാച്ചിലെ അംഗത്തെ തിരഞ്ഞെടുക്കുക",
+      step3LeaderUser: "3. ലീഡർക്കുള്ള യൂസർ നെയിം (Username)",
+      waNumLabel: "വാട്സ്ആപ്പ് നമ്പർ",
+      waNumPh: "ഒഴിച്ചിട്ടാൽ മൊബൈൽ നമ്പർ",
+      leaderPwPh: "ലീഡർ പാസ്‌വേഡ് (അംഗ പാസ്‌വേഡിൽ നിന്ന് വ്യത്യസ്തം)",
+      optOtherMobile: "— മറ്റൊരു മൊബൈൽ നമ്പർ നൽകുക —",
+      optNoMembersInBatch: "— ഈ ബാച്ചിൽ അംഗങ്ങളില്ല (നമ്പർ നൽകുക) —",
+      errLeaderReq: "യൂസർ നെയിം, മൊബൈൽ നമ്പർ എന്നിവ നൽകണം.",
+      errNewLeaderPwReq: "പുതിയ ലീഡർക്ക് പാസ്‌വേഡ് നൽകണം.",
+      errDupLeader: "ഈ യൂസർ നെയിം അല്ലെങ്കിൽ മൊബൈൽ മറ്റൊരു ലീഡർക്ക് ഉണ്ട്.",
+      errLeaderPwMin4: "ലീഡർ പാസ്‌വേഡിന് കുറഞ്ഞത് 4 അക്ഷരം വേണം.",
+      errLeaderPwDiff: "ലീഡർ പാസ്‌വേഡ് അംഗത്തിന്റെ പാസ്‌വേഡിൽ നിന്ന് വ്യത്യസ്തമായിരിക്കണം.",
+      confirmEditLeader: "ലീഡറുടെ മാറ്റങ്ങൾ സ്ഥിരീകരിക്കുക",
+      confirmNewLeader: "പുതിയ ലീഡറെ സ്ഥിരീകരിക്കുക",
+      confirmRemoveLeader: "ലീഡറെ ഒഴിവാക്കണോ?",
+      changeAdminPwForced: "അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുക (നിർബന്ധം)",
+      changeAdminPwTitle: "അഡ്മിൻ പാസ്‌വേഡ് മാറ്റുക",
+      forcedPwNote: "നിലവിലെ പാസ്‌വേഡ് ഡിഫോൾട്ട് ആണ്. തുടരുന്നതിന് മുമ്പ് പുതിയ പാസ്‌വേഡ് സെറ്റ് ചെയ്യുക.",
+      curPwLabel: "നിലവിലെ പാസ്‌വേഡ്",
+      newPwLabel: "പുതിയ പാസ്‌വേഡ്",
+      errCurPwWrong: "നിലവിലെ പാസ്‌വേഡ് തെറ്റാണ്.",
+      errNoDefaultPw: "ഡിഫോൾട്ട് പാസ്‌വേഡ് വീണ്ടും ഉപയോഗിക്കരുത്.",
+      adminPwChanged: "അഡ്മിൻ പാസ്‌വേഡ് മാറ്റി.",
+      changePwBtn: "പാസ്‌വേഡ് മാറ്റുക",
+      collectionsTitle: "കളക്ഷനുകൾ",
+      visibleNowLabel: "അംഗങ്ങൾക്കും ലീഡർമാർക്കും ഇപ്പോൾ കാണാവുന്നത്: ",
+      hiddenNowLabel: "മറച്ചവ (അഡ്മിന് മാത്രം കാണാം): ",
+      noneText: "ഒന്നുമില്ല",
+      hiddenPill: "മറച്ചിരിക്കുന്നു · അംഗങ്ങൾക്ക് കാണില്ല",
+      visiblePill: "അംഗങ്ങൾക്ക് കാണാം",
+      showBtn: "കാണിക്കുക",
+      hideBtn: "മറയ്ക്കുക",
+      confirmShowCol: "അംഗങ്ങൾക്ക് കാണിക്കണോ?",
+      confirmHideCol: "അംഗങ്ങളിൽ നിന്ന് മറയ്ക്കണോ?",
+      showColDesc: "എല്ലാ അംഗങ്ങൾക്കും ലീഡർമാർക്കും ഈ കളക്ഷൻ കാണാൻ കഴിയും.",
+      hideColDesc: "അംഗങ്ങൾക്കും ലീഡർമാർക്കും ഈ കളക്ഷൻ കാണാൻ കഴിയില്ല.",
+      confirmDelCol: "കളക്ഷൻ പൂർണ്ണമായി ഒഴിവാക്കണോ?",
+      delColWarn: "ഈ കളക്ഷന്റെ എല്ലാ വിവരങ്ങളും എന്നെന്നേക്കുമായി മായും.",
+      addNewColTitle: "പുതിയ കളക്ഷൻ ചേർക്കുക",
+      colNameLabel: "കളക്ഷന്റെ പേര്",
+      showImmediatelyLabel: "ചേർത്ത ഉടൻ അംഗങ്ങൾക്ക് കാണിക്കുക",
+      errColNameReq: "കളക്ഷന്റെ പേര് നൽകുക.",
+      errColExists: "ഈ പേരിൽ കളക്ഷൻ ഇതിനകം ഉണ്ട്.",
+      confirmNewCol: "പുതിയ കളക്ഷൻ ചേർക്കണോ?",
+      willShowImmediate: "ചേർത്ത ഉടൻ അംഗങ്ങൾക്ക് കാണാം.",
+      willAddHidden: "മറച്ച നിലയിൽ ചേരും.",
+      addColBtn: "കളക്ഷൻ ചേർക്കുക",
+      testModeBadge: "● ടെസ്റ്റ് മോഡ്",
+      liveDbBadge: "● ലൈവ് ഡാറ്റാബേസ്",
+      localModeBadge: "● ലോക്കൽ മോഡ്",
+      exportReportBtn: "📥 റിപ്പോർട്ട് (CSV/Excel)",
+      batchFullDetailsTitle: "ബാച്ച് തിരിച്ചുള്ള പൂർണ്ണ വിവരങ്ങൾ",
+      batchFullDetailsSub: n => `ആകെ ${n} ബാച്ചുകൾ · ഓരോ ബാച്ചിന്റെയും വാഗ്ദാനം, കമ്മിറ്റിക്ക് ലഭിച്ചത്, ലീഡറുടെ കയ്യിലുള്ളത്, ബാക്കി എന്നിവ താഴെ കാണാം.`,
+      leaderLabel: "ലീഡർ: ",
+      leaderNotAssigned: "ലീഡറെ നിശ്ചയിച്ചിട്ടില്ല",
+      fullyReceivedPill: "പൂർണ്ണമായി ലഭിച്ചു",
+      membersCountPill: n => `${n} അംഗങ്ങൾ`,
+      cashWithLeadersTitle: "ലീഡർമാരുടെ കയ്യിലുള്ള തുക",
+      cashWithLeadersSub: "തുക നിങ്ങൾക്ക് ലഭിച്ചാൽ 'ലഭിച്ചു' അമർത്തുക. അപ്പോൾ മാത്രമേ ഗ്രാൻഡ് ടോട്ടലിൽ വരൂ.",
+      noPendingHandover: "നിലവിൽ കൈമാറാൻ ബാക്കിയുള്ള തുക ഇല്ല.",
+      receivedBtn: "ലഭിച്ചു",
+      allBatchReceivedBtn: t => `ബാച്ചിലെ എല്ലാം ലഭിച്ചു (${t})`,
+      confirmHandoverTitle: "ഈ തുക ലഭിച്ചതായി ചേർക്കണോ?",
+      confirmHandoverLine: (tot, b) => `ആകെ ${tot} ബാച്ച് ${b}-ന്റെയും ഗ്രാൻഡ് ടോട്ടലിന്റെയും ലഭിച്ച തുകയിൽ ചേരും.`,
+      membersByBatchTitle: n => `ബാച്ച് തിരിച്ച് അംഗങ്ങൾ (${n} ബാച്ചുകൾ)`,
+      closeBtn: "അടയ്ക്കുക",
+      viewMembersBtn: n => `അംഗങ്ങളെ കാണുക (${n})`,
+      confirmDelBatch: "ബാച്ച് ഒഴിവാക്കണോ?",
+      delBatchLine: b => `ബാച്ച് ${b} ഒഴിവാക്കും.`,
+      batchLeadersTitle: "ബാച്ച് ലീഡർമാർ",
+      noLeadersYet: "ഇതുവരെ ലീഡർമാരെ ചേർത്തിട്ടില്ല.",
+      addNewLeaderBtn: "+ പുതിയ ലീഡർ ചേർക്കുക",
+      addNewBatchTitle: "പുതിയ ബാച്ച് ചേർക്കുക",
+      addBtn: "ചേർക്കുക",
+      errValidBatch: "സാധുവായ ബാച്ച് നമ്പർ നൽകുക.",
+      errBatchExists: b => `ബാച്ച് ${b} ഇതിനകം ഉണ്ട്.`,
+      confirmNewBatch: "പുതിയ ബാച്ച് ചേർക്കണോ?",
+      nameLine: "പേര്",
+      batchLine: "ബാച്ച്",
+      mobileLine: "മൊബൈൽ",
+      placeLine: "സ്ഥലം",
+      pwWillChange: "പാസ്‌വേഡ് മാറ്റും",
+      pwWillSet: "പാസ്‌വേഡ് സെറ്റ് ചെയ്യും",
+      noneLabel: "ഇല്ല"
+    },
+    en: {
+      selectLang: "Select Language",
+      loading: "Loading data…",
+      noCol: "No visible collection available right now.",
+      curCol: "Current Collection",
+      hiddenTag: " (Hidden)",
+      selectCol: "Select Collection",
+      offer: "Offer",
+      paid: "Paid",
+      pending: "Pending",
+      receivedCentral: "Received by Central Committee",
+      withLeaders: "With Leaders",
+      withLeader: "With Leader",
+      toPay: "Balance to Pay",
+      loginSub: "Sign in to continue",
+      member: "Member",
+      batchLeader: "Batch Leader",
+      admin: "Admin",
+      choose: "Select",
+      batch: "Batch",
+      batchNum: "Batch Number",
+      mobileNum: "Mobile Number",
+      username: "Username",
+      password: "Password",
+      repeatPassword: "Confirm Password",
+      firstSetupMsg: "First-time setup: Set a new Admin password.",
+      newAdminPwLabel: "New Admin Password (min 6 characters)",
+      setPwAndLogin: "Set Password & Login",
+      loginBtn: "Login",
+      logoutBtn: "Logout",
+      errPwMin6: "Password must be at least 6 characters.",
+      errPwMismatch: "Passwords do not match.",
+      errWrongPw: "Incorrect password.",
+      errCheckLeader: "Please check Username, Mobile, and Password.",
+      errCheckMember: "Please check Batch, Mobile Number, and Password.",
+      youTag: " (You)",
+      completed: "Completed",
+      welcome: "Welcome, ",
+      toLeaderPage: "Leader Dashboard",
+      tabMyInfo: "My Info",
+      tabMyBatch: "My Batch",
+      tabGrandTotal: "Grand Total",
+      yourColInfo: "Your Collection Summary",
+      offerFullyPaid: "Pledge Paid in Full",
+      youNeedToPay: "Balance you need to pay: ",
+      grandTotal: "Grand Total",
+      batchesAndMembers: (b, m) => `${b} Batches · Total ${m} Members`,
+      batchWiseInfo: "Batch-wise Summary",
+      yoursTag: " (Yours)",
+      yourBatchTag: " (Your Batch)",
+      batchTotalInfo: b => `Batch ${b} · Total Summary`,
+      totalMembersInBatch: n => `Total members in batch: ${n}`,
+      batchMembersList: b => `Batch ${b} · Members List`,
+      makeNewPledge: "Make a New Pledge",
+      pledgeDescLeader: "Enter your pledge amount and tap the button to open WhatsApp with your details ready to send to your Batch Leader.",
+      pledgeDescNoLeader: "No Batch Leader has been assigned to your batch yet.",
+      pledgeAmtLabel: "Pledge Amount (₹)",
+      pledgeAmtPh: "Enter amount (₹)",
+      pledgeWaBtn: "💬 Send Pledge (WhatsApp)",
+      errEnterPledgeAmt: "Please enter a valid pledge amount.",
+      errNoLeaderWa: "Batch Leader or WhatsApp number is not assigned for your batch yet.",
+      confirmLeaderPw: "Enter your password to confirm",
+      confirmAdminPw: "Enter Admin password to confirm",
+      confirmSaveBtn: "Confirm & Save",
+      goBackBtn: "Go Back",
+      receivable: "Receivable",
+      editBtn: "Edit",
+      searchMembers: "Search Members",
+      searchPh: scope => "Name, mobile, place" + (scope ? "" : ", batch") + "…",
+      nothingFound: "No results found.",
+      first30Only: "Showing first 30 results. Refine your search.",
+      addNewMemberBtn: "+ Add New Member",
+      editMemberTitle: "Edit Member",
+      newMemberTitle: "New Member",
+      appliesToCol: "Offer and received amounts apply to: ",
+      nameEnLabel: "Name (English)",
+      placeEnLabel: "Place (English)",
+      distEnLabel: "District (English)",
+      offerRsLabel: "Offer (₹)",
+      receivedCentralRsLabel: "Received by Central Committee (₹)",
+      adminOnlyNote: e => `Received by Central Committee: ${e} (Updated by Admin only)`,
+      pwOnlyIfChange: "Only if changing",
+      loginPwPh: "Login Password",
+      errReqMemberFields: id => "Name, Mobile" + (id ? "" : ", Password") + " are required.",
+      errEnglishOnly: "Name, Place, and District must be entered in English only.",
+      errDupMobileBatch: "This mobile number already exists in this batch.",
+      confirmEditMember: "Confirm Member Changes",
+      confirmNewMember: "Confirm New Member",
+      saveBtn: "Save",
+      cancelBtn: "Cancel",
+      removeBtn: "Remove",
+      confirmRemoveMember: "Remove this member?",
+      removedTag: "(Removed)",
+      handedToAdmin: "Handed to Admin",
+      viewMyMemberInfo: "👤 View My Personal Info (As Member)",
+      howToViewAsMember: (b, m) => `To view as member: Add a member in Batch ${b} with your mobile number (${m}).`,
+      tabTotal: "Total",
+      tabAddCash: "Add Cash",
+      tabMembers: "Members",
+      tabBatches: "Batches",
+      tabBatch: "Batches",
+      tabHandover: "Handover",
+      tabSettings: "Settings",
+      yourBatchAccount: b => `Your Batch (${b}) Summary`,
+      addReceivedCashTitle: "Add Received Cash",
+      memberLabel: "Member",
+      selectMemberOpt: "Select Member",
+      amountLabel: "Amount",
+      noteLabel: "Note",
+      notePh: "Note (Optional)",
+      addCashBtn: "Add Cash",
+      addPledgeTitle: "Add Pledge",
+      addPledgeBtn: "Add Pledge",
+      confirmAddPledge: "Add this pledge?",
+      willAddPledgeNote: (cur, nxt) => `Current offer ${cur} will be updated to ${nxt}.`,
+      errCashInput: "Please select a member and enter a valid amount.",
+      confirmAddCash: "Add this cash entry?",
+      willRecordWithLeader: "This amount will be recorded as held with the Leader.",
+      cashRecordsTitle: "Cash Records",
+      noRecordsYet: "No records yet.",
+      confirmDelRecord: "Delete this record?",
+      batchMembersCount: (b, n) => `Batch ${b} Members (${n})`,
+      noMembersYet: "No members added yet.",
+      batchesInfoTitle: "Batches Overview",
+      editLeaderTitle: "Edit Batch Leader",
+      newLeaderTitle: "New Batch Leader",
+      step1SelectBatch: "1. Select Batch",
+      step2SelectMember: "2. Select Member from Batch",
+      step3LeaderUser: "3. Leader Username",
+      waNumLabel: "WhatsApp Number",
+      waNumPh: "Uses mobile number if left blank",
+      leaderPwPh: "Leader Password (different from member password)",
+      optOtherMobile: "— Enter another mobile number —",
+      optNoMembersInBatch: "— No members in batch (Enter number) —",
+      errLeaderReq: "Username and mobile number are required.",
+      errNewLeaderPwReq: "Password is required for a new leader.",
+      errDupLeader: "This username or mobile number is already used by another leader.",
+      errLeaderPwMin4: "Leader password must be at least 4 characters.",
+      errLeaderPwDiff: "Leader password must be different from the member password.",
+      confirmEditLeader: "Confirm Leader Changes",
+      confirmNewLeader: "Confirm New Leader",
+      confirmRemoveLeader: "Remove this leader?",
+      changeAdminPwForced: "Change Admin Password (Required)",
+      changeAdminPwTitle: "Change Admin Password",
+      forcedPwNote: "Current password is a default password. Please set a new password before continuing.",
+      curPwLabel: "Current Password",
+      newPwLabel: "New Password",
+      errCurPwWrong: "Current password is incorrect.",
+      errNoDefaultPw: "Do not reuse the default password.",
+      adminPwChanged: "Admin password updated.",
+      changePwBtn: "Change Password",
+      collectionsTitle: "Collections",
+      visibleNowLabel: "Currently visible to members & leaders: ",
+      hiddenNowLabel: "Hidden (Visible to Admin only): ",
+      noneText: "None",
+      hiddenPill: "Hidden · Not visible to members",
+      visiblePill: "Visible to members",
+      showBtn: "Show",
+      hideBtn: "Hide",
+      confirmShowCol: "Make visible to members?",
+      confirmHideCol: "Hide from members?",
+      showColDesc: "All members and leaders will be able to view this collection.",
+      hideColDesc: "Members and leaders will not see this collection.",
+      confirmDelCol: "Permanently delete collection?",
+      delColWarn: "All offers, received amounts, and records in this collection will be permanently deleted.",
+      addNewColTitle: "Add New Collection",
+      colNameLabel: "Collection Name",
+      showImmediatelyLabel: "Show to members immediately",
+      errColNameReq: "Please enter a collection name.",
+      errColExists: "A collection with this name already exists.",
+      confirmNewCol: "Add new collection?",
+      willShowImmediate: "Will be visible to members immediately.",
+      willAddHidden: "Will be added as hidden.",
+      addColBtn: "Add Collection",
+      testModeBadge: "● Test Mode",
+      liveDbBadge: "● Live Database",
+      localModeBadge: "● Local Mode",
+      exportReportBtn: "📥 Report (CSV/Excel)",
+      batchFullDetailsTitle: "Batch-wise Full Details",
+      batchFullDetailsSub: n => `Total ${n} Batches · View Offer, Received by Central Committee, With Leader, and Pending for each batch.`,
+      leaderLabel: "Leader: ",
+      leaderNotAssigned: "Not assigned",
+      fullyReceivedPill: "Fully Received",
+      membersCountPill: n => `${n} Members`,
+      cashWithLeadersTitle: "Cash Held by Leaders",
+      cashWithLeadersSub: "Click 'Received' once you collect the cash from the leader. Only then will it be added to the Grand Total.",
+      noPendingHandover: "No pending cash handovers right now.",
+      receivedBtn: "Received",
+      allBatchReceivedBtn: t => `Mark All Batch Received (${t})`,
+      confirmHandoverTitle: "Confirm Cash Received?",
+      confirmHandoverLine: (tot, b) => `Total ${tot} will be added to Batch ${b} and Grand Total received amounts.`,
+      membersByBatchTitle: n => `Members by Batch (${n} Batches)`,
+      closeBtn: "Close",
+      viewMembersBtn: n => `View Members (${n})`,
+      confirmDelBatch: "Remove this batch?",
+      delBatchLine: b => `Batch ${b} will be removed.`,
+      batchLeadersTitle: "Batch Leaders",
+      noLeadersYet: "No batch leaders added yet.",
+      addNewLeaderBtn: "+ Add New Leader",
+      addNewBatchTitle: "Add New Batch",
+      addBtn: "Add",
+      errValidBatch: "Please enter a valid batch number.",
+      errBatchExists: b => `Batch ${b} already exists.`,
+      confirmNewBatch: "Add new batch?",
+      nameLine: "Name",
+      batchLine: "Batch",
+      mobileLine: "Mobile",
+      placeLine: "Place",
+      pwWillChange: "Password will be updated",
+      pwWillSet: "Password will be set",
+      noneLabel: "None"
+    },
+    kn: {
+      selectLang: "Select Language",
+      loading: "ಮಾಹಿತಿ ಲೋಡ್ ಆಗುತ್ತಿದೆ…",
+      noCol: "ಪ್ರಸ್ತುತ ಯಾವುದೇ ಕಲೆಕ್ಷನ್ ಲಭ್ಯವಿಲ್ಲ.",
+      curCol: "ಪ್ರಸ್ತುತ ಕಲೆಕ್ಷನ್",
+      hiddenTag: " (ಮರೆಮಾಡಲಾಗಿದೆ)",
+      selectCol: "ಕಲೆಕ್ಷನ್ ಆಯ್ಕೆಮಾಡಿ",
+      offer: "ವಾಗ್ದಾನ",
+      paid: "ಪಾವತಿಸಲಾಗಿದೆ",
+      pending: "ಬಾಕಿ",
+      receivedCentral: "ಕೇಂದ್ರ ಸಮಿತಿಗೆ ತಲುಪಿದ್ದು",
+      withLeaders: "ಲೀಡರ್‌ಗಳ ಬಳಿ ಇರುವುದು",
+      withLeader: "ಲೀಡರ್ ಬಳಿ ಇರುವುದು",
+      toPay: "ಪಾವತಿಸಲು ಬಾಕಿ",
+      loginSub: "ಲಾಗಿನ್ ಮಾಡಿ",
+      member: "ಸದಸ್ಯ",
+      batchLeader: "ಬ್ಯಾಚ್ ಲೀಡರ್",
+      admin: "ಅಡ್ಮಿನ್",
+      choose: "ಆಯ್ಕೆಮಾಡಿ",
+      batch: "ಬ್ಯಾಚ್",
+      batchNum: "ಬ್ಯಾಚ್ ಸಂಖ್ಯೆ",
+      mobileNum: "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+      username: "ಯೂಸರ್ ನೇಮ್",
+      password: "ಪಾಸ್‌ವರ್ಡ್",
+      repeatPassword: "ಪಾಸ್‌ವರ್ಡ್ ದೃಢೀಕರಿಸಿ",
+      firstSetupMsg: "ಮೊದಲ ಬಳಕೆ: ಹೊಸ ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್ ಹೊಂದಿಸಿ.",
+      newAdminPwLabel: "ಹೊಸ ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್ (ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳು)",
+      setPwAndLogin: "ಪಾಸ್‌ವರ್ಡ್ ಹೊಂದಿಸಿ ಲಾಗಿನ್ ಮಾಡಿ",
+      loginBtn: "ಲಾಗಿನ್",
+      logoutBtn: "ಲಾಗೌಟ್",
+      errPwMin6: "ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳನ್ನು ಹೊಂದಿರಬೇಕು.",
+      errPwMismatch: "ಎರಡೂ ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಒಂದೇ ಆಗಿಲ್ಲ.",
+      errWrongPw: "ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ.",
+      errCheckLeader: "ಯೂಸರ್ ನೇಮ್, ಮೊಬೈಲ್ ಮತ್ತು ಪಾಸ್‌ವರ್ಡ್ ಪರಿಶೀಲಿಸಿ.",
+      errCheckMember: "ಬ್ಯಾಚ್, ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಮತ್ತು ಪಾಸ್‌ವರ್ಡ್ ಪರಿಶೀಲಿಸಿ.",
+      youTag: " (ನೀವು)",
+      completed: "ಪೂರ್ಣಗೊಂಡಿದೆ",
+      welcome: "ನಮಸ್ಕಾರ, ",
+      toLeaderPage: "ಲೀಡರ್ ಪುಟಕ್ಕೆ",
+      tabMyInfo: "ನನ್ನ ಮಾಹಿತಿ",
+      tabMyBatch: "ನನ್ನ ಬ್ಯಾಚ್",
+      tabGrandTotal: "ಗ್ರ್ಯಾಂಡ್ ಟೋಟಲ್",
+      yourColInfo: "ನಿಮ್ಮ ಕಲೆಕ್ಷನ್ ವಿವರಗಳು",
+      offerFullyPaid: "ವಾಗ್ದಾನ ಸಂಪೂರ್ಣವಾಗಿ ಪಾವತಿಸಲಾಗಿದೆ",
+      youNeedToPay: "ನೀವು ಪಾವತಿಸಬೇಕಾದ ಬಾಕಿ: ",
+      grandTotal: "ಗ್ರ್ಯಾಂಡ್ ಟೋಟಲ್",
+      batchesAndMembers: (b, m) => `${b} ಬ್ಯಾಚ್‌ಗಳು · ಒಟ್ಟು ${m} ಸದಸ್ಯರು`,
+      batchWiseInfo: "ಬ್ಯಾಚ್‌ವಾರು ವಿವರಗಳು",
+      yoursTag: " (ನಿಮ್ಮದು)",
+      yourBatchTag: " (ನಿಮ್ಮ ಬ್ಯಾಚ್)",
+      batchTotalInfo: b => `ಬ್ಯಾಚ್ ${b} · ಒಟ್ಟು ವಿವರಗಳು`,
+      totalMembersInBatch: n => `ಬ್ಯಾಚ್‌ನಲ್ಲಿರುವ ಒಟ್ಟು ಸದಸ್ಯರು: ${n}`,
+      batchMembersList: b => `ಬ್ಯಾಚ್ ${b} · ಸದಸ್ಯರ ಪಟ್ಟಿ`,
+      makeNewPledge: "ಹೊಸ ವಾಗ್ದಾನ ಮಾಡಿ",
+      pledgeDescLeader: "ವಾಗ್ದಾನ ಮಾಡುವ ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ ಬಟನ್ ಒತ್ತಿದರೆ ನಿಮ್ಮ ವಿವರಗಳು ಮತ್ತು ಮೊತ್ತ ಬ್ಯಾಚ್ ಲೀಡರ್ ವಾಟ್ಸಾಪ್‌ಗೆ ಸಂದೇಶ ಕಳುಹಿಸಲು ತೆರೆಯುತ್ತದೆ.",
+      pledgeDescNoLeader: "ನಿಮ್ಮ ಬ್ಯಾಚ್‌ಗೆ ಇನ್ನೂ ಲೀಡರ್ ನೇಮಿಸಲಾಗಿಲ್ಲ.",
+      pledgeAmtLabel: "ವಾಗ್ದಾನ ಮಾಡುವ ಮೊತ್ತ (₹)",
+      pledgeAmtPh: "ಮೊತ್ತ ನಮೂದಿಸಿ (₹)",
+      pledgeWaBtn: "💬 ವಾಗ್ದಾನ ಮಾಡಿ (WhatsApp)",
+      errEnterPledgeAmt: "ದಯವಿಟ್ಟು ಸರಿಯಾದ ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ.",
+      errNoLeaderWa: "ನಿಮ್ಮ ಬ್ಯಾಚ್‌ಗೆ ಲೀಡರ್ ಅಥವಾ ವಾಟ್ಸಾಪ್ ಸಂಖ್ಯೆ ಇನ್ನೂ ನಿಗದಿಯಾಗಿಲ್ಲ.",
+      confirmLeaderPw: "ದೃಢೀಕರಿಸಲು ನಿಮ್ಮ ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ",
+      confirmAdminPw: "ದೃಢೀಕರಿಸಲು ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ",
+      confirmSaveBtn: "ಖಚಿತ, ಸೇವ್ ಮಾಡಿ",
+      goBackBtn: "ಹಿಂದಕ್ಕೆ ಹೋಗಿ",
+      receivable: "ಬರಬೇಕಾದ ಬಾಕಿ",
+      editBtn: "ತಿದ್ದುಪಡಿ",
+      searchMembers: "ಸದಸ್ಯರನ್ನು ಹುಡುಕಿ",
+      searchPh: scope => "ಹೆಸರು, ಮೊಬೈಲ್, ಸ್ಥಳ" + (scope ? "" : ", ಬ್ಯಾಚ್") + "…",
+      nothingFound: "ಯಾವುದೇ ಮಾಹಿತಿ ಕಂಡುಬಂದಿಲ್ಲ.",
+      first30Only: "ಮೊದಲ 30 ಫಲಿತಾಂಶಗಳು ಮಾತ್ರ. ಹುಡುಕಾಟವನ್ನು ಇನ್ನಷ್ಟು ಸ್ಪಷ್ಟಪಡಿಸಿ.",
+      addNewMemberBtn: "+ ಹೊಸ ಸದಸ್ಯರನ್ನು ಸೇರಿಸಿ",
+      editMemberTitle: "ಸದಸ್ಯರ ವಿವರ ತಿದ್ದುಪಡಿ",
+      newMemberTitle: "ಹೊಸ ಸದಸ್ಯ",
+      appliesToCol: "ವಾಗ್ದಾನ ಮತ್ತು ಪಾವತಿಸಿದ ಮೊತ್ತ ಅನ್ವಯವಾಗುವುದು: ",
+      nameEnLabel: "ಹೆಸರು (English)",
+      placeEnLabel: "ಸ್ಥಳ (English)",
+      distEnLabel: "ಜಿಲ್ಲೆ (English)",
+      offerRsLabel: "ವಾಗ್ದಾನ (₹)",
+      receivedCentralRsLabel: "ಕೇಂದ್ರ ಸಮಿತಿಗೆ ತಲುಪಿದ್ದು (₹)",
+      adminOnlyNote: e => `ಕೇಂದ್ರ ಸಮಿತಿಗೆ ತಲುಪಿದ್ದು: ${e} (ಅಡ್ಮಿನ್ ಮಾತ್ರ ಸೇರಿಸುತ್ತಾರೆ)`,
+      pwOnlyIfChange: "ಬದಲಾಯಿಸಬೇಕಿದ್ದರೆ ಮಾತ್ರ",
+      loginPwPh: "ಲಾಗಿನ್ ಪಾಸ್‌ವರ್ಡ್",
+      errReqMemberFields: id => "ಹೆಸರು, ಮೊಬೈಲ್" + (id ? "" : ", ಪಾಸ್‌ವರ್ಡ್") + " ಕಡ್ಡಾಯವಾಗಿದೆ.",
+      errEnglishOnly: "ಹೆಸರು, ಸ್ಥಳ ಮತ್ತು ಜಿಲ್ಲೆಯನ್ನು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ (English) ಮಾತ್ರ ನಮೂದಿಸಬೇಕು.",
+      errDupMobileBatch: "ಈ ಬ್ಯಾಚ್‌ನಲ್ಲಿ ಈ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಈಗಾಗಲೇ ಇದೆ.",
+      confirmEditMember: "ಬದಲಾವಣೆಗಳನ್ನು ದೃಢೀಕರಿಸಿ",
+      confirmNewMember: "ಹೊಸ ಸದಸ್ಯರನ್ನು ದೃಢೀಕರಿಸಿ",
+      saveBtn: "ಸೇವ್",
+      cancelBtn: "ರದ್ದುಮಾಡಿ",
+      removeBtn: "ತೆಗೆದುಹಾಕಿ",
+      confirmRemoveMember: "ಈ ಸದಸ್ಯರನ್ನು ತೆಗೆದುಹಾಕಬೇಕೇ?",
+      removedTag: "(ತೆಗೆದುಹಾಕಲಾಗಿದೆ)",
+      handedToAdmin: "ಅಡ್ಮಿನ್‌ಗೆ ಹಸ್ತಾಂತರಿಸಲಾಗಿದೆ",
+      viewMyMemberInfo: "👤 ನನ್ನ ವೈಯಕ್ತಿಕ ವಿವರಗಳನ್ನು (ಸದಸ್ಯರಾಗಿ) ನೋಡಿ",
+      howToViewAsMember: (b, m) => `ಸದಸ್ಯರಾಗಿ ನೋಡಲು: ಬ್ಯಾಚ್ ${b} ರಲ್ಲಿ ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯೊಂದಿಗೆ (${m}) ಸದಸ್ಯರನ್ನು ಸೇರಿಸಿ.`,
+      tabTotal: "ಟೋಟಲ್",
+      tabAddCash: "ಆಡ್ ಕ್ಯಾಶ್",
+      tabMembers: "ಸದಸ್ಯರು",
+      tabBatches: "ಬ್ಯಾಚ್‌ಗಳು",
+      tabBatch: "ಬ್ಯಾಚ್",
+      tabHandover: "ಹಸ್ತಾಂತರ",
+      tabSettings: "ಸೆಟ್ಟಿಂಗ್",
+      yourBatchAccount: b => `ನಿಮ್ಮ ಬ್ಯಾಚ್ (${b}) ಲೆಕ್ಕ`,
+      addReceivedCashTitle: "ಪಡೆದ ಮೊತ್ತವನ್ನು ಸೇರಿಸಿ (Add Cash)",
+      memberLabel: "ಸದಸ್ಯ",
+      selectMemberOpt: "ಸದಸ್ಯರನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+      amountLabel: "ಮೊತ್ತ",
+      noteLabel: "ಟಿಪ್ಪಣಿ",
+      notePh: "ಟಿಪ್ಪಣಿ (ಐಚ್ಛಿಕ)",
+      addCashBtn: "ಮೊತ್ತ ಸೇರಿಸಿ",
+      addPledgeTitle: "ವಾಗ್ದಾನ ಸೇರಿಸಿ (Add Pledge)",
+      addPledgeBtn: "ವಾಗ್ದಾನ ಸೇರಿಸಿ",
+      confirmAddPledge: "ಈ ವಾಗ್ದಾನವನ್ನು ಸೇರಿಸಬೇಕೇ?",
+      willAddPledgeNote: (cur, nxt) => `ಪ್ರಸ್ತುತ ವಾಗ್ದಾನ ${cur} → ಹೊಸ ವಾಗ್ದಾನ ${nxt} ಆಗಿ ಬದಲಾಗುತ್ತದೆ.`,
+      errCashInput: "ಸದಸ್ಯರನ್ನು ಮತ್ತು ಸರಿಯಾದ ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ.",
+      confirmAddCash: "ಈ ಮೊತ್ತವನ್ನು ಸೇರಿಸಬೇಕೇ?",
+      willRecordWithLeader: "ಈ ಮೊತ್ತವು ಲೀಡರ್ ಬಳಿ ಇದೆ ಎಂದು ದಾಖಲಾಗುತ್ತದೆ.",
+      cashRecordsTitle: "ಹಣದ ದಾಖಲೆಗಳು",
+      noRecordsYet: "ಇನ್ನೂ ಯಾವುದೇ ದಾಖಲೆಗಳಿಲ್ಲ.",
+      confirmDelRecord: "ಈ ದಾಖಲೆಯನ್ನು ತೆಗೆದುಹಾಕಬೇಕೇ?",
+      batchMembersCount: (b, n) => `ಬ್ಯಾಚ್ ${b} ಸದಸ್ಯರು (${n})`,
+      noMembersYet: "ಇನ್ನೂ ಸದಸ್ಯರನ್ನು ಸೇರಿಸಲಾಗಿಲ್ಲ.",
+      batchesInfoTitle: "ಬ್ಯಾಚ್‌ಗಳ ವಿವರಗಳು",
+      editLeaderTitle: "ಲೀಡರ್ ವಿವರ ತಿದ್ದುಪಡಿ",
+      newLeaderTitle: "ಹೊಸ ಬ್ಯಾಚ್ ಲೀಡರ್",
+      step1SelectBatch: "1. ಬ್ಯಾಚ್ ಆಯ್ಕೆಮಾಡಿ",
+      step2SelectMember: "2. ಬ್ಯಾಚ್‌ನ ಸದಸ್ಯರನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+      step3LeaderUser: "3. ಲೀಡರ್ ಯೂಸರ್ ನೇಮ್ (Username)",
+      waNumLabel: "ವಾಟ್ಸಾಪ್ ಸಂಖ್ಯೆ",
+      waNumPh: "ಖಾಲಿ ಬಿಟ್ಟರೆ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಬಳಸಲಾಗುತ್ತದೆ",
+      leaderPwPh: "ಲೀಡರ್ ಪಾಸ್‌ವರ್ಡ್ (ಸದಸ್ಯರ ಪಾಸ್‌ವರ್ಡ್‌ಗಿಂತ ಭಿನ್ನವಾಗಿರಲಿ)",
+      optOtherMobile: "— ಬೇರೆ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನಮೂದಿಸಿ —",
+      optNoMembersInBatch: "— ಈ ಬ್ಯಾಚ್‌ನಲ್ಲಿ ಸದಸ್ಯರಿಲ್ಲ (ಸಂಖ್ಯೆ ನಮೂದಿಸಿ) —",
+      errLeaderReq: "ಯೂಸರ್ ನೇಮ್ ಮತ್ತು ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಕಡ್ಡಾಯವಾಗಿದೆ.",
+      errNewLeaderPwReq: "ಹೊಸ ಲೀಡರ್‌ಗೆ ಪಾಸ್‌ವರ್ಡ್ ಕಡ್ಡಾಯವಾಗಿದೆ.",
+      errDupLeader: "ಈ ಯೂಸರ್ ನೇಮ್ ಅಥವಾ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಬೇರೊಬ್ಬ ಲೀಡರ್‌ಗೆ ಇದೆ.",
+      errLeaderPwMin4: "ಲೀಡರ್ ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 4 ಅಕ್ಷರಗಳನ್ನು ಹೊಂದಿರಬೇಕು.",
+      errLeaderPwDiff: "ಲೀಡರ್ ಪಾಸ್‌ವರ್ಡ್ ಸದಸ್ಯರ ಪಾಸ್‌ವರ್ಡ್‌ಗಿಂತ ಭಿನ್ನವಾಗಿರಬೇಕು.",
+      confirmEditLeader: "ಲೀಡರ್ ಬದಲಾವಣೆಗಳನ್ನು ದೃಢೀಕರಿಸಿ",
+      confirmNewLeader: "ಹೊಸ ಲೀಡರ್ ಅನ್ನು ದೃಢೀಕರಿಸಿ",
+      confirmRemoveLeader: "ಈ ಲೀಡರ್ ಅನ್ನು ತೆಗೆದುಹಾಕಬೇಕೇ?",
+      changeAdminPwForced: "ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಿ (ಕಡ್ಡಾಯ)",
+      changeAdminPwTitle: "ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಿ",
+      forcedPwNote: "ಪ್ರಸ್ತುತ ಪಾಸ್‌ವರ್ಡ್ ಡೀಫಾಲ್ಟ್ ಆಗಿದೆ. ಮುಂದುವರಿಯುವ ಮೊದಲು ಹೊಸ ಪಾಸ್‌ವರ್ಡ್ ಹೊಂದಿಸಿ.",
+      curPwLabel: "ಪ್ರಸ್ತುತ ಪಾಸ್‌ವರ್ಡ್",
+      newPwLabel: "ಹೊಸ ಪಾಸ್‌ವರ್ಡ್",
+      errCurPwWrong: "ಪ್ರಸ್ತುತ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ.",
+      errNoDefaultPw: "ಡೀಫಾಲ್ಟ್ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಮತ್ತೆ ಬಳಸಬೇಡಿ.",
+      adminPwChanged: "ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಲಾಗಿದೆ.",
+      changePwBtn: "ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಿ",
+      collectionsTitle: "ಕಲೆಕ್ಷನ್‌ಗಳು",
+      visibleNowLabel: "ಸದಸ್ಯರು ಮತ್ತು ಲೀಡರ್‌ಗಳಿಗೆ ಪ್ರಸ್ತುತ ಕಾಣಿಸುತ್ತಿರುವುದು: ",
+      hiddenNowLabel: "ಮರೆಮಾಡಲ್ಪಟ್ಟವು (ಅಡ್ಮಿನ್‌ಗೆ ಮಾತ್ರ ಕಾಣಿಸುತ್ತದೆ): ",
+      noneText: "ಯಾವುದೂ ಇಲ್ಲ",
+      hiddenPill: "ಮರೆಮಾಡಲಾಗಿದೆ · ಸದಸ್ಯರಿಗೆ ಕಾಣಿಸುವುದಿಲ್ಲ",
+      visiblePill: "ಸದಸ್ಯರಿಗೆ ಕಾಣಿಸುತ್ತದೆ",
+      showBtn: "ತೋರಿಸಿ",
+      hideBtn: "ಮರೆಮಾಡಿ",
+      confirmShowCol: "ಸದಸ್ಯರಿಗೆ ತೋರಿಸಬೇಕೇ?",
+      confirmHideCol: "ಸದಸ್ಯರಿಂದ ಮರೆಮಾಡಬೇಕೇ?",
+      showColDesc: "ಎಲ್ಲಾ ಸದಸ್ಯರು ಮತ್ತು ಲೀಡರ್‌ಗಳು ಈ ಕಲೆಕ್ಷನ್ ನೋಡಬಹುದು.",
+      hideColDesc: "ಸದಸ್ಯರು ಮತ್ತು ಲೀಡರ್‌ಗಳಿಗೆ ಈ ಕಲೆಕ್ಷನ್ ಕಾಣಿಸುವುದಿಲ್ಲ.",
+      confirmDelCol: "ಕಲೆಕ್ಷನ್ ಅನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಅಳಿಸಬೇಕೇ?",
+      delColWarn: "ಈ ಕಲೆಕ್ಷನ್‌ನ ಎಲ್ಲಾ ಮಾಹಿತಿಗಳು ಶಾಶ್ವತವಾಗಿ ಅಳಿಸಿಹೋಗುತ್ತವೆ.",
+      addNewColTitle: "ಹೊಸ ಕಲೆಕ್ಷನ್ ಸೇರಿಸಿ",
+      colNameLabel: "ಕಲೆಕ್ಷನ್ ಹೆಸರು",
+      showImmediatelyLabel: "ಸೇರಿಸಿದ ತಕ್ಷಣ ಸದಸ್ಯರಿಗೆ ತೋರಿಸಿ",
+      errColNameReq: "ಕಲೆಕ್ಷನ್ ಹೆಸರನ್ನು ನಮೂದಿಸಿ.",
+      errColExists: "ಈ ಹೆಸರಿನ ಕಲೆಕ್ಷನ್ ಈಗಾಗಲೇ ಇದೆ.",
+      confirmNewCol: "ಹೊಸ ಕಲೆಕ್ಷನ್ ಸೇರಿಸಬೇಕೇ?",
+      willShowImmediate: "ಸೇರಿಸಿದ ತಕ್ಷಣ ಸದಸ್ಯರಿಗೆ ಕಾಣಿಸುತ್ತದೆ.",
+      willAddHidden: "ಮರೆಮಾಡಿದ ಸ್ಥಿತಿಯಲ್ಲಿ ಸೇರಿಸಲಾಗುತ್ತದೆ.",
+      addColBtn: "ಕಲೆಕ್ಷನ್ ಸೇರಿಸಿ",
+      testModeBadge: "● ಟೆಸ್ಟ್ ಮೋಡ್",
+      liveDbBadge: "● ಲೈವ್ ಡೇಟಾಬೇಸ್",
+      localModeBadge: "● ಲೋಕಲ್ ಮೋಡ್",
+      exportReportBtn: "📥 ವರದಿ (CSV/Excel)",
+      batchFullDetailsTitle: "ಬ್ಯಾಚ್‌ವಾರು ಪೂರ್ಣ ವಿವರಗಳು",
+      batchFullDetailsSub: n => `ಒಟ್ಟು ${n} ಬ್ಯಾಚ್‌ಗಳು · ಪ್ರತಿ ಬ್ಯಾಚ್‌ನ ವಾಗ್ದಾನ, ಸಮಿತಿಗೆ ತಲುಪಿದ್ದು, ಲೀಡರ್ ಬಳಿ ಇರುವುದು ಮತ್ತು ಬಾಕಿ ವಿವರಗಳನ್ನು ಕೆಳಗೆ ನೋಡಬಹುದು.`,
+      leaderLabel: "ಲೀಡರ್: ",
+      leaderNotAssigned: "ಲೀಡರ್ ನೇಮಿಸಲಾಗಿಲ್ಲ",
+      fullyReceivedPill: "ಸಂಪೂರ್ಣವಾಗಿ ತಲುಪಿದೆ",
+      membersCountPill: n => `${n} ಸದಸ್ಯರು`,
+      cashWithLeadersTitle: "ಲೀಡರ್‌ಗಳ ಬಳಿ ಇರುವ ಮೊತ್ತ",
+      cashWithLeadersSub: "ಹಣ ನಿಮಗೆ ತಲುಪಿದ ನಂತರ 'ತಲುಪಿದೆ' ಒತ್ತಿರಿ. ಆಗ ಮಾತ್ರ ಅದು ಗ್ರ್ಯಾಂಡ್ ಟೋಟಲ್‌ಗೆ ಸೇರುತ್ತದೆ.",
+      noPendingHandover: "ಪ್ರಸ್ತುತ ಹಸ್ತಾಂತರಿಸಲು ಬಾಕಿ ಇರುವ ಮೊತ್ತವಿಲ್ಲ.",
+      receivedBtn: "ತಲುಪಿದೆ",
+      allBatchReceivedBtn: t => `ಬ್ಯಾಚ್‌ನ ಎಲ್ಲವೂ ತಲುಪಿದೆ (${t})`,
+      confirmHandoverTitle: "ಈ ಮೊತ್ತ ತಲುಪಿದೆ ಎಂದು ಸೇರಿಸಬೇಕೇ?",
+      confirmHandoverLine: (tot, b) => `ಒಟ್ಟು ${tot} ಬ್ಯಾಚ್ ${b} ಮತ್ತು ಗ್ರ್ಯಾಂಡ್ ಟೋಟಲ್‌ನ ತಲುಪಿದ ಮೊತ್ತಕ್ಕೆ ಸೇರುತ್ತದೆ.`,
+      membersByBatchTitle: n => `ಬ್ಯಾಚ್‌ವಾರು ಸದಸ್ಯರು (${n} ಬ್ಯಾಚ್‌ಗಳು)`,
+      closeBtn: "ಮುಚ್ಚಿ",
+      viewMembersBtn: n => `ಸದಸ್ಯರನ್ನು ನೋಡಿ (${n})`,
+      confirmDelBatch: "ಈ ಬ್ಯಾಚ್ ಅನ್ನು ತೆಗೆದುಹಾಕಬೇಕೇ?",
+      delBatchLine: b => `ಬ್ಯಾಚ್ ${b} ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ.`,
+      batchLeadersTitle: "ಬ್ಯಾಚ್ ಲೀಡರ್‌ಗಳು",
+      noLeadersYet: "ಇನ್ನೂ ಲೀಡರ್‌ಗಳನ್ನು ಸೇರಿಸಲಾಗಿಲ್ಲ.",
+      addNewLeaderBtn: "+ ಹೊಸ ಲೀಡರ್ ಸೇರಿಸಿ",
+      addNewBatchTitle: "ಹೊಸ ಬ್ಯಾಚ್ ಸೇರಿಸಿ",
+      addBtn: "ಸೇರಿಸಿ",
+      errValidBatch: "ಸರಿಯಾದ ಬ್ಯಾಚ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.",
+      errBatchExists: b => `ಬ್ಯಾಚ್ ${b} ಈಗಾಗಲೇ ಇದೆ.`,
+      confirmNewBatch: "ಹೊಸ ಬ್ಯಾಚ್ ಸೇರಿಸಬೇಕೇ?",
+      nameLine: "ಹೆಸರು",
+      batchLine: "ಬ್ಯಾಚ್",
+      mobileLine: "ಮೊಬೈಲ್",
+      placeLine: "ಸ್ಥಳ",
+      pwWillChange: "ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಲಾಗುತ್ತದೆ",
+      pwWillSet: "ಪಾಸ್‌ವರ್ಡ್ ಹೊಂದಿಸಲಾಗುತ್ತದೆ",
+      noneLabel: "ಇಲ್ಲ"
+    }
+  };
+
+  let curLang = "ml";
+  try {
+    const savedL = localStorage.getItem(LANG_KEY);
+    if (savedL && I18N[savedL]) curLang = savedL;
+  } catch (e) {}
+
+  const t = (k, ...args) => {
+    const dict = I18N[curLang] || I18N.ml;
+    const val = dict[k] !== undefined ? dict[k] : I18N.ml[k];
+    return typeof val === "function" ? val(...args) : val;
+  };
+
+  const setLang = l => {
+    if (!I18N[l]) return;
+    curLang = l;
+    document.documentElement.lang = l;
+    try { localStorage.setItem(LANG_KEY, l); } catch (e) {}
+    render();
+  };
+
+  let db = null;
+  let cloudRef = null;
+  let isCloudConnected = false;
+
+  const sha = async s => {
+    try {
+      const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+      return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
+    } catch (e) {
+      return "x" + s;
+    }
+  };
+
+  const loadSession = () => {
+    for (const st of ["sessionStorage", "localStorage"]) {
+      try { const s = window[st].getItem(SESSION_KEY); if (s) return JSON.parse(s); } catch (e) {}
+    }
+    return {};
+  };
+
+  const saveSession = () => {
+    try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+    try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    try {
+      if (view.role) {
+        const st = view.role === "member" ? localStorage : sessionStorage;
+        st.setItem(SESSION_KEY, JSON.stringify({ role: view.role, user: view.user, asMember: view.asMember }));
+      }
+    } catch (e) {}
+  };
+
+  const V0 = {
+    role: null, user: null, tab: "member", err: "", open: null, edit: null,
+    editPw: "", editErr: "", confirm: null, cerr: "", q: "", bErr: "",
+    ledit: null, lErr: "", openB: null, cashErr: "", pledgeErr: "", col: "c1", lscroll: false, asMember: false,
+    mSec: "me", lSec: "total", oSec: "dash"
+  };
+
+  let view = { ...V0, ...loadSession() };
+
+  const defaultDB = async () => ({
+    admin: null,
+    batches: Array.from({ length: BATCH_COUNT }, (_, i) => i + 1),
+    collections: [{ id: "c1", name: FIRST_COLLECTION, hidden: false }],
+    donors: [],
+    leaders: [],
+    entries: []
+  });
+
+  const save = async () => {
+    try { localStorage.setItem(DATA_KEY, JSON.stringify(db)); } catch (e) {}
+    if (cloudRef) {
+      try { await setDoc(cloudRef, db); } catch (e) { console.error("Cloud save error:", e); }
+    }
+  };
+
+  const fmt = n => "₹" + Number(n || 0).toLocaleString("en-IN");
+  const sum = (l, k) => l.reduce((a, d) => a + Number(d[k] || 0), 0);
+  const O = d => Number(((d.cols || {})[view.col] || {}).offer || 0);
+  const R = d => Number(((d.cols || {})[view.col] || {}).received || 0);
+  const setC = (d, o, r) => { d.cols = d.cols || {}; d.cols[view.col] = { offer: o, received: r }; };
+  const sumO = l => l.reduce((a, d) => a + O(d), 0), sumR = l => l.reduce((a, d) => a + R(d), 0);
+  const visCols = () => (db.collections || []).filter(c => view.role === "owner" || !c.hidden);
+  const ensureCol = () => {
+    const v = visCols();
+    if (!v.some(c => c.id === view.col)) view.col = v.length ? v[v.length - 1].id : null;
+  };
+  const colName = () => {
+    const c = (db.collections || []).find(x => x.id === view.col);
+    return c ? c.name : "";
+  };
+
+  function h(tag, attrs, ...kids) {
+    const e = document.createElement(tag);
+    for (const k in (attrs || {})) {
+      const v = attrs[k];
+      if (k === "on") for (const ev in v) e.addEventListener(ev, v[ev]);
+      else if (k === "class") e.className = v;
+      else if (v !== false && v != null) e.setAttribute(k, v);
+    }
+    for (const c of kids.flat()) if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(c));
+    return e;
+  }
+
+  function langBar() {
+    const sel = h("select", {
+      id: "langSel",
+      "aria-label": t("selectLang"),
+      on: { change: () => setLang(sel.value) }
+    },
+      ...[["ml", "മലയാളം"], ["en", "English"], ["kn", "ಕನ್ನಡ"]].map(([code, label]) => {
+        const opt = h("option", { value: code }, label);
+        if (code === curLang) opt.selected = true;
+        return opt;
+      })
+    );
+    return h("div", { class: "lbar" },
+      h("span", null, "🌐 " + t("selectLang") + ":"),
+      sel
+    );
+  }
+
+  function navBar(items, activeKey, onSelect) {
+    return h("nav", { class: "nav", role: "tablist" },
+      ...items.map(it => h("button", {
+        type: "button",
+        role: "tab",
+        "aria-selected": activeKey === it.k ? "true" : "false",
+        class: activeKey === it.k ? "on" : "",
+        on: { click: () => onSelect(it.k) }
+      },
+        h("span", { class: "ic" }, it.ic),
+        h("span", null, it.l, it.badge ? h("span", { class: "nbadge" }, it.badge) : null)
+      ))
+    );
+  }
+
+  const NOCOL = () => h("div", { class: "card" }, h("div", { class: "mut" }, t("noCol")));
+
+  function collTabs(label) {
+    const v = visCols();
+    if (v.length <= 1 && view.role !== "owner") {
+      return v.length === 1
+        ? h("div", { class: "card", style: "padding:10px 14px;background:var(--pri);color:var(--onpri)" },
+            h("div", { style: "font-size:12px;opacity:0.85" }, t("curCol")),
+            h("div", { style: "font-weight:700;font-size:15px" }, v[0].name)
+          )
+        : null;
+    }
+    return h("div", { class: "card", style: "padding:12px" },
+      label && h("div", { class: "mut" }, label),
+      h("div", { class: "ctabs", role: "tablist" }, ...v.map(c =>
+        h("button", {
+          role: "tab",
+          "aria-selected": c.id === view.col ? "true" : "false",
+          class: c.id === view.col ? "on" : "",
+          on: {
+            click: () => {
+              view.col = c.id; view.edit = null; view.open = null;
+              view.openB = null; view.confirm = null; view.q = ""; view.ledit = null; render();
+            }
+          }
+        }, c.name + (c.hidden ? t("hiddenTag") : ""))
+      ))
+    );
+  }
+
+  const heldOf = f => (db.entries || []).filter(e => e.status === "held" && e.colId === view.col && f(e)).reduce((a, e) => a + e.amount, 0);
+  const heldD = id => heldOf(e => e.donorId === id);
+  const heldB = b => heldOf(e => e.batch === b);
+
+  const tiles = (o, r, hd, isGrand) => hd == null ? h("div", { class: "tiles" },
+    h("div", { class: "tile" }, h("div", { class: "l" }, t("offer")), h("div", { class: "v" }, fmt(o))),
+    h("div", { class: "tile r" }, h("div", { class: "l" }, t("paid")), h("div", { class: "v" }, fmt(r))),
+    h("div", { class: "tile p" }, h("div", { class: "l" }, t("pending")), h("div", { class: "v" }, fmt(Math.max(0, o - r))))
+  ) : h("div", { class: "tiles t4" },
+    h("div", { class: "tile" }, h("div", { class: "l" }, t("offer")), h("div", { class: "v" }, fmt(o))),
+    h("div", { class: "tile r" }, h("div", { class: "l" }, t("receivedCentral")), h("div", { class: "v" }, fmt(r))),
+    h("div", { class: "tile h" }, h("div", { class: "l" }, isGrand ? t("withLeaders") : t("withLeader")), h("div", { class: "v" }, fmt(hd))),
+    h("div", { class: "tile p" }, h("div", { class: "l" }, isGrand ? t("pending") : t("toPay")), h("div", { class: "v" }, fmt(Math.max(0, o - r - hd))))
+  );
+
+  const bar = (o, r) => h("div", { class: "bar" }, h("i", { style: "width:" + (o ? Math.min(100, r / o * 100) : 0) + "%" }));
+
+  function render() {
+    const app = document.getElementById("app");
+    app.replaceChildren();
+    if (!db) { app.append(langBar(), h("div", { class: "card" }, h("p", { class: "mut" }, t("loading")))); return; }
+    if (view.role) ensureCol();
+    if (!view.role) app.append(...loginView());
+    else if (view.role === "member" || (view.role === "leader" && view.asMember)) app.append(...memberView());
+    else if (view.role === "leader") app.append(...leaderView());
+    else app.append(...ownerView());
+
+    if (view.scroll) { view.scroll = false; const el = document.getElementById("en"); if (el) el.scrollIntoView({ block: "center" }); }
+    if (view.lscroll) { view.lscroll = false; const el = document.getElementById("lu"); if (el) el.scrollIntoView({ block: "center" }); }
+  }
+
+  function loginView() {
+    const tab = view.tab, f = {};
+    const mk = (id, lab, el) => h("label", { for: id }, lab, el);
+    f.batch = h("select", { id: "bt" }, h("option", { value: "" }, t("choose")), ...db.batches.map(b => h("option", { value: b }, t("batch") + " " + b)));
+    f.mobile = h("input", { id: "mb", type: "tel", inputmode: "numeric", autocomplete: "tel", placeholder: t("mobileNum") });
+    f.uid = h("input", { id: "ui", autocomplete: "username", placeholder: t("username") });
+    f.lm = h("input", { id: "lmb", type: "tel", inputmode: "numeric", autocomplete: "tel", placeholder: t("mobileNum") });
+    f.pw = h("input", { id: "pw", type: "password", autocomplete: "current-password", placeholder: t("password") });
+    f.pw2 = h("input", { id: "pw2", type: "password", autocomplete: "new-password", placeholder: t("repeatPassword") });
+    const setup = tab === "owner" && !db.admin;
+
+    const go = async () => {
+      view.err = "";
+      const p = await sha(f.pw.value);
+      if (tab === "owner") {
+        if (!db.admin) {
+          if (f.pw.value.length < 6) view.err = t("errPwMin6");
+          else if (f.pw.value !== f.pw2.value) view.err = t("errPwMismatch");
+          else { db.admin = p; await save(); view.role = "owner"; view.oSec = "dash"; saveSession(); }
+        } else if (p === db.admin) { view.role = "owner"; view.oSec = "dash"; saveSession(); }
+        else view.err = t("errWrongPw");
+      } else if (tab === "leader") {
+        const v = f.uid.value.trim().toLowerCase(), lm = f.lm.value.trim();
+        const l = db.leaders.find(x => x.username.toLowerCase() === v && x.mobile === lm && x.pw === p);
+        if (l) { view.role = "leader"; view.user = l.id; view.lSec = "total"; saveSession(); }
+        else view.err = t("errCheckLeader");
+      } else {
+        const b = Number(f.batch.value), m = f.mobile.value.trim();
+        const d = db.donors.find(x => x.batch === b && x.mobile === m && x.pw === p);
+        if (d) { view.role = "member"; view.user = d.id; view.mSec = "me"; saveSession(); }
+        else view.err = t("errCheckMember");
+      }
+      render();
+    };
+
+    const tb = (k, l) => h("button", { type: "button", class: tab === k ? "on" : "", on: { click: () => { view.tab = k; view.err = ""; render(); } } }, l);
+
+    return [
+      langBar(),
+      h("div", { class: "card" },
+        h("div", null, h("h1", null, "COLLECTIONS"), h("div", { class: "mut" }, t("loginSub"))),
+        h("div", { class: "tabs" }, tb("member", t("member")), tb("leader", t("batchLeader")), tb("owner", t("admin"))),
+        h("form", { class: "card", style: "border:0;padding:0", on: { submit: e => { e.preventDefault(); go(); } } },
+          tab === "member" && mk("bt", t("batchNum"), f.batch),
+          tab === "member" && mk("mb", t("mobileNum"), f.mobile),
+          tab === "leader" && mk("ui", t("username"), f.uid),
+          tab === "leader" && mk("lmb", t("mobileNum"), f.lm),
+          setup && h("div", { class: "mut" }, t("firstSetupMsg")),
+          mk("pw", setup ? t("newAdminPwLabel") : t("password"), f.pw),
+          setup && mk("pw2", t("repeatPassword"), f.pw2),
+          view.err && h("div", { class: "err", role: "alert" }, view.err),
+          h("button", { type: "submit" }, setup ? t("setPwAndLogin") : t("loginBtn"))
+        )
+      )
+    ];
+  }
+
+  const linked = l => db.donors.find(x => x.batch === l.batch && x.mobile === l.mobile);
+  const curDonor = () => view.asMember ? linked(me()) : db.donors.find(x => x.id === view.user);
+  const logout = () => h("button", {
+    class: "sec sm",
+    on: { click: () => { view = { ...V0 }; saveSession(); render(); } }
+  }, t("logoutBtn"));
+
+  function peerRow(p, isMe) {
+    const hd = heldD(p.id), pd = Math.max(0, O(p) - R(p) - hd);
+    const loc = [p.place, p.district].filter(Boolean).join(", ");
+    return h("div", { class: "peer" + (isMe ? " me" : "") },
+      h("div", { class: "row" }, h("b", null, p.name + (isMe ? t("youTag") : "")), pd <= 0 && O(p) > 0 ? h("span", { class: "pill ok" }, t("completed")) : h("span", { class: "pill" }, t("pending") + " " + fmt(pd))),
+      loc && h("div", { class: "mut" }, "📍 " + loc),
+      h("div", { class: "row mut num" }, h("span", null, t("offer") + " " + fmt(O(p))), h("span", null, t("receivedCentral") + " " + fmt(R(p)))),
+      hd > 0 && h("div", { class: "mut num" }, t("withLeader") + " " + fmt(hd))
+    );
+  }
+
+  /* ==================== MEMBER VIEW (3 SEPARATE SECTIONS) ==================== */
+  function memberView() {
+    const d = curDonor();
+    if (!d) {
+      if (view.role === "leader") { view.asMember = false; saveSession(); return leaderView(); }
+      view = { ...V0 }; saveSession(); return loginView();
+    }
+    
+    const mtop = h("div", { class: "top" },
+      h("div", null, h("div", { class: "mut" }, "COLLECTIONS"), h("h1", null, t("welcome") + d.name)),
+      h("div", { class: "row" }, view.asMember && h("button", { class: "sec sm", on: { click: () => { view.asMember = false; saveSession(); render(); } } }, t("toLeaderPage")), logout())
+    );
+
+    // Personal Information Card ALWAYS in English by default regardless of selected language
+    const batchLeader = db.leaders.find(x => x.batch === d.batch);
+    const leaderDonor = batchLeader ? db.donors.find(x => x.batch === d.batch && x.mobile === batchLeader.mobile) : null;
+    const leaderDisplayEn = batchLeader
+      ? (leaderDonor ? leaderDonor.name : batchLeader.username) + ` · ${batchLeader.mobile}`
+      : "Not assigned";
+
+    const placeTextEn = [d.place, d.district].filter(Boolean).join(", ") || "Not provided";
+    const profileCard = h("div", { class: "card", lang: "en" },
+      h("h2", { style: "font-family:'Inter',system-ui,sans-serif" }, "Personal Information · Profile"),
+      h("div", { class: "pgrid" },
+        h("div", { class: "pitem" }, h("div", { class: "pl" }, "Name"), h("div", { class: "pv" }, d.name)),
+        h("div", { class: "pitem" }, h("div", { class: "pl" }, "Mobile Number"), h("div", { class: "pv num" }, d.mobile)),
+        h("div", { class: "pitem" }, h("div", { class: "pl" }, "Place"), h("div", { class: "pv" }, placeTextEn)),
+        h("div", { class: "pitem" }, h("div", { class: "pl" }, "Batch Number"), h("div", { class: "pv" }, "Batch " + d.batch)),
+        h("div", { class: "pitem", style: "grid-column:1 / -1" }, h("div", { class: "pl" }, "Batch Leader"), h("div", { class: "pv" }, leaderDisplayEn))
+      )
+    );
+
+    if (!view.col) return [langBar(), mtop, profileCard, NOCOL()];
+
+    const nav = navBar([
+      { k: "me", ic: "👤", l: t("tabMyInfo") },
+      { k: "batch", ic: "👥", l: t("tabMyBatch") },
+      { k: "grand", ic: "📊", l: t("tabGrandTotal") }
+    ], view.mSec, k => { view.mSec = k; render(); });
+
+    const out = [langBar(), mtop, profileCard, collTabs(t("selectCol")), nav];
+
+    if (view.mSec === "me") {
+      const hd = heldD(d.id), pd = Math.max(0, O(d) - R(d) - hd);
+      out.push(
+        h("div", { class: "card mine" },
+          h("div", { class: "mut" }, colName()),
+          h("h2", null, t("yourColInfo")),
+          tiles(O(d), R(d), hd),
+          bar(O(d), R(d) + hd),
+          h("div", { class: "row" },
+            pd <= 0 && O(d) > 0
+              ? h("span", { class: "pill ok" }, t("offerFullyPaid"))
+              : h("span", { class: "pill" }, t("youNeedToPay") + fmt(pd))
+          )
+        )
+      );
+      out.push(pledgeCard(d));
+    } 
+    else if (view.mSec === "grand") {
+      const go = sumO(db.donors), gr = sumR(db.donors);
+      const totalHeld = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).reduce((a, e) => a + e.amount, 0);
+      out.push(
+        h("div", { class: "card" },
+          h("h2", null, t("grandTotal") + " · " + colName()),
+          tiles(go, gr, totalHeld, true),
+          bar(go, gr + totalHeld),
+          h("div", { class: "mut" }, t("batchesAndMembers", db.batches.length, db.donors.length))
+        ),
+        h("div", { class: "card" },
+          h("h2", null, t("batchWiseInfo")),
+          ...db.batches.map(x => {
+            const l = db.donors.filter(z => z.batch === x), o = sumO(l), r = sumR(l), bh = heldB(x), mine = x === d.batch;
+            return h("div", { class: "batch" + (mine ? " mine" : "") },
+              h("div", { class: "row" }, h("b", null, t("batch") + " " + x + (mine ? t("yoursTag") : "")), h("span", { class: "mut num" }, t("offer") + " " + fmt(o))),
+              h("div", { class: "row mut num" },
+                h("span", null, t("receivedCentral") + " " + fmt(r)),
+                h("span", null, t("withLeader") + " " + fmt(bh))
+              ),
+              h("div", { class: "row mut num" },
+                h("span", null, t("pending") + " " + fmt(Math.max(0, o - r - bh)))
+              ),
+              bar(o, r + bh)
+            );
+          })
+        )
+      );
+    } 
+    else if (view.mSec === "batch") {
+      const bl = db.donors.filter(x => x.batch === d.batch), bo = sumO(bl), br = sumR(bl), bh = heldB(d.batch);
+      out.push(
+        h("div", { class: "card" },
+          h("h2", null, t("batchTotalInfo", d.batch)),
+          tiles(bo, br, bh),
+          bar(bo, br + bh),
+          h("div", { class: "mut" }, t("totalMembersInBatch", bl.length))
+        ),
+        h("div", { class: "card" },
+          h("h2", null, t("batchMembersList", d.batch)),
+          ...bl.map(p => peerRow(p, p.id === d.id))
+        )
+      );
+    }
+
+    return out;
+  }
+
+  function fmtWaPhone(raw) {
+    let n = (raw || "").replace(/\D/g, "");
+    if (n.length === 10) n = "91" + n;
+    return n;
+  }
+
+  function pledgeCard(d) {
+    const l = db.leaders.find(x => x.batch === d.batch);
+    const leaderPhone = l ? fmtWaPhone(l.wa || l.mobile) : "";
+    const amt = h("input", { id: "pa", type: "number", inputmode: "numeric", min: 1, placeholder: t("pledgeAmtPh") });
+    const errEl = h("div", { class: "err", role: "alert", style: "display:none" });
+    const btn = h("a", { class: "btn", target: "_blank", rel: "noopener noreferrer", href: "#", style: "cursor:pointer" }, t("pledgeWaBtn"));
+    btn.addEventListener("click", ev => {
+      const v = Number(amt.value);
+      if (!(v > 0)) {
+        ev.preventDefault();
+        errEl.textContent = t("errEnterPledgeAmt");
+        errEl.style.display = "block";
+        return;
+      }
+      if (!l || !leaderPhone) {
+        ev.preventDefault();
+        errEl.textContent = t("errNoLeaderWa");
+        errEl.style.display = "block";
+        return;
+      }
+      errEl.style.display = "none";
+      const placeStr = [d.place, d.district].filter(Boolean).join(", ") || "Not provided";
+      const msg =
+        "Assalamu Alaikum,\n" +
+        "*COLLECTIONS - New Pledge*\n\n" +
+        "• *Collection:* " + colName() + "\n" +
+        "• *Name:* " + d.name + "\n" +
+        "• *Phone:* " + d.mobile + "\n" +
+        "• *Place:* " + placeStr + "\n" +
+        "• *Batch:* Batch " + d.batch + "\n" +
+        "• *Pledge Amount:* " + fmt(v);
+      const web = "https://wa.me/" + leaderPhone + "?text=" + encodeURIComponent(msg);
+      let framed = false;
+      try { framed = window.self !== window.top; } catch (e) { framed = true; }
+      if (framed) { btn.href = web; return; }
+      ev.preventDefault();
+      const deep = "whatsapp://send?phone=" + leaderPhone + "&text=" + encodeURIComponent(msg);
+      const fb = setTimeout(() => { if (!document.hidden) window.location.href = web; }, 1800);
+      document.addEventListener("visibilitychange", () => { if (document.hidden) clearTimeout(fb); }, { once: true });
+      window.location.href = deep;
+    });
+
+    amt.addEventListener("input", () => { errEl.style.display = "none"; });
+
+    return h("div", { class: "card" },
+      h("h2", null, t("makeNewPledge")),
+      h("p", { class: "sub" }, l ? t("pledgeDescLeader") : t("pledgeDescNoLeader")),
+      h("label", { for: "pa" }, t("pledgeAmtLabel"), amt),
+      errEl,
+      btn
+    );
+  }
+
+  /* ==================== SHARED HELPERS ==================== */
+  const me = () => view.role === "leader" ? db.leaders.find(x => x.id === view.user) : null;
+  const authHash = () => view.role === "leader" ? me().pw : db.admin;
+  const ask = c => { view.confirm = c; view.cerr = ""; render(); window.scrollTo(0, 0); };
+
+  function confirmCard() {
+    const c = view.confirm;
+    const ap = h("input", { id: "ap", type: "password", autocomplete: "off" });
+    const ok = async () => {
+      if (c.needPw && (await sha(ap.value)) !== authHash()) { view.cerr = t("errWrongPw"); render(); return; }
+      await c.run();
+      await save();
+      view.confirm = null; view.cerr = ""; render();
+    };
+    return h("div", { class: "card" }, h("h2", null, c.title),
+      h("div", { style: "display:grid;gap:4px" }, ...c.lines.map(l => h("div", { class: "num" }, l))),
+      c.needPw && h("label", { for: "ap" }, view.role === "leader" ? t("confirmLeaderPw") : t("confirmAdminPw"), ap),
+      view.cerr && h("div", { class: "err", role: "alert" }, view.cerr),
+      h("div", { class: "row" }, h("button", { on: { click: ok } }, t("confirmSaveBtn")), h("button", { class: "sec", on: { click: () => { view.confirm = null; view.cerr = ""; render(); } } }, t("goBackBtn")))
+    );
+  }
+
+  function memberRow(d, showBatch) {
+    const hd = heldD(d.id);
+    const loc = [d.place, d.district].filter(Boolean).join(", ");
+    return h("div", { class: "row", style: "border-top:1px dashed var(--line);padding-top:8px" },
+      h("div", { style: "min-width:0" },
+        h("div", null, h("b", null, d.name), showBatch ? " · " + t("batch") + " " + d.batch : null),
+        h("div", { class: "mut num" }, d.mobile + (loc ? " · 📍 " + loc : "")),
+        h("div", { class: "mut num" }, t("offer") + " " + fmt(O(d)) + " · " + t("receivedCentral") + " " + fmt(R(d)) + (hd ? " · " + t("withLeader") + " " + fmt(hd) : "") + " · " + t("receivable") + " " + fmt(Math.max(0, O(d) - R(d) - hd)))
+      ),
+      h("button", { class: "sec sm", on: { click: () => { view.edit = { ...d, offer: O(d), received: R(d) }; view.editPw = ""; view.editErr = ""; view.scroll = true; render(); } } }, t("editBtn"))
+    );
+  }
+
+  function searchCard(scope) {
+    const res = h("div", { style: "display:grid;gap:10px" });
+    const qi = h("input", { id: "q", type: "search", placeholder: t("searchPh", scope), value: view.q || "" });
+    const run = () => {
+      view.q = qi.value;
+      const q = view.q.trim().toLowerCase();
+      res.replaceChildren();
+      if (!q) return;
+      const m = db.donors.filter(d => (scope ? d.batch === scope : true) && (d.name.toLowerCase().includes(q) || d.mobile.includes(q) || (d.place || "").toLowerCase().includes(q) || (d.district || "").toLowerCase().includes(q) || (!scope && String(d.batch) === q)));
+      if (!m.length) res.append(h("div", { class: "mut" }, t("nothingFound")));
+      m.slice(0, 30).forEach(d => res.append(memberRow(d, !scope)));
+      if (m.length > 30) res.append(h("div", { class: "mut" }, t("first30Only")));
+    };
+    qi.addEventListener("input", run); run();
+    return h("div", { class: "card" }, h("h2", null, t("searchMembers")), qi, res);
+  }
+
+  function addMemberUI(scope) {
+    return view.edit ? editForm() : h("button", { on: { click: () => { view.edit = { id: null, name: "", mobile: "", place: "", district: "", batch: scope || view.open || db.batches[0] || 1, offer: 0, received: 0 }; view.editPw = ""; view.editErr = ""; view.scroll = true; render(); } } }, t("addNewMemberBtn"));
+  }
+
+  function editForm() {
+    const e = view.edit, f = {}, lead = view.role === "leader", LB = lead ? me().batch : null;
+    const isEnglishOnly = s => /^[A-Za-z0-9\s.,'()\-/&]+$/.test(s);
+    f.name = h("input", { id: "en", placeholder: "Full Name (English only)", value: e.name || "" });
+    f.mobile = h("input", { id: "em", type: "tel", inputmode: "numeric", placeholder: t("mobileNum"), value: e.mobile || "" });
+    f.place = h("input", { id: "epl", placeholder: "Place (e.g. Irikkur)", value: e.place || "" });
+    f.dist = h("input", { id: "eds", placeholder: "District (e.g. Kannur)", value: e.district || "" });
+    f.batch = h("select", { id: "eb" }, ...(lead ? [LB] : db.batches).map(b => { const o = h("option", { value: b }, t("batch") + " " + b); if (b === Number(e.batch)) o.selected = true; return o; }));
+    f.offer = h("input", { id: "eo", type: "number", inputmode: "numeric", min: 0, value: e.offer });
+    f.rec = h("input", { id: "er", type: "number", inputmode: "numeric", min: 0, value: e.received });
+    f.pw = h("input", { id: "ep", type: "text", placeholder: e.id ? t("pwOnlyIfChange") : t("loginPwPh"), autocomplete: "off", value: view.editPw || "" });
+    const L = (i, t, c) => h("label", { for: i }, t, c);
+
+    return h("form", {
+      class: "card",
+      on: {
+        submit: ev => {
+          ev.preventDefault();
+          const old = e.id ? db.donors.find(x => x.id === e.id) : null;
+          const rec = {
+            name: f.name.value.trim(),
+            mobile: f.mobile.value.trim(),
+            place: f.place.value.trim(),
+            district: f.dist.value.trim(),
+            batch: lead ? LB : Number(f.batch.value),
+            offer: Number(f.offer.value) || 0,
+            received: lead ? (old ? R(old) : 0) : (Number(f.rec.value) || 0)
+          };
+          const pwText = f.pw.value;
+          view.edit = { ...e, ...rec }; view.editPw = pwText;
+          if (!rec.name || !rec.mobile || (!e.id && !pwText)) { view.editErr = t("errReqMemberFields", e.id); render(); return; }
+          if (!isEnglishOnly(rec.name) || (rec.place && !isEnglishOnly(rec.place)) || (rec.district && !isEnglishOnly(rec.district))) {
+            view.editErr = t("errEnglishOnly");
+            render(); return;
+          }
+          if (db.donors.some(x => x.batch === rec.batch && x.mobile === rec.mobile && x.id !== e.id)) { view.editErr = t("errDupMobileBatch"); render(); return; }
+          view.editErr = "";
+          const sens = !old || old.name !== rec.name || old.mobile !== rec.mobile || old.batch !== rec.batch || (old.place || "") !== rec.place || (old.district || "") !== rec.district || !!pwText;
+          const locNew = [rec.place, rec.district].filter(Boolean).join(", ");
+          const locOld = old ? [old.place, old.district].filter(Boolean).join(", ") : "";
+          const lines = [];
+          if (!old) {
+            lines.push(`${t("newMemberTitle")}: ${rec.name} · ${t("batch")} ${rec.batch} · ${rec.mobile}`);
+            if (locNew) lines.push(`${t("placeLine")}: ${locNew}`);
+          } else {
+            lines.push(`${old.name} · ${t("batch")} ${old.batch}`);
+            if (old.name !== rec.name) lines.push(`${t("nameLine")}: ${old.name} → ${rec.name}`);
+            if (old.batch !== rec.batch) lines.push(`${t("batchLine")}: ${old.batch} → ${rec.batch}`);
+            if (old.mobile !== rec.mobile) lines.push(`${t("mobileLine")}: ${old.mobile} → ${rec.mobile}`);
+            if (locOld !== locNew) lines.push(`${t("placeLine")}: ${locOld || t("noneLabel")} → ${locNew || t("noneLabel")}`);
+            if (pwText) lines.push(t("pwWillChange"));
+          }
+          if (!old || O(old) !== rec.offer) lines.push(`${t("offer")}: ${old ? fmt(O(old)) + " → " : ""}${fmt(rec.offer)}`);
+          if (!old || R(old) !== rec.received) lines.push(`${t("receivedCentral")}: ${old ? fmt(R(old)) + " → " : ""}${fmt(rec.received)}`);
+          lines.push(`${t("pending")}: ${fmt(Math.max(0, rec.offer - rec.received))}`);
+          if (old && lines.length <= 2) { view.edit = null; render(); return; }
+          ask({
+            title: old ? t("confirmEditMember") : t("confirmNewMember"),
+            lines, needPw: sens,
+            run: async () => {
+              if (old) {
+                old.name = rec.name; old.mobile = rec.mobile; old.place = rec.place; old.district = rec.district; old.batch = rec.batch;
+                setC(old, rec.offer, rec.received);
+                if (pwText) old.pw = await sha(pwText);
+              } else {
+                const nd = { id: "d" + Date.now(), name: rec.name, mobile: rec.mobile, place: rec.place, district: rec.district, batch: rec.batch, pw: await sha(pwText), cols: {} };
+                setC(nd, rec.offer, rec.received);
+                db.donors.push(nd);
+              }
+              view.edit = null; view.editPw = "";
+            }
+          });
+        }
+      }
+    },
+      h("h2", null, e.id ? t("editMemberTitle") : t("newMemberTitle")),
+      h("div", { class: "mut" }, t("appliesToCol") + colName()),
+      L("en", t("nameEnLabel"), f.name),
+      h("div", { class: "g2" }, L("eb", t("batch"), f.batch), L("em", t("mobileNum"), f.mobile)),
+      h("div", { class: "g2" }, L("epl", t("placeEnLabel"), f.place), L("eds", t("distEnLabel"), f.dist)),
+      h("div", { class: "g2" }, L("eo", t("offerRsLabel"), f.offer), lead ? h("div", { class: "mut" }, t("adminOnlyNote", fmt(e.received))) : L("er", t("receivedCentralRsLabel"), f.rec)),
+      L("ep", t("password"), f.pw),
+      view.editErr && h("div", { class: "err", role: "alert" }, view.editErr),
+      h("div", { class: "row" },
+        h("button", { type: "submit" }, t("saveBtn")),
+        h("button", { type: "button", class: "sec", on: { click: () => { view.edit = null; view.editErr = ""; render(); } } }, t("cancelBtn")),
+        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveMember"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`], needPw: true, run: () => { db.donors = db.donors.filter(x => x.id !== e.id); db.entries = db.entries.filter(x => x.donorId !== e.id); view.edit = null; } }) } }, t("removeBtn"))
+      )
+    );
+  }
+
+  function entryRow(en, actions) {
+    const d = db.donors.find(x => x.id === en.donorId);
+    return h("div", { class: "ent" },
+      h("div", { style: "min-width:0" }, h("div", { class: "num" }, (d ? d.name : t("removedTag")) + " · " + fmt(en.amount)), h("div", { class: "mut" }, en.at + (en.note ? " · " + en.note : ""))),
+      h("div", { class: "row" }, en.status === "held" ? h("span", { class: "pill am" }, t("withLeader")) : h("span", { class: "pill ok" }, t("handedToAdmin")), actions)
+    );
+  }
+
+  /* ==================== LEADER VIEW ==================== */
+  function leaderView() {
+    const l = me();
+    if (!l) { view = { ...V0 }; saveSession(); return loginView(); }
+    const b = l.batch, bl = db.donors.filter(x => x.batch === b), bo = sumO(bl), br = sumR(bl), bh = heldB(b);
+    const go = sumO(db.donors), gr = sumR(db.donors);
+    const totalHeldAll = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).reduce((a, e) => a + e.amount, 0);
+
+    const top = h("div", { class: "top" },
+      h("div", null, h("div", { class: "mut" }, t("batchLeader") + " · " + l.username), h("h1", null, t("batch") + " " + b)),
+      logout()
+    );
+    if (view.confirm) return [langBar(), top, confirmCard()];
+    if (!view.col) return [langBar(), top, NOCOL()];
+
+    const ld = linked(l);
+    const asM = ld
+      ? h("button", { class: "sec sm", style: "width:100%", on: { click: () => { view.asMember = true; view.mSec = "me"; view.edit = null; view.confirm = null; saveSession(); render(); window.scrollTo(0, 0); } } }, t("viewMyMemberInfo"))
+      : h("div", { class: "mut" }, t("howToViewAsMember", b, l.mobile));
+
+    const nav = navBar([
+      { k: "total", ic: "📊", l: t("tabTotal") },
+      { k: "cash", ic: "💵", l: t("tabAddCash") },
+      { k: "members", ic: "👥", l: `${t("tabMembers")} (${bl.length})` },
+      { k: "batches", ic: "🎓", l: t("tabBatches") }
+    ], view.lSec, k => { view.lSec = k; view.edit = null; render(); });
+
+    const out = [langBar(), top, asM, collTabs(t("selectCol")), nav];
+
+    if (view.lSec === "total") {
+      out.push(
+        h("div", { class: "card" },
+          h("h2", null, t("grandTotal") + " · " + colName()),
+          tiles(go, gr, totalHeldAll, true),
+          bar(go, gr + totalHeldAll),
+          h("div", { class: "mut" }, t("batchesAndMembers", db.batches.length, db.donors.length))
+        ),
+        h("div", { class: "card" },
+          h("h2", null, t("yourBatchAccount", b)),
+          tiles(bo, br, bh),
+          bar(bo, br + bh)
+        )
+      );
+    }
+    else if (view.lSec === "cash") {
+      const sel = h("select", { id: "cm" }, h("option", { value: "" }, t("selectMemberOpt")), ...bl.map(d => h("option", { value: d.id }, d.name + " · " + d.mobile)));
+      const amt = h("input", { id: "ca", type: "number", inputmode: "numeric", min: 1, placeholder: t("pledgeAmtPh") });
+      const note = h("input", { id: "cn", placeholder: t("notePh") });
+
+      out.push(
+        h("form", {
+          class: "card",
+          on: {
+            submit: ev => {
+              ev.preventDefault();
+              const a = Number(amt.value);
+              if (!sel.value || !(a > 0)) { view.cashErr = t("errCashInput"); render(); return; }
+              view.cashErr = "";
+              const d = db.donors.find(x => x.id === sel.value);
+              ask({
+                title: t("confirmAddCash"),
+                lines: [d.name + " → " + fmt(a) + (note.value ? " · " + note.value : ""), t("willRecordWithLeader")],
+                needPw: false,
+                run: () => {
+                  db.entries.push({ id: "x" + Date.now(), colId: view.col, batch: b, donorId: d.id, amount: a, at: new Date().toLocaleDateString("en-IN"), note: note.value.trim(), status: "held" });
+                }
+              });
+            }
+          }
+        },
+          h("h2", null, t("addReceivedCashTitle")),
+          h("label", { for: "cm" }, t("memberLabel"), sel),
+          h("label", { for: "ca" }, t("amountLabel"), amt),
+          h("label", { for: "cn" }, t("noteLabel"), note),
+          view.cashErr && h("div", { class: "err", role: "alert" }, view.cashErr),
+          h("button", { type: "submit" }, t("addCashBtn"))
+        )
+      );
+
+      const psel = h("select", { id: "pm" }, h("option", { value: "" }, t("selectMemberOpt")), ...bl.map(d => h("option", { value: d.id }, d.name + " · " + d.mobile)));
+      const pamt = h("input", { id: "pa_l", type: "number", inputmode: "numeric", min: 1, placeholder: t("pledgeAmtPh") });
+
+      out.push(
+        h("form", {
+          class: "card",
+          on: {
+            submit: ev => {
+              ev.preventDefault();
+              const a = Number(pamt.value);
+              if (!psel.value || !(a > 0)) { view.pledgeErr = t("errCashInput"); render(); return; }
+              view.pledgeErr = "";
+              const d = db.donors.find(x => x.id === psel.value);
+              const curOffer = O(d);
+              const newOffer = curOffer + a;
+              ask({
+                title: t("confirmAddPledge"),
+                lines: [
+                  d.name + " → +" + fmt(a),
+                  t("willAddPledgeNote", fmt(curOffer), fmt(newOffer))
+                ],
+                needPw: false,
+                run: () => {
+                  setC(d, newOffer, R(d));
+                }
+              });
+            }
+          }
+        },
+          h("h2", null, t("addPledgeTitle")),
+          h("label", { for: "pm" }, t("memberLabel"), psel),
+          h("label", { for: "pa_l" }, t("pledgeAmtLabel"), pamt),
+          view.pledgeErr && h("div", { class: "err", role: "alert" }, view.pledgeErr),
+          h("button", { type: "submit", style: "background:var(--ok);border-color:var(--ok);color:#fff" }, t("addPledgeBtn"))
+        )
+      );
+
+      const ents = db.entries.filter(x => x.batch === b && x.colId === view.col).slice().reverse();
+      out.push(h("div", { class: "card" }, h("h2", null, t("cashRecordsTitle")),
+        ents.length ? ents.slice(0, 30).map(en => entryRow(en, en.status === "held" && h("button", { class: "dng sm", on: { click: () => ask({ title: t("confirmDelRecord"), lines: [(db.donors.find(x => x.id === en.donorId) || { name: "" }).name + " · " + fmt(en.amount)], needPw: true, run: () => { db.entries = db.entries.filter(z => z.id !== en.id); } }) } }, t("removeBtn")))) : h("div", { class: "mut" }, t("noRecordsYet"))));
+    } 
+    else if (view.lSec === "members") {
+      out.push(
+        addMemberUI(b),
+        searchCard(b),
+        h("div", { class: "card" },
+          h("h2", null, t("batchMembersCount", b, bl.length)),
+          bl.length ? bl.map(d => memberRow(d, false)) : h("div", { class: "mut" }, t("noMembersYet"))
+        )
+      );
+    } 
+    else if (view.lSec === "batches") {
+      out.push(
+        h("div", { class: "card" },
+          h("h2", null, t("batchesInfoTitle") + " · " + colName()),
+          ...db.batches.map(x => {
+            const l = db.donors.filter(z => z.batch === x), o = sumO(l), r = sumR(l), xh = heldB(x), mine = x === b;
+            return h("div", { class: "batch" + (mine ? " mine" : "") },
+              h("div", { class: "row" }, h("b", null, t("batch") + " " + x + (mine ? t("yourBatchTag") : "")), h("span", { class: "mut num" }, t("offer") + " " + fmt(o))),
+              h("div", { class: "row mut num" },
+                h("span", null, t("receivedCentral") + " " + fmt(r)),
+                h("span", null, t("withLeader") + " " + fmt(xh))
+              ),
+              h("div", { class: "row mut num" },
+                h("span", null, t("pending") + " " + fmt(Math.max(0, o - r - xh)))
+              ),
+              bar(o, r + xh)
+            );
+          })
+        )
+      );
+    }
+
+    return out;
+  }
+
+  /* ==================== OWNER / ADMIN VIEW ==================== */
+  function leaderForm() {
+    const e = view.ledit, f = {};
+    const curBatch = Number(e.batch) || db.batches[0] || 1;
+    const batchMembers = db.donors.filter(d => d.batch === curBatch);
+    
+    const matchedMember = e.donorId !== undefined 
+      ? batchMembers.find(d => d.id === e.donorId) 
+      : batchMembers.find(d => d.mobile === e.mobile);
+
+    f.bt = h("select", {
+      id: "lb",
+      on: {
+        change: () => {
+          const nb = Number(f.bt.value);
+          const nMembers = db.donors.filter(d => d.batch === nb);
+          const firstM = nMembers[0];
+          view.ledit = {
+            ...e,
+            username: f.un.value,
+            batch: nb,
+            donorId: firstM ? firstM.id : "",
+            mobile: firstM ? firstM.mobile : "",
+            wa: f.wa.value,
+            pwText: f.pw.value
+          };
+          view.lErr = "";
+          render();
+        }
+      }
+    }, ...db.batches.map(b => {
+      const o = h("option", { value: b }, t("batch") + " " + b);
+      if (b === curBatch) o.selected = true;
+      return o;
+    }));
+
+    f.mem = h("select", {
+      id: "lmem",
+      on: {
+        change: () => {
+          const mid = f.mem.value;
+          const m = batchMembers.find(d => d.id === mid);
+          view.ledit = {
+            ...e,
+            username: f.un.value,
+            batch: curBatch,
+            donorId: mid,
+            mobile: m ? m.mobile : "",
+            wa: f.wa.value,
+            pwText: f.pw.value
+          };
+          view.lErr = "";
+          render();
+        }
+      }
+    },
+      ...batchMembers.map(d => {
+        const o = h("option", { value: d.id }, d.name + " (" + d.mobile + ")");
+        if (matchedMember && matchedMember.id === d.id) o.selected = true;
+        return o;
+      }),
+      (() => {
+        const o = h("option", { value: "" }, batchMembers.length ? t("optOtherMobile") : t("optNoMembersInBatch"));
+        if (!matchedMember) o.selected = true;
+        return o;
+      })()
+    );
+
+    const initMobile = matchedMember ? matchedMember.mobile : (e.mobile || "");
+    f.un = h("input", { id: "lu", placeholder: "leader" + curBatch, value: e.username || "" });
+    f.mb = h("input", {
+      id: "lm",
+      type: "tel",
+      inputmode: "numeric",
+      value: initMobile,
+      readonly: matchedMember ? "readonly" : null,
+      style: matchedMember ? "opacity:0.75;cursor:not-allowed" : null
+    });
+    f.wa = h("input", { id: "lw", type: "tel", inputmode: "numeric", placeholder: t("waNumPh"), value: e.wa || "" });
+    f.pw = h("input", {
+      id: "lp",
+      type: "text",
+      autocomplete: "off",
+      placeholder: e.id ? t("pwOnlyIfChange") : t("leaderPwPh"),
+      value: e.pwText || ""
+    });
+
+    return h("form", {
+      class: "card",
+      on: {
+        submit: async ev => {
+          ev.preventDefault();
+          const selMem = batchMembers.find(d => d.id === f.mem.value);
+          const rec = {
+            username: f.un.value.trim(),
+            mobile: selMem ? selMem.mobile : f.mb.value.trim(),
+            batch: Number(f.bt.value),
+            wa: f.wa.value.trim()
+          };
+          const pwText = f.pw.value;
+          view.ledit = { ...e, ...rec, donorId: f.mem.value, pwText };
+
+          if (!rec.username || !rec.mobile) {
+            view.lErr = t("errLeaderReq");
+            render(); return;
+          }
+          if (!e.id && !pwText) {
+            view.lErr = t("errNewLeaderPwReq");
+            render(); return;
+          }
+          if (db.leaders.some(x => x.id !== e.id && (x.username.toLowerCase() === rec.username.toLowerCase() || x.mobile === rec.mobile))) {
+            view.lErr = t("errDupLeader");
+            render(); return;
+          }
+          if (pwText) {
+            if (pwText.length < 4) { view.lErr = t("errLeaderPwMin4"); render(); return; }
+            const h1 = await sha(pwText);
+            if (db.donors.some(d => d.mobile === rec.mobile && d.batch === rec.batch && d.pw === h1)) {
+              view.lErr = t("errLeaderPwDiff"); render(); return;
+            }
+          }
+          view.lErr = "";
+          const pwNote = pwText ? " · " + (e.id ? t("pwWillChange") : t("pwWillSet")) : "";
+
+          ask({
+            title: e.id ? t("confirmEditLeader") : t("confirmNewLeader"),
+            lines: [
+              (selMem ? selMem.name + " (" + rec.username + ")" : rec.username) + " · " + t("batch") + " " + rec.batch + " · " + rec.mobile +
+              (rec.wa ? " · WhatsApp " + rec.wa : "") + pwNote
+            ],
+            needPw: true,
+            run: async () => {
+              const finalPwHash = pwText ? await sha(pwText) : null;
+              if (e.id) {
+                const l = db.leaders.find(x => x.id === e.id);
+                Object.assign(l, rec);
+                if (finalPwHash) l.pw = finalPwHash;
+              } else {
+                db.leaders.push({ id: "l" + Date.now(), ...rec, pw: finalPwHash });
+              }
+              view.ledit = null;
+            }
+          });
+        }
+      }
+    },
+      h("h2", null, e.id ? t("editLeaderTitle") : t("newLeaderTitle")),
+      h("label", { for: "lb" }, t("step1SelectBatch"), f.bt),
+      h("label", { for: "lmem" }, t("step2SelectMember"), f.mem),
+      h("label", { for: "lu" }, t("step3LeaderUser"), f.un),
+      h("div", { class: "g2" },
+        h("label", { for: "lm" }, t("mobileNum"), f.mb),
+        h("label", { for: "lw" }, t("waNumLabel"), f.wa)
+      ),
+      h("label", { for: "lp" }, t("password"), f.pw),
+      view.lErr && h("div", { class: "err", role: "alert" }, view.lErr),
+      h("div", { class: "row" },
+        h("button", { type: "submit" }, t("saveBtn")),
+        h("button", { type: "button", class: "sec", on: { click: () => { view.ledit = null; view.lErr = ""; render(); } } }, t("cancelBtn")),
+        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveLeader"), lines: [`${e.username} · ${t("batch")} ${e.batch}`], needPw: true, run: () => { db.leaders = db.leaders.filter(x => x.id !== e.id); view.ledit = null; } }) } }, t("removeBtn"))
+      )
+    );
+  }
+
+  function pwChangeCard(requireCur, forced) {
+    const cur = h("input", { id: "pcur", type: "password", autocomplete: "current-password" });
+    const n1 = h("input", { id: "pn1", type: "password", autocomplete: "new-password" });
+    const n2 = h("input", { id: "pn2", type: "password", autocomplete: "new-password" });
+    const L = (i, t, c) => h("label", { for: i }, t, c);
+    const msg = view.pwMsg; view.pwMsg = null;
+    return h("form", { class: "card", on: { submit: async ev => {
+      ev.preventDefault();
+      const fail = txt => { view.pwMsg = { e: true, t: txt }; render(); };
+      if (requireCur && (await sha(cur.value)) !== db.admin) return fail(t("errCurPwWrong"));
+      if (n1.value.length < 6) return fail(t("errPwMin6"));
+      if (n1.value !== n2.value) return fail(t("errPwMismatch"));
+      const hh = await sha(n1.value);
+      if (hh === LEGACY_DEFAULT_HASH) return fail(t("errNoDefaultPw"));
+      db.admin = hh; await save();
+      view.pwMsg = { e: false, t: t("adminPwChanged") }; render();
+    } } },
+      h("h2", null, forced ? t("changeAdminPwForced") : t("changeAdminPwTitle")),
+      forced && h("p", { class: "sub" }, t("forcedPwNote")),
+      requireCur && L("pcur", t("curPwLabel"), cur),
+      L("pn1", t("newPwLabel"), n1),
+      L("pn2", t("repeatPassword"), n2),
+      msg && h("div", { class: msg.e ? "err" : "mut", role: "alert" }, msg.t),
+      h("button", { type: "submit" }, t("changePwBtn"))
+    );
+  }
+
+  function collManager() {
+    const vis = db.collections.filter(c => !c.hidden), hid = db.collections.filter(c => c.hidden);
+    const nm = h("input", { id: "cname", placeholder: "ഉദാ: കണ്യാല മൗല ആണ്ട് 2027" });
+    const show = h("input", { id: "cshow", type: "checkbox", style: "width:auto" });
+    const card = h("div", { class: "card" }, h("h2", null, t("collectionsTitle")),
+      h("div", { class: "vis" },
+        h("div", null, h("b", null, t("visibleNowLabel")), vis.map(c => c.name).join(", ") || t("noneText")),
+        h("div", null, h("b", null, t("hiddenNowLabel")), hid.map(c => c.name).join(", ") || t("noneText"))
+      )
+    );
+    db.collections.forEach(c => card.append(h("div", { class: "batch" },
+      h("div", { class: "row" }, h("b", null, c.name), c.hidden ? h("span", { class: "pill am" }, t("hiddenPill")) : h("span", { class: "pill ok" }, t("visiblePill"))),
+      h("div", { class: "row", style: "justify-content:flex-start" },
+        h("button", { class: "sec sm", on: { click: () => ask({ title: c.hidden ? t("confirmShowCol") : t("confirmHideCol"), lines: [c.name, c.hidden ? t("showColDesc") : t("hideColDesc")], needPw: false, run: () => { c.hidden = !c.hidden; } }) } }, c.hidden ? t("showBtn") : t("hideBtn")),
+        h("button", { class: "dng sm", disabled: db.collections.length < 2 ? "true" : null, on: { click: () => ask({ title: t("confirmDelCol"), lines: [c.name, t("delColWarn")], needPw: true, run: () => { db.collections = db.collections.filter(x => x.id !== c.id); db.donors.forEach(d => { if (d.cols) delete d.cols[c.id]; }); db.entries = db.entries.filter(x => x.colId !== c.id); } }) } }, t("removeBtn"))
+      )
+    )));
+    card.append(h("form", {
+      class: "batch",
+      on: {
+        submit: ev => {
+          ev.preventDefault();
+          const n = nm.value.trim();
+          if (!n) { view.cErr = t("errColNameReq"); render(); return; }
+          if (db.collections.some(c => c.name.toLowerCase() === n.toLowerCase())) { view.cErr = t("errColExists"); render(); return; }
+          view.cErr = ""; const sh = show.checked;
+          ask({
+            title: t("confirmNewCol"),
+            lines: [n, sh ? t("willShowImmediate") : t("willAddHidden")],
+            needPw: true,
+            run: () => { const id = "c" + Date.now(); db.collections.push({ id, name: n, hidden: !sh }); view.col = id; }
+          });
+        }
+      }
+    },
+      h("h2", null, t("addNewColTitle")),
+      h("label", { for: "cname" }, t("colNameLabel"), nm),
+      h("label", { for: "cshow", style: "display:flex;gap:8px;align-items:center;font-weight:400" }, show, t("showImmediatelyLabel")),
+      view.cErr && h("div", { class: "err", role: "alert" }, view.cErr),
+      h("button", { type: "submit" }, t("addColBtn"))
+    ));
+    return card;
+  }
+
+  function exportReportCSV() {
+    const rows = [["Batch", "Name", "Mobile", "Place", "District", "Offer (Rs)", "Received by Central Committee (Rs)", "With Leader (Rs)", "Pending (Rs)"]];
+    db.batches.forEach(b => {
+      db.donors.filter(d => d.batch === b).forEach(d => {
+        const o = O(d), r = R(d), hd = heldD(d.id), pend = Math.max(0, o - r - hd);
+        rows.push([b, d.name, d.mobile, d.place || "", d.district || "", o, r, hd, pend]);
+      });
+    });
+    const csv = "\uFEFF" + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `COLLECTIONS_${colName().replace(/\s+/g, "_")}.csv`;
+    a.click();
+  }
+
+  function ownerView() {
+    const o = sumO(db.donors), r = sumR(db.donors);
+    const pendingEntriesCount = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).length;
+    const statusBadge = isCloudConnected
+      ? h("span", { class: "badge ok" }, t("liveDbBadge"))
+      : h("span", { class: "badge" }, t("localModeBadge"));
+
+    const top = h("div", { class: "top" },
+      h("div", null, h("h1", null, t("admin") + " · COLLECTIONS"), statusBadge),
+      logout()
+    );
+    if (view.confirm) return [langBar(), top, confirmCard()];
+    if (db.admin === LEGACY_DEFAULT_HASH) return [langBar(), top, pwChangeCard(false, true)];
+
+    const nav = navBar([
+      { k: "dash", ic: "📊", l: t("tabTotal") },
+      { k: "batches", ic: "🎓", l: t("tabBatch") },
+      { k: "cash", ic: "💰", l: t("tabHandover"), badge: pendingEntriesCount || null },
+      { k: "members", ic: "👥", l: t("tabMembers") },
+      { k: "settings", ic: "⚙️", l: t("tabSettings") }
+    ], view.oSec, k => { view.oSec = k; view.edit = null; view.ledit = null; render(); });
+
+    const out = [langBar(), top, collTabs(t("selectCol")), nav];
+
+    if (view.oSec === "dash") {
+      const totalHeldAll = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).reduce((a, e) => a + e.amount, 0);
+      out.push(
+        h("div", { class: "card" },
+          h("h2", null, t("grandTotal") + " · " + colName()),
+          tiles(o, r, totalHeldAll, true),
+          bar(o, r + totalHeldAll),
+          h("div", { class: "row" },
+            h("div", { class: "mut" }, t("batchesAndMembers", db.batches.length, db.donors.length)),
+            db.donors.length > 0 && h("button", { class: "sec sm", on: { click: exportReportCSV } }, t("exportReportBtn"))
+          )
+        )
+      );
+    } 
+    else if (view.oSec === "batches") {
+      out.push(
+        h("div", { class: "card", style: "padding:12px 15px" },
+          h("h2", null, t("batchFullDetailsTitle") + " · " + colName()),
+          h("div", { class: "mut" }, t("batchFullDetailsSub", db.batches.length))
+        ),
+        ...db.batches.map(b => {
+          const bl = db.donors.filter(x => x.batch === b);
+          const bo = sumO(bl), br = sumR(bl), bh = heldB(b);
+          const bp = Math.max(0, bo - br - bh);
+          const ld = db.leaders.find(x => x.batch === b);
+          const ldMember = ld ? db.donors.find(x => x.batch === b && x.mobile === ld.mobile) : null;
+          const ldName = ld ? (ldMember ? `${ldMember.name} (${ld.username})` : ld.username) + ` · ${ld.mobile}` : t("leaderNotAssigned");
+
+          return h("div", { class: "card" },
+            h("div", { class: "row" },
+              h("div", null,
+                h("h2", null, t("batch") + " " + b),
+                h("div", { class: "mut" }, t("leaderLabel") + ldName)
+              ),
+              bp <= 0 && bo > 0
+                ? h("span", { class: "pill ok" }, t("fullyReceivedPill"))
+                : h("span", { class: "pill" }, t("membersCountPill", bl.length))
+            ),
+            tiles(bo, br, bh),
+            bar(bo, br + bh)
+          );
+        })
+      );
+    }
+    else if (view.oSec === "cash") {
+      const hb = db.batches.filter(b => heldB(b) > 0);
+      const ho = h("div", { class: "card" },
+        h("h2", null, t("cashWithLeadersTitle")),
+        h("p", { class: "sub" }, t("cashWithLeadersSub"))
+      );
+      if (!hb.length) ho.append(h("div", { class: "mut" }, t("noPendingHandover")));
+      hb.forEach(b => {
+        const es = db.entries.filter(x => x.batch === b && x.colId === view.col && x.status === "held"), tot = heldB(b), ld = db.leaders.find(x => x.batch === b);
+        const confirmE = list => ask({
+          title: t("confirmHandoverTitle"),
+          lines: [...list.map(en => (db.donors.find(x => x.id === en.donorId) || { name: "?" }).name + " · " + fmt(en.amount)), t("confirmHandoverLine", fmt(sum(list, "amount")), b)],
+          needPw: false,
+          run: () => {
+            list.forEach(en => { const d = db.donors.find(x => x.id === en.donorId); if (d) setC(d, O(d), R(d) + en.amount); en.status = "confirmed"; });
+          }
+        });
+        ho.append(h("div", { class: "batch" }, h("div", { class: "row" }, h("b", null, t("batch") + " " + b + (ld ? " · " + ld.username : "")), h("span", { class: "pill am num" }, fmt(tot))),
+          ...es.map(en => entryRow(en, h("button", { class: "sec sm", on: { click: () => confirmE([en]) } }, t("receivedBtn")))),
+          es.length > 1 && h("button", { class: "sm", on: { click: () => confirmE(es) } }, t("allBatchReceivedBtn", fmt(tot)))));
+      });
+      out.push(ho);
+    } 
+    else if (view.oSec === "members") {
+      out.push(addMemberUI(null), searchCard(null));
+      const list = h("div", { class: "card" }, h("h2", null, t("membersByBatchTitle", db.batches.length)));
+      for (const b of db.batches) {
+        const bl = db.donors.filter(x => x.batch === b), bo = sumO(bl), br = sumR(bl), open = view.open === b;
+        const w = h("div", { class: "batch" },
+          h("div", { class: "row" }, h("b", null, t("batch") + " " + b), h("span", { class: "mut num" }, fmt(br) + " / " + fmt(bo))),
+          h("div", { class: "row", style: "justify-content:flex-start" },
+            h("button", { class: "sec sm", on: { click: () => { view.open = open ? null : b; render(); } } }, open ? t("closeBtn") : t("viewMembersBtn", bl.length)),
+            !bl.length && h("button", { class: "dng sm", on: { click: () => ask({ title: t("confirmDelBatch"), lines: [t("delBatchLine", b)], needPw: true, run: () => { db.batches = db.batches.filter(z => z !== b); } }) } }, t("removeBtn"))
+          )
+        );
+        if (open) bl.forEach(d => w.append(memberRow(d, false)));
+        list.append(w);
+      }
+      out.push(list);
+    } 
+    else if (view.oSec === "settings") {
+      const lc = h("div", { class: "card" }, h("h2", null, t("batchLeadersTitle")));
+      if (!db.leaders.length) lc.append(h("div", { class: "mut" }, t("noLeadersYet")));
+      db.leaders.slice().sort((a, b) => a.batch - b.batch).forEach(l => {
+        const mInfo = db.donors.find(d => d.batch === l.batch && d.mobile === l.mobile);
+        lc.append(h("div", { class: "row", style: "border-top:1px dashed var(--line);padding-top:8px" },
+          h("div", { style: "min-width:0" },
+            h("div", null, h("b", null, t("batch") + " " + l.batch), " · " + (mInfo ? mInfo.name + " (" + l.username + ")" : l.username)),
+            h("div", { class: "mut num" }, l.mobile)
+          ),
+          h("button", { class: "sec sm", on: { click: () => { view.ledit = { ...l, pwText: "" }; view.lErr = ""; view.lscroll = true; render(); } } }, t("editBtn"))
+        ));
+      });
+      if (!view.ledit) lc.append(h("button", { on: { click: () => { const b0 = db.batches[0] || 1, m0 = db.donors.find(d => d.batch === b0); view.ledit = { id: null, username: "", mobile: m0 ? m0.mobile : "", donorId: m0 ? m0.id : "", batch: b0, pwText: "" }; view.lErr = ""; view.lscroll = true; render(); } } }, t("addNewLeaderBtn")));
+      out.push(lc);
+      if (view.ledit) out.push(leaderForm());
+
+      out.push(collManager());
+      out.push(pwChangeCard(true, false));
+
+      const nb = h("input", { id: "nb", type: "number", inputmode: "numeric", min: 1, placeholder: t("batchNum") });
+      out.push(h("form", {
+        class: "card",
+        on: {
+          submit: ev => {
+            ev.preventDefault();
+            const n = Number(nb.value);
+            if (!n || n < 1) { view.bErr = t("errValidBatch"); render(); }
+            else if (db.batches.includes(n)) { view.bErr = t("errBatchExists", n); render(); }
+            else {
+              view.bErr = "";
+              ask({ title: t("confirmNewBatch"), lines: [t("batch") + " " + n], needPw: true, run: () => { db.batches.push(n); db.batches.sort((a, b) => a - b); view.open = n; } });
+            }
+          }
+        }
+      },
+        h("h2", null, t("addNewBatchTitle")),
+        h("div", { class: "row", style: "flex-wrap:nowrap" }, nb, h("button", { type: "submit", style: "white-space:nowrap" }, t("addBtn"))),
+        view.bErr && h("div", { class: "err", role: "alert" }, view.bErr)
+      ));
+    }
+
+    return out;
+  }
+
+  (async () => {
+    render();
+    if (firebaseConfig.apiKey && firebaseConfig.projectId) {
+      try {
+        const app = initializeApp(firebaseConfig);
+        const firestore = getFirestore(app);
+        cloudRef = doc(firestore, "collections_data", "main");
+        const snap = await getDoc(cloudRef);
+        if (!snap.exists()) {
+          db = await defaultDB();
+          await setDoc(cloudRef, db);
+        } else {
+          db = snap.data();
+        }
+        isCloudConnected = true;
+        onSnapshot(cloudRef, docSnap => {
+          if (docSnap.exists()) {
+            db = docSnap.data();
+            localStorage.setItem(DATA_KEY, JSON.stringify(db));
+            render();
+          }
+        });
+      } catch (err) {
+        console.error("Firebase init failed, using local storage:", err);
+      }
+    }
+
+    if (!db) {
+      try {
+        const saved = localStorage.getItem(DATA_KEY);
+        db = saved ? JSON.parse(saved) : await defaultDB();
+      } catch (e) {
+        db = await defaultDB();
+      }
+      await save();
+    }
+    render();
+  })();
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+</script>
+</body>
+</html>

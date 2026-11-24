@@ -1,0 +1,24 @@
+{
+  "name": "COLLECTIONS",
+  "short_name": "COLLECTIONS",
+  "description": "കണ്യാല മൗല ആണ്ട് 2026 - Alumni Collection Management",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f3f5f8",
+  "theme_color": "#1f3a5f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
