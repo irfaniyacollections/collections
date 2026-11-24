@@ -12,9 +12,9 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;600;700&family=Inter:wght@400;600;700&display=swap">
   <style>
-    :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f3f5f8;--card:#fff;--fg:#17202e;--mut:#5d6b80;--line:#dce2ea;--pri:#1f3a5f;--onpri:#fff;--acc:#d98a1c;--ok:#1d7a4d;--warn:#b4531a;--okbg:#e3f3ea;--warnbg:#fbeadf;--font:'Noto Sans Malayalam','Noto Sans Kannada','Inter',system-ui,sans-serif}
-    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1520;--card:#182131;--fg:#e8edf5;--mut:#9aa8bd;--line:#2a364b;--pri:#7fa6dc;--onpri:#0f1520;--acc:#f0b14d;--ok:#5fd09a;--warn:#f0a27a;--okbg:#17352a;--warnbg:#3a2418;color-scheme:dark}}
-    :root[data-theme="dark"]{--bg:#0f1520;--card:#182131;--fg:#e8edf5;--mut:#9aa8bd;--line:#2a364b;--pri:#7fa6dc;--onpri:#0f1520;--acc:#f0b14d;--ok:#5fd09a;--warn:#f0a27a;--okbg:#17352a;--warnbg:#3a2418;color-scheme:dark}
+    :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef2f7;--card:#ffffff;--fg:#132038;--mut:#4f6280;--line:#d5dfec;--pri:#1b3a8c;--onpri:#ffffff;--acc:#006994;--ok:#2e7d32;--warn:#c62828;--okbg:#e6f3e7;--warnbg:#fdeaea;--font:'Noto Sans Malayalam','Noto Sans Kannada','Inter',system-ui,sans-serif}
+    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1324;--card:#142038;--fg:#eaf0f9;--mut:#9fb0c9;--line:#263859;--pri:#5c8df6;--onpri:#091120;--acc:#38bdf8;--ok:#57c25d;--warn:#f26464;--okbg:#152f1c;--warnbg:#3b181c;color-scheme:dark}}
+    :root[data-theme="dark"]{--bg:#0b1324;--card:#142038;--fg:#eaf0f9;--mut:#9fb0c9;--line:#263859;--pri:#5c8df6;--onpri:#091120;--acc:#38bdf8;--ok:#57c25d;--warn:#f26464;--okbg:#152f1c;--warnbg:#3b181c;color-scheme:dark}
     *{box-sizing:border-box}
     html{scroll-padding-top:env(safe-area-inset-top,0px)}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--font);padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -58,7 +58,7 @@
     .batch{border-top:1px solid var(--line);padding-top:10px;display:grid;gap:6px}
     .pill{font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--warnbg);color:var(--warn)}.pill.ok{background:var(--okbg);color:var(--ok)}
     .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .mine{background:var(--okbg);border-radius:10px;padding:12px;border:1px solid rgba(29,122,77,0.2)}
+    .mine{background:var(--okbg);border-radius:10px;padding:14px;border:1px solid rgba(46,125,50,0.28)}
     .peer{border-top:1px dashed var(--line);padding-top:8px;display:grid;gap:2px}.peer.me{font-weight:600}
     .t4{grid-template-columns:1fr 1fr}.tile.h .v{color:var(--acc)}
     .ent{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:8px}
@@ -138,7 +138,7 @@
       tabMyInfo: "എന്റെ വിവരം",
       tabMyBatch: "എന്റെ ബാച്ച്",
       tabGrandTotal: "ഗ്രാൻഡ് ടോട്ടൽ",
-      yourColInfo: "നിങ്ങളുടെ കളക്ഷൻ വിവരങ്ങൾ",
+      yourColInfo: "വ്യക്തിഗത വാഗ്ദാന വിവരങ്ങൾ",
       offerFullyPaid: "വാഗ്ദാനം പൂർണ്ണമായി നൽകി",
       youNeedToPay: "നിങ്ങൾ ഇനി നൽകാനുള്ളത് ",
       grandTotal: "ഗ്രാൻഡ് ടോട്ടൽ",
@@ -1069,6 +1069,7 @@
     else if (view.mSec === "grand") {
       const go = sumO(db.donors), gr = sumR(db.donors);
       const totalHeld = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).reduce((a, e) => a + e.amount, 0);
+      const remPledgeLabel = curLang === "ml" ? "ബാക്കി വാഗ്ദാനം" : t("pending");
       out.push(
         h("div", { class: "card" },
           h("h2", null, t("grandTotal") + " · " + colName()),
@@ -1087,7 +1088,7 @@
                 h("span", null, t("withLeader") + " " + fmt(bh))
               ),
               h("div", { class: "row mut num" },
-                h("span", null, t("pending") + " " + fmt(Math.max(0, o - r - bh)))
+                h("span", null, remPledgeLabel + " " + fmt(Math.max(0, o - r - bh)))
               ),
               bar(o, r + bh)
             );
