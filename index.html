@@ -13,15 +13,15 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;600;700&family=Noto+Sans+Kannada:wght@400;600;700&family=Inter:wght@400;600;700&display=swap">
   <style>
     :root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eef2f7;--card:#ffffff;--fg:#132038;--mut:#4f6280;--line:#d5dfec;--pri:#1b3a8c;--onpri:#ffffff;--acc:#006994;--ok:#2e7d32;--warn:#c62828;--okbg:#e6f3e7;--warnbg:#fdeaea;--font:'Noto Sans Malayalam','Noto Sans Kannada','Inter',system-ui,sans-serif}
-    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1324;--card:#142038;--fg:#eaf0f9;--mut:#9fb0c9;--line:#263859;--pri:#5c8df6;--onpri:#091120;--acc:#38bdf8;--ok:#57c25d;--warn:#f26464;--okbg:#152f1c;--warnbg:#3b181c;color-scheme:dark}}
-    :root[data-theme="dark"]{--bg:#0b1324;--card:#142038;--fg:#eaf0f9;--mut:#9fb0c9;--line:#263859;--pri:#5c8df6;--onpri:#091120;--acc:#38bdf8;--ok:#57c25d;--warn:#f26464;--okbg:#152f1c;--warnbg:#3b181c;color-scheme:dark}
+    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070e1c;--card:#1a2946;--fg:#f1f5fc;--mut:#b2c2da;--line:#324a75;--pri:#6b98ff;--onpri:#081020;--acc:#4cc9f0;--ok:#62d269;--warn:#ff7373;--okbg:#173621;--warnbg:#421b20;color-scheme:dark}}
+    :root[data-theme="dark"]{--bg:#070e1c;--card:#1a2946;--fg:#f1f5fc;--mut:#b2c2da;--line:#324a75;--pri:#6b98ff;--onpri:#081020;--acc:#4cc9f0;--ok:#62d269;--warn:#ff7373;--okbg:#173621;--warnbg:#421b20;color-scheme:dark}
     *{box-sizing:border-box}
     html{scroll-padding-top:env(safe-area-inset-top,0px)}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 var(--font);padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
     #app{max-width:560px;margin:0 auto;display:grid;gap:12px}
     h1{font-size:21px;margin:0;line-height:1.3}h2{font-size:16px;margin:0}
     .mut{color:var(--mut);font-size:13px}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;display:grid;gap:12px;min-width:0}
+    .card{background:var(--card);border:1px solid var(--line);border-top:1px solid rgba(255,255,255,0.22);border-radius:12px;padding:15px;display:grid;gap:12px;min-width:0;box-shadow:0 6px 16px rgba(0,0,0,0.26),0 2px 0 rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.14)}
     label{display:grid;gap:4px;font-weight:600;font-size:13px}
     input,select{font:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);width:100%;min-width:0}
     input:focus,select:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
@@ -49,7 +49,7 @@
 
     .err{color:var(--warn);font-weight:600;font-size:13px}
     .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    .tile{border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0;background:var(--card)}
+    .tile{border:1px solid var(--line);border-top:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px;min-width:0;background:var(--card);box-shadow:0 4px 10px rgba(0,0,0,0.22),0 2px 0 rgba(0,0,0,0.24)}
     .tile .l{font-size:12px;color:var(--mut)}.tile .v{font:700 17px/1.3 Inter,sans-serif;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
     .tile.p .v{color:var(--warn)}.tile.r .v{color:var(--ok)}
     .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
@@ -59,7 +59,37 @@
     .pill{font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--warnbg);color:var(--warn)}.pill.ok{background:var(--okbg);color:var(--ok)}
     .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .mine{background:var(--okbg);border-radius:10px;padding:14px;border:1px solid rgba(46,125,50,0.28)}
-    .peer{border-top:1px dashed var(--line);padding-top:8px;display:grid;gap:2px}.peer.me{font-weight:600}
+    .sgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:2px}
+    .sbox{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 8px;text-align:center;display:grid;gap:2px;box-shadow:inset 0 2px 5px rgba(0,0,0,0.22),0 1px 0 rgba(255,255,255,0.08)}
+    .sbox .sl{font-size:11.5px;color:var(--mut);font-weight:600}
+    .sbox .sv{font:700 16px/1.25 Inter,sans-serif;color:var(--pri);font-variant-numeric:tabular-nums}
+    .sbox.coop .sv{color:var(--ok)}
+    .sbox.pct .sv{color:var(--acc)}
+    .bstats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:2px}
+    .bstat{display:grid;gap:1px;text-align:center}
+    .bstat .bl{font-size:11px;color:var(--mut)}
+    .bstat .bv{font:700 13.5px/1.2 Inter,sans-serif;color:var(--fg);font-variant-numeric:tabular-nums}
+    .bstat.ok .bv{color:var(--ok)}
+    .bstat.pct .bv{color:var(--acc)}
+    .vchart-wrap{overflow-x:auto;overflow-y:hidden;padding-bottom:6px;margin-top:4px;-webkit-overflow-scrolling:touch}
+    .vchart-inner{display:inline-flex;align-items:flex-end;gap:10px;min-height:175px;padding:10px 6px 2px 6px}
+    .vcol{display:flex;flex-direction:column;align-items:center;gap:5px;width:36px;flex:0 0 36px}
+    .vpct{font:700 10.5px/1 Inter,sans-serif;font-variant-numeric:tabular-nums;color:var(--fg);white-space:nowrap}
+    .vtrack{width:18px;height:112px;border-radius:8px;background:var(--line);display:flex;align-items:flex-end;overflow:hidden;padding:2px}
+    .vfill{width:100%;border-radius:6px;background:var(--ok);transition:height .25s ease}
+    .vfill.mid{background:var(--acc)}
+    .vfill.low{background:var(--warn)}
+    .vlbl{font:700 11.5px/1.1 Inter,sans-serif;color:var(--fg);white-space:nowrap}
+    .vaxis-note{font-size:11.5px;color:var(--mut);font-weight:600;margin-top:2px}
+    .peer{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px}.peer.me{font-weight:600}
+    .mgrid4{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-top:2px}
+    .mbox{background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:5px 7px;display:grid;gap:1px;min-width:0;box-shadow:inset 0 2px 4px rgba(0,0,0,0.22),0 1px 0 rgba(255,255,255,0.08)}
+    .mbox .ml{font-size:10px;color:var(--mut);font-weight:600;line-height:1.2}
+    .mbox .mv{font:700 12.5px/1.25 Inter,sans-serif;color:var(--fg);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+    .mbox.o .mv{color:var(--pri)}
+    .mbox.h .mv{color:var(--acc)}
+    .mbox.r .mv{color:var(--ok)}
+    .mbox.p .mv{color:var(--warn)}
     .t4{grid-template-columns:1fr 1fr}.tile.h .v{color:var(--acc)}
     .ent{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:8px}
     .pill.am{background:var(--bg);color:var(--acc);border:1px solid var(--acc)}
@@ -143,20 +173,57 @@
       youNeedToPay: "നിങ്ങൾ ഇനി നൽകാനുള്ളത് ",
       grandTotal: "ഗ്രാൻഡ് ടോട്ടൽ",
       batchesAndMembers: (b, m) => `${b} ബാച്ചുകൾ · ആകെ ${m} അംഗങ്ങൾ`,
+      batchesOnlySub: b => `${b} ബാച്ചുകൾ`,
+      totalMembersLabel: "ആകെ അംഗങ്ങൾ",
+      cooperatedMembersLabel: "ആകെ സഹകരിച്ചവർ",
+      overallCooperationRateLabel: "സഹകരണ ശതമാനം",
+      batchMembersCountLabel: "ആകെ അംഗങ്ങൾ",
+      batchCooperatedCountLabel: "സഹകരിച്ചവർ",
+      cooperationRateLabel: "സഹകരണ ശതമാനം",
+      willRecordWithLeaderAndOffer: (cur, nxt) => `ഈ തുക ലീഡറുടെ കയ്യിൽ എന്ന് രേഖപ്പെടുത്തുകയും വാഗ്ദാനം ${cur} → ${nxt} ആയി കൂടുകയും ചെയ്യും.`,
+      batchCoopGraphTitle: "ബാച്ച് തിരിച്ചുള്ള സഹകരണ ശതമാനം",
       batchWiseInfo: "ബാച്ച് തിരിച്ചുള്ള വിവരങ്ങൾ",
       yoursTag: " (നിങ്ങളുടേത്)",
       yourBatchTag: " (നിങ്ങളുടെ ബാച്ച്)",
       batchTotalInfo: b => `ബാച്ച് ${b} · ആകെ വിവരങ്ങൾ`,
       totalMembersInBatch: n => `ബാച്ചിലെ ആകെ അംഗങ്ങൾ: ${n}`,
       batchMembersList: b => `ബാച്ച് ${b} · അംഗങ്ങളുടെ ലിസ്റ്റ്`,
-      makeNewPledge: "പുതിയ വാഗ്ദാനം നൽകുക",
-      pledgeDescLeader: "വാഗ്ദാനം ചെയ്യുന്ന സംഖ്യ നൽകി ബട്ടൺ അമർത്തിയാൽ നിങ്ങളുടെ വിവരങ്ങളും തുകയും ബാച്ച് ലീഡറുടെ WhatsApp-ലേക്ക് സന്ദേശമായി അയയ്ക്കാൻ തുറന്നുവരും.",
-      pledgeDescNoLeader: "നിങ്ങളുടെ ബാച്ചിന് ഇതുവരെ ലീഡറെ നിശ്ചയിച്ചിട്ടില്ല.",
-      pledgeAmtLabel: "വാഗ്ദാനം ചെയ്യുന്ന സംഖ്യ (₹)",
+      makeNewPledge: "Google Pay / UPI പേയ്‌മെന്റ്",
+      pledgeDescLeader: "കേന്ദ്ര കമ്മിറ്റിയിലേക്ക് നേരിട്ട് പണം അയക്കാം. തുക ടൈപ്പ് ചെയ്ത് പേയ്‌മെന്റ് നടത്തുക.",
+      pledgeDescNoLeader: "കേന്ദ്ര കമ്മിറ്റിയിലേക്ക് നേരിട്ട് പണം അയക്കാം. തുക ടൈപ്പ് ചെയ്ത് പേയ്‌മെന്റ് നടത്തുക.",
+      selfPledgeTitle: "വാഗ്ദാനം ചെയ്യുക",
+      selfPledgePrompt: "വാഗ്ദാനം ഏറ്റെടുക്കേണ്ട തുക എന്റർ ചെയ്ത് ബട്ടൺ ഞെക്കുക.",
+      selfPledgeNote: "വാഗ്ദാനം ഏറ്റെടുത്ത് പണം പിന്നീട് നൽകാനുള്ള ഓപ്ഷൻ ആണ് ഇത്.",
+      selfPledgeConfirmMsg: "വാഗ്ദാനം ഏറ്റെടുത്ത് പണം പിന്നീട് നൽകാനുള്ള ഓപ്ഷൻ ആണ് ഇത്. താങ്കളുടെ വാഗ്ദാന തുക കണക്കിൽ ചേരുന്നതാണ്.",
+      selfPledgeBtn: "വാഗ്ദാനം ചെയ്യുക",
+      selfPledgeAmtLabel: "വാഗ്ദാനം ചെയ്യുന്ന തുക (₹)",
+      pledgeAmtLabel: "തുക (₹)",
       pledgeAmtPh: "തുക നൽകുക (₹)",
-      pledgeWaBtn: "💬 വാഗ്ദാനം ചെയ്യുക (WhatsApp)",
-      errEnterPledgeAmt: "വാഗ്ദാനം ചെയ്യുന്ന സംഖ്യ നൽകുക.",
-      errNoLeaderWa: "നിങ്ങളുടെ ബാച്ചിന് ഇതുവരെ ലീഡറെയോ വാട്സ്ആപ്പ് നമ്പറോ നിശ്ചയിച്ചിട്ടില്ല.",
+      pledgeWaBtn: "💳 Google Pay വഴി പേയ്‌മെന്റ് ചെയ്യുക",
+      errNoUpiConfigured: "അഡ്മിൻ സെറ്റിംഗിൽ Google Pay UPI ID ഇതുവരെ സെറ്റ് ചെയ്തിട്ടില്ല.",
+      gpayNotifiedMsg: amt => `✅ ${amt} — അഡ്മിനെ അറിയിച്ചു`,
+      gpayWaitingAdminMsg: "⏳ അഡ്മിന്റെ കൺഫർമേഷന് വേണ്ടി കാത്തിരിക്കുന്നു",
+      tabGpay: "GPay",
+      gpaySettingsTitle: "Google Pay UPI ID",
+      gpayUpiLabel: "Google Pay UPI ID",
+      gpayUpiPh: "ഉദാ: irfaniya@okicici",
+      gpayCurLabel: "നിലവിലെ UPI ID: ",
+      gpaySaveBtn: "UPI ID സേവ് ചെയ്യുക",
+      confirmGpayUpiTitle: "Google Pay UPI ID സ്ഥിരീകരിക്കുക",
+      errInvalidUpi: "സാധുവായ ഒരു UPI ID നൽകുക (ഉദാ: name@bank).",
+      gpayAdminTitle: "Google Pay പേയ്‌മെന്റുകൾ",
+      gpayAdminSub: "അംഗങ്ങൾ Google Pay വഴി അയച്ചതായി അറിയിച്ച തുകകൾ താഴെ കാണാം. 'ലഭിച്ചു' അമർത്തുമ്പോൾ വാഗ്ദാനത്തിലും കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ചതിലും ആഡ് ആകും.",
+      noGpayPending: "നിലവിൽ സ്ഥിരീകരിക്കാൻ GPay എൻട്രികൾ ഇല്ല.",
+      confirmGpayHandoverTitle: "ഈ GPay തുക ലഭിച്ചതായി കൺഫോം ആക്കണോ?",
+      confirmGpayHandoverLine: (amt, name) => `${name} · ${amt} — വാഗ്ദാനത്തിലും കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ചതിലും ആഡ് ആകും.`,
+      gpayBatchLabel: b => `ബാച്ച് ${b}`,
+      gpayFromMember: "അംഗം → GPay",
+      memberGpayHistoryTitle: "Google Pay പേയ്‌മെന്റ് വിവരങ്ങൾ",
+      pledgeHistoryTitle: "വാഗ്ദാന രേഖകൾ (തീയതി & സമയം)",
+      gpayStatusPending: "⏳ അഡ്മിൻ സ്ഥിരീകരണത്തിനായി കാത്തിരിക്കുന്നു",
+      gpayStatusConfirmed: "✅ അഡ്മിൻ കൺഫോം ചെയ്തു (ലഭിച്ചു)",
+      errEnterPledgeAmt: "തുക നൽകുക.",
+      errNoLeaderWa: "അഡ്മിൻ സെറ്റിംഗിൽ Google Pay UPI ID ഇതുവരെ സെറ്റ് ചെയ്തിട്ടില്ല.",
       confirmLeaderPw: "സ്ഥിരീകരിക്കാൻ നിങ്ങളുടെ പാസ്‌വേഡ് നൽകുക",
       confirmAdminPw: "സ്ഥിരീകരിക്കാൻ അഡ്മിൻ പാസ്‌വേഡ് നൽകുക",
       confirmSaveBtn: "ഉറപ്പാണ്, സേവ് ചെയ്യുക",
@@ -355,20 +422,57 @@
       youNeedToPay: "Balance you need to pay: ",
       grandTotal: "Grand Total",
       batchesAndMembers: (b, m) => `${b} Batches · Total ${m} Members`,
+      batchesOnlySub: b => `${b} Batches`,
+      totalMembersLabel: "Total Members",
+      cooperatedMembersLabel: "Cooperated",
+      overallCooperationRateLabel: "Cooperation %",
+      batchMembersCountLabel: "Total Members",
+      batchCooperatedCountLabel: "Cooperated",
+      cooperationRateLabel: "Cooperation %",
+      willRecordWithLeaderAndOffer: (cur, nxt) => `Recorded as held with Leader and offer updates from ${cur} to ${nxt}.`,
+      batchCoopGraphTitle: "Batch Cooperation Progress",
       batchWiseInfo: "Batch-wise Summary",
       yoursTag: " (Yours)",
       yourBatchTag: " (Your Batch)",
       batchTotalInfo: b => `Batch ${b} · Total Summary`,
       totalMembersInBatch: n => `Total members in batch: ${n}`,
       batchMembersList: b => `Batch ${b} · Members List`,
-      makeNewPledge: "Make a New Pledge",
-      pledgeDescLeader: "Enter your pledge amount and tap the button to open WhatsApp with your details ready to send to your Batch Leader.",
-      pledgeDescNoLeader: "No Batch Leader has been assigned to your batch yet.",
-      pledgeAmtLabel: "Pledge Amount (₹)",
+      makeNewPledge: "Google Pay / UPI Payment",
+      pledgeDescLeader: "Send directly to the Central Committee. Type the amount and make payment.",
+      pledgeDescNoLeader: "Send directly to the Central Committee. Type the amount and make payment.",
+      selfPledgeTitle: "Make a Pledge",
+      selfPledgePrompt: "Enter the pledge amount to take and tap the button.",
+      selfPledgeNote: "This is the option to take a pledge and pay the amount later.",
+      selfPledgeConfirmMsg: "This is the option to take a pledge and pay the amount later. Your pledge amount will be added to your account.",
+      selfPledgeBtn: "Make Pledge",
+      selfPledgeAmtLabel: "Pledge Amount (₹)",
+      pledgeAmtLabel: "Amount (₹)",
       pledgeAmtPh: "Enter amount (₹)",
-      pledgeWaBtn: "💬 Send Pledge (WhatsApp)",
-      errEnterPledgeAmt: "Please enter a valid pledge amount.",
-      errNoLeaderWa: "Batch Leader or WhatsApp number is not assigned for your batch yet.",
+      pledgeWaBtn: "💳 Pay via Google Pay / UPI",
+      errNoUpiConfigured: "Google Pay UPI ID is not configured in Admin Settings yet.",
+      gpayNotifiedMsg: amt => `✅ ${amt} — Admin Notified`,
+      gpayWaitingAdminMsg: "⏳ Waiting for Admin Confirmation",
+      tabGpay: "GPay",
+      gpaySettingsTitle: "Google Pay UPI ID",
+      gpayUpiLabel: "Google Pay UPI ID",
+      gpayUpiPh: "e.g. irfaniya@okicici",
+      gpayCurLabel: "Current UPI ID: ",
+      gpaySaveBtn: "Save UPI ID",
+      confirmGpayUpiTitle: "Confirm Google Pay UPI ID",
+      errInvalidUpi: "Please enter a valid UPI ID (e.g. name@bank).",
+      gpayAdminTitle: "Google Pay Payments",
+      gpayAdminSub: "Members who submitted GPay payments appear here. Clicking 'Received' adds the amount to Offer and Received by Central Committee.",
+      noGpayPending: "No pending GPay entries right now.",
+      confirmGpayHandoverTitle: "Confirm GPay Amount Received?",
+      confirmGpayHandoverLine: (amt, name) => `${name} · ${amt} will be added to Offer and Received by Central Committee.`,
+      gpayBatchLabel: b => `Batch ${b}`,
+      gpayFromMember: "Member → GPay",
+      memberGpayHistoryTitle: "Google Pay Payment History",
+      pledgeHistoryTitle: "Pledge Records (Date & Time)",
+      gpayStatusPending: "⏳ Pending Admin Confirmation",
+      gpayStatusConfirmed: "✅ Confirmed by Admin (Received)",
+      errEnterPledgeAmt: "Please enter a valid amount.",
+      errNoLeaderWa: "Google Pay UPI ID is not configured in Admin Settings yet.",
       confirmLeaderPw: "Enter your password to confirm",
       confirmAdminPw: "Enter Admin password to confirm",
       confirmSaveBtn: "Confirm & Save",
@@ -567,20 +671,57 @@
       youNeedToPay: "ನೀವು ಪಾವತಿಸಬೇಕಾದ ಬಾಕಿ: ",
       grandTotal: "ಗ್ರ್ಯಾಂಡ್ ಟೋಟಲ್",
       batchesAndMembers: (b, m) => `${b} ಬ್ಯಾಚ್‌ಗಳು · ಒಟ್ಟು ${m} ಸದಸ್ಯರು`,
+      batchesOnlySub: b => `${b} ಬ್ಯಾಚ್‌ಗಳು`,
+      totalMembersLabel: "ಒಟ್ಟು ಸದಸ್ಯರು",
+      cooperatedMembersLabel: "ಸಹಕರಿಸಿದವರು",
+      overallCooperationRateLabel: "ಸಹಕಾರ ಪ್ರಮಾಣ",
+      batchMembersCountLabel: "ಒಟ್ಟು ಸದಸ್ಯರು",
+      batchCooperatedCountLabel: "ಸಹಕರಿಸಿದವರು",
+      cooperationRateLabel: "ಸಹಕಾರ ಪ್ರಮಾಣ",
+      willRecordWithLeaderAndOffer: (cur, nxt) => `ಲೀಡರ್ ಬಳಿ ಇದೆ ಎಂದು ದಾಖಲಾಗುತ್ತದೆ ಮತ್ತು ವಾಗ್ದಾನ ${cur} → ${nxt} ಆಗಿ ಹೆಚ್ಚುತ್ತದೆ.`,
+      batchCoopGraphTitle: "ಬ್ಯಾಚ್ ಸಹಕಾರ ಪ್ರಗತಿ",
       batchWiseInfo: "ಬ್ಯಾಚ್‌ವಾರು ವಿವರಗಳು",
       yoursTag: " (ನಿಮ್ಮದು)",
       yourBatchTag: " (ನಿಮ್ಮ ಬ್ಯಾಚ್)",
       batchTotalInfo: b => `ಬ್ಯಾಚ್ ${b} · ಒಟ್ಟು ವಿವರಗಳು`,
       totalMembersInBatch: n => `ಬ್ಯಾಚ್‌ನಲ್ಲಿರುವ ಒಟ್ಟು ಸದಸ್ಯರು: ${n}`,
       batchMembersList: b => `ಬ್ಯಾಚ್ ${b} · ಸದಸ್ಯರ ಪಟ್ಟಿ`,
-      makeNewPledge: "ಹೊಸ ವಾಗ್ದಾನ ಮಾಡಿ",
-      pledgeDescLeader: "ವಾಗ್ದಾನ ಮಾಡುವ ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ ಬಟನ್ ಒತ್ತಿದರೆ ನಿಮ್ಮ ವಿವರಗಳು ಮತ್ತು ಮೊತ್ತ ಬ್ಯಾಚ್ ಲೀಡರ್ ವಾಟ್ಸಾಪ್‌ಗೆ ಸಂದೇಶ ಕಳುಹಿಸಲು ತೆರೆಯುತ್ತದೆ.",
-      pledgeDescNoLeader: "ನಿಮ್ಮ ಬ್ಯಾಚ್‌ಗೆ ಇನ್ನೂ ಲೀಡರ್ ನೇಮಿಸಲಾಗಿಲ್ಲ.",
-      pledgeAmtLabel: "ವಾಗ್ದಾನ ಮಾಡುವ ಮೊತ್ತ (₹)",
+      makeNewPledge: "Google Pay / UPI ಪಾವತಿ",
+      pledgeDescLeader: "ಕೇಂದ್ರ ಸಮಿತಿಗೆ ನೇರವಾಗಿ ಹಣ ಕಳುಹಿಸಬಹುದು. ಮೊತ್ತವನ್ನು ಟೈಪ್ ಮಾಡಿ ಪಾವತಿ ಮಾಡಿ.",
+      pledgeDescNoLeader: "ಕೇಂದ್ರ ಸಮಿತಿಗೆ ನೇರವಾಗಿ ಹಣ ಕಳುಹಿಸಬಹುದು. ಮೊತ್ತವನ್ನು ಟೈಪ್ ಮಾಡಿ ಪಾವತಿ ಮಾಡಿ.",
+      selfPledgeTitle: "ವಾಗ್ದಾನ ಮಾಡಿ",
+      selfPledgePrompt: "ವಹಿಸಿಕೊಳ್ಳಬೇಕಾದ ವಾಗ್ದಾನ ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ ಬಟನ್ ಒತ್ತಿರಿ.",
+      selfPledgeNote: "ಇದು ವಾಗ್ದಾನ ವಹಿಸಿಕೊಂಡು ಹಣವನ್ನು ನಂತರ ಪಾವತಿಸುವ ಆಯ್ಕೆಯಾಗಿದೆ.",
+      selfPledgeConfirmMsg: "ಇದು ವಾಗ್ದಾನ ವಹಿಸಿಕೊಂಡು ಹಣವನ್ನು ನಂತರ ಪಾವತಿಸುವ ಆಯ್ಕೆಯಾಗಿದೆ. ನಿಮ್ಮ ವಾಗ್ದಾನ ಮೊತ್ತವು ಲೆಕ್ಕಕ್ಕೆ ಸೇರುತ್ತದೆ.",
+      selfPledgeBtn: "ವಾಗ್ದಾನ ಮಾಡಿ",
+      selfPledgeAmtLabel: "ವಾಗ್ದಾನ ಮೊತ್ತ (₹)",
+      pledgeAmtLabel: "ಮೊತ್ತ (₹)",
       pledgeAmtPh: "ಮೊತ್ತ ನಮೂದಿಸಿ (₹)",
-      pledgeWaBtn: "💬 ವಾಗ್ದಾನ ಮಾಡಿ (WhatsApp)",
+      pledgeWaBtn: "💳 Google Pay ಮೂಲಕ ಪಾವತಿಸಿ",
+      errNoUpiConfigured: "ಅಡ್ಮಿನ್ ಸೆಟ್ಟಿಂಗ್‌ನಲ್ಲಿ Google Pay UPI ID ಇನ್ನೂ ಹೊಂದಿಸಲಾಗಿಲ್ಲ.",
+      gpayNotifiedMsg: amt => `✅ ${amt} — ಅಡ್ಮಿನ್‌ಗೆ ತಿಳಿಸಲಾಗಿದೆ`,
+      gpayWaitingAdminMsg: "⏳ ಅಡ್ಮಿನ್ ದೃಢೀಕರಣಕ್ಕಾಗಿ ಕಾಯುತ್ತಿದೆ",
+      tabGpay: "GPay",
+      gpaySettingsTitle: "Google Pay UPI ID",
+      gpayUpiLabel: "Google Pay UPI ID",
+      gpayUpiPh: "ಉದಾ: irfaniya@okicici",
+      gpayCurLabel: "ಪ್ರಸ್ತುತ UPI ID: ",
+      gpaySaveBtn: "UPI ID ಸೇವ್ ಮಾಡಿ",
+      confirmGpayUpiTitle: "Google Pay UPI ID ದೃಢೀಕರಿಸಿ",
+      errInvalidUpi: "ಸರಿಯಾದ UPI ID ನಮೂದಿಸಿ (ಉದಾ: name@bank).",
+      gpayAdminTitle: "Google Pay ಪಾವತಿಗಳು",
+      gpayAdminSub: "ಸದಸ್ಯರು Google Pay ಮೂಲಕ ಕಳುಹಿಸಿದ ಮೊತ್ತಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ. 'ತಲುಪಿದೆ' ಒತ್ತಿದಾಗ ವಾಗ್ದಾನ ಮತ್ತು ಕೇಂದ್ರ ಸಮಿತಿಗೆ ತಲುಪಿದ ಮೊತ್ತಕ್ಕೆ ಸೇರುತ್ತದೆ.",
+      noGpayPending: "ಪ್ರಸ್ತುತ ದೃಢೀಕರಿಸಲು GPay ದಾಖಲೆಗಳಿಲ್ಲ.",
+      confirmGpayHandoverTitle: "ಈ GPay ಮೊತ್ತ ತಲುಪಿದೆ ಎಂದು ದೃಢೀಕರಿಸಬೇಕೇ?",
+      confirmHandoverLine: (tot, b) => `ಒಟ್ಟು ${tot} ಬ್ಯಾಚ್ ${b}-ന്റെയും ഗ്രാൻഡ് ടോട്ടലിന്റെയും ലഭിച്ച തുകയിൽ ചേരും.`,
+      gpayBatchLabel: b => `ಬ್ಯಾಚ್ ${b}`,
+      gpayFromMember: "ಸದಸ್ಯ → GPay",
+      memberGpayHistoryTitle: "Google Pay ಪಾವತಿ ವಿವರಗಳು",
+      pledgeHistoryTitle: "ವಾಗ್ದಾನ ದಾಖಲೆಗಳು (ದಿನಾಂಕ & ಸಮಯ)",
+      gpayStatusPending: "⏳ ಅಡ್ಮಿನ್ ದೃಢೀಕರಣಕ್ಕಾಗಿ ಕಾಯುತ್ತಿದೆ",
+      gpayStatusConfirmed: "✅ ಅಡ್ಮಿನ್ ದೃಢೀಕರಿಸಿದ್ದಾರೆ (ತಲುಪಿದೆ)",
       errEnterPledgeAmt: "ದಯವಿಟ್ಟು ಸರಿಯಾದ ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ.",
-      errNoLeaderWa: "ನಿಮ್ಮ ಬ್ಯಾಚ್‌ಗೆ ಲೀಡರ್ ಅಥವಾ ವಾಟ್ಸಾಪ್ ಸಂಖ್ಯೆ ಇನ್ನೂ ನಿಗದಿಯಾಗಿಲ್ಲ.",
+      errNoLeaderWa: "ಅಡ್ಮಿನ್ ಸೆಟ್ಟಿಂಗ್‌ನಲ್ಲಿ Google Pay UPI ID ಇನ್ನೂ ಹೊಂದಿಸಲಾಗಿಲ್ಲ.",
       confirmLeaderPw: "ದೃಢೀಕರಿಸಲು ನಿಮ್ಮ ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ",
       confirmAdminPw: "ದೃಢೀಕರಿಸಲು ಅಡ್ಮಿನ್ ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ",
       confirmSaveBtn: "ಖಚಿತ, ಸೇವ್ ಮಾಡಿ",
@@ -779,8 +920,7 @@
     try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
     try {
       if (view.role) {
-        const st = view.role === "member" ? localStorage : sessionStorage;
-        st.setItem(SESSION_KEY, JSON.stringify({ role: view.role, user: view.user, asMember: view.asMember }));
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ role: view.role, user: view.user, asMember: view.asMember }));
       }
     } catch (e) {}
   };
@@ -796,20 +936,31 @@
 
   const defaultDB = async () => ({
     admin: null,
+    gpayUpiId: "",
     batches: Array.from({ length: BATCH_COUNT }, (_, i) => i + 1),
     collections: [{ id: "c1", name: FIRST_COLLECTION, hidden: false }],
     donors: [],
     leaders: [],
-    entries: []
+    entries: [],
+    gpayEntries: []
   });
 
+  let isCloudSaving = false;
   const save = async () => {
     try { localStorage.setItem(DATA_KEY, JSON.stringify(db)); } catch (e) {}
     if (cloudRef) {
+      isCloudSaving = true;
       try { await setDoc(cloudRef, db); } catch (e) { console.error("Cloud save error:", e); }
+      finally { isCloudSaving = false; }
     }
   };
 
+  const nowStamp = () => {
+    const dt = new Date();
+    const dStr = dt.toLocaleDateString("en-IN");
+    const tStr = dt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+    return dStr + " · " + tStr;
+  };
   const fmt = n => "₹" + Number(n || 0).toLocaleString("en-IN");
   const sum = (l, k) => l.reduce((a, d) => a + Number(d[k] || 0), 0);
   const O = d => Number(((d.cols || {})[view.col] || {}).offer || 0);
@@ -830,8 +981,37 @@
     const e = document.createElement(tag);
     for (const k in (attrs || {})) {
       const v = attrs[k];
-      if (k === "on") for (const ev in v) e.addEventListener(ev, v[ev]);
-      else if (k === "class") e.className = v;
+      if (k === "on") {
+        for (const ev in v) {
+          const origHandler = v[ev];
+          if (tag === "button" && ev === "click") {
+            let busy = false;
+            e.addEventListener(ev, async evt => {
+              if (busy || e.disabled) return;
+              busy = true;
+              e.disabled = true;
+              try {
+                await origHandler(evt);
+              } finally {
+                setTimeout(() => { busy = false; e.disabled = false; }, 220);
+              }
+            });
+          } else if (tag === "form" && ev === "submit") {
+            let subBusy = false;
+            e.addEventListener(ev, async evt => {
+              if (subBusy) { evt.preventDefault(); return; }
+              subBusy = true;
+              try {
+                await origHandler(evt);
+              } finally {
+                setTimeout(() => { subBusy = false; }, 220);
+              }
+            });
+          } else {
+            e.addEventListener(ev, origHandler);
+          }
+        }
+      } else if (k === "class") e.className = v;
       else if (v !== false && v != null) e.setAttribute(k, v);
     }
     for (const c of kids.flat()) if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(c));
@@ -901,6 +1081,13 @@
     );
   }
 
+  const batchLeaderText = x => {
+    const ld = (db.leaders || []).find(z => z.batch === x);
+    if (!ld) return t("leaderLabel") + t("leaderNotAssigned");
+    const mInfo = (db.donors || []).find(d => d.batch === x && d.mobile === ld.mobile);
+    const lName = mInfo ? mInfo.name : ld.username;
+    return t("leaderLabel") + lName;
+  };
   const heldOf = f => (db.entries || []).filter(e => e.status === "held" && e.colId === view.col && f(e)).reduce((a, e) => a + e.amount, 0);
   const heldD = id => heldOf(e => e.donorId === id);
   const heldB = b => heldOf(e => e.batch === b);
@@ -916,6 +1103,69 @@
     h("div", { class: "tile p" }, h("div", { class: "l" }, isGrand ? t("pending") : t("toPay")), h("div", { class: "v" }, fmt(Math.max(0, o - r - hd))))
   );
 
+  const personMiniBoxes = p => {
+    const o = O(p), r = R(p), hd = heldD(p.id), rem = Math.max(0, o - r - hd);
+    return h("div", { class: "mgrid4" },
+      h("div", { class: "mbox o" }, h("div", { class: "ml" }, t("offer")), h("div", { class: "mv" }, fmt(o))),
+      h("div", { class: "mbox r" }, h("div", { class: "ml" }, t("receivedCentral")), h("div", { class: "mv" }, fmt(r))),
+      h("div", { class: "mbox h" }, h("div", { class: "ml" }, t("withLeader")), h("div", { class: "mv" }, fmt(hd))),
+      h("div", { class: "mbox p" }, h("div", { class: "ml" }, t("pending")), h("div", { class: "mv" }, fmt(rem)))
+    );
+  };
+  const batchMiniBoxes = (list, bh) => {
+    const o = sumO(list), r = sumR(list), rem = Math.max(0, o - r - bh);
+    return h("div", { class: "mgrid4" },
+      h("div", { class: "mbox o" }, h("div", { class: "ml" }, t("offer")), h("div", { class: "mv" }, fmt(o))),
+      h("div", { class: "mbox r" }, h("div", { class: "ml" }, t("receivedCentral")), h("div", { class: "mv" }, fmt(r))),
+      h("div", { class: "mbox h" }, h("div", { class: "ml" }, t("withLeader")), h("div", { class: "mv" }, fmt(bh))),
+      h("div", { class: "mbox p" }, h("div", { class: "ml" }, t("pending")), h("div", { class: "mv" }, fmt(rem)))
+    );
+  };
+  const coopBoxes = list => {
+    const tot = list.length;
+    const coop = list.filter(z => O(z) > 0).length;
+    const pct = tot > 0 ? Math.round((coop / tot) * 100) : 0;
+    return h("div", { class: "sgrid3" },
+      h("div", { class: "sbox" },
+        h("div", { class: "sl" }, t("batchMembersCountLabel")),
+        h("div", { class: "sv" }, String(tot))
+      ),
+      h("div", { class: "sbox coop" },
+        h("div", { class: "sl" }, t("batchCooperatedCountLabel")),
+        h("div", { class: "sv" }, String(coop))
+      ),
+      h("div", { class: "sbox pct" },
+        h("div", { class: "sl" }, t("cooperationRateLabel")),
+        h("div", { class: "sv" }, pct + "%")
+      )
+    );
+  };
+  const batchCoopGraph = batches => {
+    return h("div", { class: "card" },
+      h("div", { class: "row" },
+        h("h2", null, t("batchCoopGraphTitle")),
+        h("span", { class: "vaxis-note" }, "B (1–" + batches.length + ") · ← →")
+      ),
+      h("div", { class: "vchart-wrap" },
+        h("div", { class: "vchart-inner" },
+          ...batches.map(b => {
+            const list = db.donors.filter(z => z.batch === b);
+            const tot = list.length;
+            const coop = list.filter(z => O(z) > 0).length;
+            const pct = tot > 0 ? Math.min(100, Math.round((coop / tot) * 100)) : 0;
+            const toneClass = pct >= 70 ? "" : (pct >= 35 ? " mid" : " low");
+            return h("div", { class: "vcol" },
+              h("span", { class: "vpct" }, pct + "%"),
+              h("div", { class: "vtrack", role: "progressbar", "aria-valuenow": String(pct), "aria-valuemin": "0", "aria-valuemax": "100" },
+                h("i", { class: "vfill" + toneClass, style: "height:" + pct + "%" })
+              ),
+              h("span", { class: "vlbl" }, "B" + b)
+            );
+          })
+        )
+      )
+    );
+  };
   const bar = (o, r) => h("div", { class: "bar" }, h("i", { style: "width:" + (o ? Math.min(100, r / o * 100) : 0) + "%" }));
 
   function render() {
@@ -1002,8 +1252,7 @@
     return h("div", { class: "peer" + (isMe ? " me" : "") },
       h("div", { class: "row" }, h("b", null, p.name + (isMe ? t("youTag") : "")), pd <= 0 && O(p) > 0 ? h("span", { class: "pill ok" }, t("completed")) : h("span", { class: "pill" }, t("pending") + " " + fmt(pd))),
       loc && h("div", { class: "mut" }, "📍 " + loc),
-      h("div", { class: "row mut num" }, h("span", null, t("offer") + " " + fmt(O(p))), h("span", null, t("receivedCentral") + " " + fmt(R(p)))),
-      hd > 0 && h("div", { class: "mut num" }, t("withLeader") + " " + fmt(hd))
+      personMiniBoxes(p)
     );
   }
 
@@ -1019,6 +1268,7 @@
       h("div", null, h("div", { class: "mut" }, "COLLECTIONS"), h("h1", null, t("welcome") + d.name)),
       h("div", { class: "row" }, view.asMember && h("button", { class: "sec sm", on: { click: () => { view.asMember = false; saveSession(); render(); } } }, t("toLeaderPage")), logout())
     );
+    if (view.confirm) return [langBar(), mtop, confirmCard()];
 
     // Personal Information Card ALWAYS in English by default regardless of selected language
     const batchLeader = db.leaders.find(x => x.batch === d.batch);
@@ -1051,6 +1301,41 @@
 
     if (view.mSec === "me") {
       const hd = heldD(d.id), pd = Math.max(0, O(d) - R(d) - hd);
+      const myGpayList = (db.gpayEntries || [])
+        .filter(e => e.donorId === d.id && e.colId === view.col)
+        .slice()
+        .reverse();
+
+      const buildGpayHistoryRow = ge => {
+        const isConfirmed = ge.status === "confirmed";
+        return h("div", { class: "ent" },
+          h("div", { style: "min-width:0" },
+            h("div", { class: "num" }, h("b", null, fmt(ge.amount))),
+            h("div", { class: "mut" }, (ge.at || "") + (ge.upiId ? " · " + ge.upiId : ""))
+          ),
+          h("span", { class: isConfirmed ? "pill ok" : "pill am" },
+            isConfirmed ? t("gpayStatusConfirmed") : t("gpayStatusPending")
+          )
+        );
+      };
+
+      const historyTitleEl = h("h2", null, t("memberGpayHistoryTitle") + " (" + myGpayList.length + ")");
+      const historyItemsContainer = h("div", { style: "display:grid;gap:8px" }, ...myGpayList.map(buildGpayHistoryRow));
+      const historyCardEl = h("div", {
+        class: "card",
+        style: myGpayList.length > 0 ? "" : "display:none"
+      }, historyTitleEl, historyItemsContainer);
+
+      const onGpayNotifiedLive = newEntry => {
+        const updatedList = (db.gpayEntries || [])
+          .filter(e => e.donorId === d.id && e.colId === view.col)
+          .slice()
+          .reverse();
+        historyTitleEl.textContent = t("memberGpayHistoryTitle") + " (" + updatedList.length + ")";
+        historyItemsContainer.prepend(buildGpayHistoryRow(newEntry));
+        historyCardEl.style.display = "";
+      };
+
       out.push(
         h("div", { class: "card mine" },
           h("div", { class: "mut" }, colName()),
@@ -1064,36 +1349,60 @@
           )
         )
       );
-      out.push(pledgeCard(d));
+      out.push(pledgeCard(d, onGpayNotifiedLive));
+      out.push(selfPledgeCard(d));
+      out.push(historyCardEl);
+      const myPledgeLogs = (db.pledgeLogs || [])
+        .filter(p => p.donorId === d.id && p.colId === view.col)
+        .slice()
+        .reverse();
+      if (myPledgeLogs.length > 0) {
+        out.push(
+          h("div", { class: "card" },
+            h("h2", null, t("pledgeHistoryTitle") + " (" + myPledgeLogs.length + ")"),
+            ...myPledgeLogs.map(pl => h("div", { class: "ent" },
+              h("div", { style: "min-width:0" },
+                h("div", { class: "num" }, h("b", null, "+" + fmt(pl.amount))),
+                h("div", { class: "mut num" }, "🕒 " + (pl.at || ""))
+              ),
+              h("span", { class: "pill ok" }, t("offer"))
+            ))
+          )
+        );
+      }
     } 
     else if (view.mSec === "grand") {
       const go = sumO(db.donors), gr = sumR(db.donors);
       const totalHeld = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).reduce((a, e) => a + e.amount, 0);
       const remPledgeLabel = curLang === "ml" ? "ബാക്കി വാഗ്ദാനം" : t("pending");
+      const totalMembersCount = db.donors.length;
+      const totalCooperated = db.donors.filter(z => O(z) > 0).length;
+      const overallPct = totalMembersCount > 0 ? Math.round((totalCooperated / totalMembersCount) * 100) : 0;
       out.push(
         h("div", { class: "card" },
           h("h2", null, t("grandTotal") + " · " + colName()),
           tiles(go, gr, totalHeld, true),
           bar(go, gr + totalHeld),
-          h("div", { class: "mut" }, t("batchesAndMembers", db.batches.length, db.donors.length))
+          h("div", { class: "mut" }, t("batchesOnlySub", db.batches.length)),
+          coopBoxes(db.donors)
         ),
-        h("div", { class: "card" },
-          h("h2", null, t("batchWiseInfo")),
-          ...db.batches.map(x => {
-            const l = db.donors.filter(z => z.batch === x), o = sumO(l), r = sumR(l), bh = heldB(x), mine = x === d.batch;
-            return h("div", { class: "batch" + (mine ? " mine" : "") },
-              h("div", { class: "row" }, h("b", null, t("batch") + " " + x + (mine ? t("yoursTag") : "")), h("span", { class: "mut num" }, t("offer") + " " + fmt(o))),
-              h("div", { class: "row mut num" },
-                h("span", null, t("receivedCentral") + " " + fmt(r)),
-                h("span", null, t("withLeader") + " " + fmt(bh))
-              ),
-              h("div", { class: "row mut num" },
-                h("span", null, remPledgeLabel + " " + fmt(Math.max(0, o - r - bh)))
-              ),
-              bar(o, r + bh)
-            );
-          })
-        )
+        batchCoopGraph(db.batches),
+        h("div", { class: "card", style: "padding:12px 15px" },
+          h("h2", null, t("batchWiseInfo"))
+        ),
+        ...db.batches.map(x => {
+          const l = db.donors.filter(z => z.batch === x);
+          const o = sumO(l), r = sumR(l), bh = heldB(x), mine = x === d.batch;
+          return h("div", { class: "card" + (mine ? " mine" : "") },
+            h("div", { class: "row" },
+              h("span", { style: "font-size:17px;font-weight:700;line-height:1.25" }, t("batch") + " " + x + (mine ? t("yoursTag") : "")),
+              h("span", { class: "mut", style: "font-size:13px" }, batchLeaderText(x))
+            ),
+            coopBoxes(l),
+            batchMiniBoxes(l, bh),
+            bar(o, r + bh)
+          );
+        })
       );
     } 
     else if (view.mSec === "batch") {
@@ -1103,7 +1412,7 @@
           h("h2", null, t("batchTotalInfo", d.batch)),
           tiles(bo, br, bh),
           bar(bo, br + bh),
-          h("div", { class: "mut" }, t("totalMembersInBatch", bl.length))
+          coopBoxes(bl)
         ),
         h("div", { class: "card" },
           h("h2", null, t("batchMembersList", d.batch)),
@@ -1121,54 +1430,151 @@
     return n;
   }
 
-  function pledgeCard(d) {
-    const l = db.leaders.find(x => x.batch === d.batch);
-    const leaderPhone = l ? fmtWaPhone(l.wa || l.mobile) : "";
+  function pledgeCard(d, onNotified) {
+    const upiId = (db.gpayUpiId || "").trim();
     const amt = h("input", { id: "pa", type: "number", inputmode: "numeric", min: 1, placeholder: t("pledgeAmtPh") });
     const errEl = h("div", { class: "err", role: "alert", style: "display:none" });
-    const btn = h("a", { class: "btn", target: "_blank", rel: "noopener noreferrer", href: "#", style: "cursor:pointer" }, t("pledgeWaBtn"));
-    btn.addEventListener("click", ev => {
+    const notifiedEl = h("div", { class: "pill ok", style: "display:none;border-radius:8px;padding:8px 10px" });
+    const waitingEl = h("div", { class: "pill am", style: "display:none;border-radius:8px;padding:8px 10px" }, t("gpayWaitingAdminMsg"));
+
+    const buildUpiUrl = v => {
+      const params = new URLSearchParams({
+        pa: upiId,
+        pn: "COLLECTIONS",
+        am: String(v),
+        cu: "INR",
+        tn: (colName() || "COLLECTIONS") + " - Batch " + d.batch
+      });
+      return "upi://pay?" + params.toString();
+    };
+
+    const payBtn = h("a", { class: "btn", href: "#", style: "cursor:pointer" }, t("pledgeWaBtn"));
+    let payBusy = false;
+    payBtn.addEventListener("click", async ev => {
+      ev.preventDefault();
+      if (payBusy) return;
+      payBusy = true;
+      setTimeout(() => { payBusy = false; }, 500);
+
       const v = Number(amt.value);
       if (!(v > 0)) {
-        ev.preventDefault();
         errEl.textContent = t("errEnterPledgeAmt");
         errEl.style.display = "block";
+        notifiedEl.style.display = "none";
+        waitingEl.style.display = "none";
         return;
       }
-      if (!l || !leaderPhone) {
-        ev.preventDefault();
-        errEl.textContent = t("errNoLeaderWa");
+      if (!upiId) {
+        errEl.textContent = t("errNoUpiConfigured");
         errEl.style.display = "block";
+        notifiedEl.style.display = "none";
+        waitingEl.style.display = "none";
         return;
       }
+
       errEl.style.display = "none";
-      const placeStr = [d.place, d.district].filter(Boolean).join(", ") || "Not provided";
-      const msg =
-        "Assalamu Alaikum,\n" +
-        "*COLLECTIONS - New Pledge*\n\n" +
-        "• *Collection:* " + colName() + "\n" +
-        "• *Name:* " + d.name + "\n" +
-        "• *Phone:* " + d.mobile + "\n" +
-        "• *Place:* " + placeStr + "\n" +
-        "• *Batch:* Batch " + d.batch + "\n" +
-        "• *Pledge Amount:* " + fmt(v);
-      const web = "https://wa.me/" + leaderPhone + "?text=" + encodeURIComponent(msg);
-      let framed = false;
-      try { framed = window.self !== window.top; } catch (e) { framed = true; }
-      if (framed) { btn.href = web; return; }
-      ev.preventDefault();
-      const deep = "whatsapp://send?phone=" + leaderPhone + "&text=" + encodeURIComponent(msg);
-      const fb = setTimeout(() => { if (!document.hidden) window.location.href = web; }, 1800);
-      document.addEventListener("visibilitychange", () => { if (document.hidden) clearTimeout(fb); }, { once: true });
-      window.location.href = deep;
+      const newEntry = {
+        id: "gp" + Date.now(),
+        colId: view.col,
+        batch: d.batch,
+        donorId: d.id,
+        donorName: d.name,
+        mobile: d.mobile,
+        upiId: upiId,
+        amount: v,
+        at: nowStamp(),
+        status: "pending"
+      };
+      db.gpayEntries = db.gpayEntries || [];
+      const nowMs = Date.now();
+      const recentDup = db.gpayEntries.find(
+        x => x.donorId === d.id && x.colId === view.col && x.amount === v && x.status === "pending" && (nowMs - Number((x.id || "").replace("gp", "") || 0)) < 2000
+      );
+      const entryToUse = recentDup || newEntry;
+      if (!recentDup) {
+        db.gpayEntries.push(newEntry);
+        await save();
+      }
+
+      notifiedEl.textContent = t("gpayNotifiedMsg", fmt(v));
+      notifiedEl.style.display = "block";
+      waitingEl.textContent = t("gpayWaitingAdminMsg");
+      waitingEl.style.display = "block";
+      if (typeof onNotified === "function") onNotified(entryToUse);
+
+      const upiUrl = buildUpiUrl(v);
+      payBtn.href = upiUrl;
+      window.location.href = upiUrl;
     });
+
+    amt.addEventListener("input", () => {
+      errEl.style.display = "none";
+    });
+
+    return h("div", { class: "card" },
+      h("h2", null, t("makeNewPledge")),
+      h("p", { class: "sub" }, t("pledgeDescLeader")),
+      upiId && h("div", { class: "mut num" }, "UPI ID: " + upiId),
+      h("label", { for: "pa" }, t("pledgeAmtLabel"), amt),
+      errEl,
+      payBtn,
+      notifiedEl,
+      waitingEl
+    );
+  }
+
+  function selfPledgeCard(d) {
+    const amt = h("input", { id: "sp_amt", type: "number", inputmode: "numeric", min: 1, placeholder: t("pledgeAmtPh") });
+    const errEl = h("div", { class: "err", role: "alert", style: "display:none" });
+    const btn = h("button", {
+      type: "button",
+      style: "background:var(--ok);border-color:var(--ok);color:#fff",
+      on: {
+        click: () => {
+          const v = Number(amt.value);
+          if (!(v > 0)) {
+            errEl.textContent = t("errEnterPledgeAmt");
+            errEl.style.display = "block";
+            return;
+          }
+          errEl.style.display = "none";
+          const curOffer = O(d);
+          const nextOffer = curOffer + v;
+          ask({
+            title: t("confirmAddPledge"),
+            lines: [
+              d.name + " · " + t("offer") + ": " + fmt(curOffer) + " → " + fmt(nextOffer),
+              t("selfPledgeConfirmMsg")
+            ],
+            needPw: false,
+            run: () => {
+              const targetDonor = (db.donors || []).find(x => x.id === d.id) || d;
+              const curR = Number(((targetDonor.cols || {})[view.col] || {}).received || 0);
+              setC(targetDonor, nextOffer, curR);
+              db.pledgeLogs = db.pledgeLogs || [];
+              db.pledgeLogs.push({
+                id: "pl" + Date.now(),
+                colId: view.col,
+                batch: targetDonor.batch,
+                donorId: targetDonor.id,
+                donorName: targetDonor.name,
+                amount: v,
+                by: "member",
+                at: nowStamp()
+              });
+            }
+          });
+        }
+      }
+    }, t("selfPledgeBtn"));
 
     amt.addEventListener("input", () => { errEl.style.display = "none"; });
 
     return h("div", { class: "card" },
-      h("h2", null, t("makeNewPledge")),
-      h("p", { class: "sub" }, l ? t("pledgeDescLeader") : t("pledgeDescNoLeader")),
-      h("label", { for: "pa" }, t("pledgeAmtLabel"), amt),
+      h("h2", null, t("selfPledgeTitle")),
+      h("p", { class: "sub" }, t("selfPledgePrompt")),
+      h("div", { class: "mut" }, t("selfPledgeNote")),
+      h("label", { for: "sp_amt" }, t("selfPledgeAmtLabel"), amt),
       errEl,
       btn
     );
@@ -1177,35 +1583,72 @@
   /* ==================== SHARED HELPERS ==================== */
   const me = () => view.role === "leader" ? db.leaders.find(x => x.id === view.user) : null;
   const authHash = () => view.role === "leader" ? me().pw : db.admin;
-  const ask = c => { view.confirm = c; view.cerr = ""; render(); window.scrollTo(0, 0); };
+  let isSavingConfirm = false;
+  let confirmSeq = 0;
+  const ask = c => {
+    if (isSavingConfirm) return;
+    confirmSeq += 1;
+    view.confirm = { ...c, _seq: confirmSeq, _done: false };
+    view.cerr = "";
+    render();
+    window.scrollTo(0, 0);
+  };
 
   function confirmCard() {
     const c = view.confirm;
+    if (!c || c._done) return h("div", { class: "card" });
+    const expectedSeq = c._seq;
     const ap = h("input", { id: "ap", type: "password", autocomplete: "off" });
-    const ok = async () => {
-      if (c.needPw && (await sha(ap.value)) !== authHash()) { view.cerr = t("errWrongPw"); render(); return; }
-      await c.run();
-      await save();
-      view.confirm = null; view.cerr = ""; render();
-    };
+    const confirmBtn = h("button", { type: "button" }, t("confirmSaveBtn"));
+    const cancelBtn = h("button", {
+      type: "button",
+      class: "sec",
+      on: { click: () => { if (isSavingConfirm) return; view.confirm = null; view.cerr = ""; render(); } }
+    }, t("goBackBtn"));
+
+    let confirmBtnBusy = false;
+    confirmBtn.addEventListener("click", async () => {
+      if (confirmBtnBusy || isSavingConfirm || c._done || !view.confirm || view.confirm._seq !== expectedSeq) return;
+      confirmBtnBusy = true;
+      isSavingConfirm = true;
+      confirmBtn.disabled = true;
+      try {
+        if (c.needPw && (await sha(ap.value)) !== authHash()) {
+          view.cerr = t("errWrongPw");
+          render();
+          return;
+        }
+        c._done = true;
+        view.confirm = null;
+        view.cerr = "";
+        await c.run();
+        await save();
+        render();
+      } finally {
+        isSavingConfirm = false;
+        setTimeout(() => { confirmBtnBusy = false; }, 220);
+      }
+    });
+
     return h("div", { class: "card" }, h("h2", null, c.title),
       h("div", { style: "display:grid;gap:4px" }, ...c.lines.map(l => h("div", { class: "num" }, l))),
       c.needPw && h("label", { for: "ap" }, view.role === "leader" ? t("confirmLeaderPw") : t("confirmAdminPw"), ap),
       view.cerr && h("div", { class: "err", role: "alert" }, view.cerr),
-      h("div", { class: "row" }, h("button", { on: { click: ok } }, t("confirmSaveBtn")), h("button", { class: "sec", on: { click: () => { view.confirm = null; view.cerr = ""; render(); } } }, t("goBackBtn")))
+      h("div", { class: "row" }, confirmBtn, cancelBtn)
     );
   }
 
   function memberRow(d, showBatch) {
-    const hd = heldD(d.id);
     const loc = [d.place, d.district].filter(Boolean).join(", ");
-    return h("div", { class: "row", style: "border-top:1px dashed var(--line);padding-top:8px" },
-      h("div", { style: "min-width:0" },
-        h("div", null, h("b", null, d.name), showBatch ? " · " + t("batch") + " " + d.batch : null),
-        h("div", { class: "mut num" }, d.mobile + (loc ? " · 📍 " + loc : "")),
-        h("div", { class: "mut num" }, t("offer") + " " + fmt(O(d)) + " · " + t("receivedCentral") + " " + fmt(R(d)) + (hd ? " · " + t("withLeader") + " " + fmt(hd) : "") + " · " + t("receivable") + " " + fmt(Math.max(0, O(d) - R(d) - hd)))
+    return h("div", { style: "border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px" },
+      h("div", { class: "row" },
+        h("div", { style: "min-width:0" },
+          h("div", null, h("b", null, d.name), showBatch ? " · " + t("batch") + " " + d.batch : null),
+          h("div", { class: "mut num" }, d.mobile + (loc ? " · 📍 " + loc : ""))
+        ),
+        h("button", { class: "sec sm", on: { click: () => { view.edit = { ...d, offer: O(d), received: R(d) }; view.editPw = ""; view.editErr = ""; view.scroll = true; render(); } } }, t("editBtn"))
       ),
-      h("button", { class: "sec sm", on: { click: () => { view.edit = { ...d, offer: O(d), received: R(d) }; view.editPw = ""; view.editErr = ""; view.scroll = true; render(); } } }, t("editBtn"))
+      personMiniBoxes(d)
     );
   }
 
@@ -1349,11 +1792,13 @@
       ? h("button", { class: "sec sm", style: "width:100%", on: { click: () => { view.asMember = true; view.mSec = "me"; view.edit = null; view.confirm = null; saveSession(); render(); window.scrollTo(0, 0); } } }, t("viewMyMemberInfo"))
       : h("div", { class: "mut" }, t("howToViewAsMember", b, l.mobile));
 
+    if (!["total", "cash", "members", "batches"].includes(view.lSec)) view.lSec = "total";
+
     const nav = navBar([
-      { k: "total", ic: "📊", l: t("tabTotal") },
+      { k: "total", ic: "🎓", l: t("batch") + " " + b },
       { k: "cash", ic: "💵", l: t("tabAddCash") },
       { k: "members", ic: "👥", l: `${t("tabMembers")} (${bl.length})` },
-      { k: "batches", ic: "🎓", l: t("tabBatches") }
+      { k: "batches", ic: "📊", l: t("tabGrandTotal") }
     ], view.lSec, k => { view.lSec = k; view.edit = null; render(); });
 
     const out = [langBar(), top, asM, collTabs(t("selectCol")), nav];
@@ -1361,15 +1806,27 @@
     if (view.lSec === "total") {
       out.push(
         h("div", { class: "card" },
-          h("h2", null, t("grandTotal") + " · " + colName()),
-          tiles(go, gr, totalHeldAll, true),
-          bar(go, gr + totalHeldAll),
-          h("div", { class: "mut" }, t("batchesAndMembers", db.batches.length, db.donors.length))
+          h("h2", null, t("batchTotalInfo", b) + " · " + colName()),
+          tiles(bo, br, bh),
+          bar(bo, br + bh),
+          coopBoxes(bl)
         ),
         h("div", { class: "card" },
-          h("h2", null, t("yourBatchAccount", b)),
-          tiles(bo, br, bh),
-          bar(bo, br + bh)
+          h("h2", null, t("batchMembersList", b)),
+          bl.length ? bl.map(p => {
+            const hd = heldD(p.id), pd = Math.max(0, O(p) - R(p) - hd);
+            const loc = [p.place, p.district].filter(Boolean).join(", ");
+            return h("div", { class: "peer" },
+              h("div", { class: "row" },
+                h("b", null, p.name),
+                pd <= 0 && O(p) > 0
+                  ? h("span", { class: "pill ok" }, t("completed"))
+                  : h("span", { class: "pill" }, t("receivable") + " " + fmt(pd))
+              ),
+              h("div", { class: "mut num" }, p.mobile + (loc ? " · 📍 " + loc : "")),
+              personMiniBoxes(p)
+            );
+          }) : h("div", { class: "mut" }, t("noMembersYet"))
         )
       );
     }
@@ -1388,12 +1845,18 @@
               if (!sel.value || !(a > 0)) { view.cashErr = t("errCashInput"); render(); return; }
               view.cashErr = "";
               const d = db.donors.find(x => x.id === sel.value);
+              const curOffer = O(d);
+              const nextOffer = curOffer + a;
               ask({
                 title: t("confirmAddCash"),
-                lines: [d.name + " → " + fmt(a) + (note.value ? " · " + note.value : ""), t("willRecordWithLeader")],
+                lines: [
+                  d.name + " → " + fmt(a) + (note.value ? " · " + note.value : ""),
+                  t("willRecordWithLeaderAndOffer", fmt(curOffer), fmt(nextOffer))
+                ],
                 needPw: false,
                 run: () => {
-                  db.entries.push({ id: "x" + Date.now(), colId: view.col, batch: b, donorId: d.id, amount: a, at: new Date().toLocaleDateString("en-IN"), note: note.value.trim(), status: "held" });
+                  setC(d, nextOffer, R(d));
+                  db.entries.push({ id: "x" + Date.now(), colId: view.col, batch: b, donorId: d.id, amount: a, at: nowStamp(), note: note.value.trim(), status: "held" });
                 }
               });
             }
@@ -1432,6 +1895,17 @@
                 needPw: false,
                 run: () => {
                   setC(d, newOffer, R(d));
+                  db.pledgeLogs = db.pledgeLogs || [];
+                  db.pledgeLogs.push({
+                    id: "pl" + Date.now(),
+                    colId: view.col,
+                    batch: b,
+                    donorId: d.id,
+                    donorName: d.name,
+                    amount: a,
+                    by: l.username,
+                    at: nowStamp()
+                  });
                 }
               });
             }
@@ -1448,6 +1922,22 @@
       const ents = db.entries.filter(x => x.batch === b && x.colId === view.col).slice().reverse();
       out.push(h("div", { class: "card" }, h("h2", null, t("cashRecordsTitle")),
         ents.length ? ents.slice(0, 30).map(en => entryRow(en, en.status === "held" && h("button", { class: "dng sm", on: { click: () => ask({ title: t("confirmDelRecord"), lines: [(db.donors.find(x => x.id === en.donorId) || { name: "" }).name + " · " + fmt(en.amount)], needPw: true, run: () => { db.entries = db.entries.filter(z => z.id !== en.id); } }) } }, t("removeBtn")))) : h("div", { class: "mut" }, t("noRecordsYet"))));
+      const bPledges = (db.pledgeLogs || []).filter(x => x.batch === b && x.colId === view.col).slice().reverse();
+      if (bPledges.length > 0) {
+        out.push(h("div", { class: "card" },
+          h("h2", null, t("pledgeHistoryTitle") + " (" + bPledges.length + ")"),
+          ...bPledges.slice(0, 30).map(pl => {
+            const dn = (db.donors.find(x => x.id === pl.donorId) || {}).name || pl.donorName || "";
+            return h("div", { class: "ent" },
+              h("div", { style: "min-width:0" },
+                h("div", { class: "num" }, h("b", null, dn), " · +" + fmt(pl.amount)),
+                h("div", { class: "mut num" }, "🕒 " + (pl.at || ""))
+              ),
+              h("span", { class: "pill ok" }, t("offer"))
+            );
+          })
+        ));
+      }
     } 
     else if (view.lSec === "members") {
       out.push(
@@ -1460,24 +1950,31 @@
       );
     } 
     else if (view.lSec === "batches") {
+      const remPledgeLabel = curLang === "ml" ? "ബാക്കി വാഗ്ദാനം" : t("pending");
       out.push(
         h("div", { class: "card" },
-          h("h2", null, t("batchesInfoTitle") + " · " + colName()),
-          ...db.batches.map(x => {
-            const l = db.donors.filter(z => z.batch === x), o = sumO(l), r = sumR(l), xh = heldB(x), mine = x === b;
-            return h("div", { class: "batch" + (mine ? " mine" : "") },
-              h("div", { class: "row" }, h("b", null, t("batch") + " " + x + (mine ? t("yourBatchTag") : "")), h("span", { class: "mut num" }, t("offer") + " " + fmt(o))),
-              h("div", { class: "row mut num" },
-                h("span", null, t("receivedCentral") + " " + fmt(r)),
-                h("span", null, t("withLeader") + " " + fmt(xh))
-              ),
-              h("div", { class: "row mut num" },
-                h("span", null, t("pending") + " " + fmt(Math.max(0, o - r - xh)))
-              ),
-              bar(o, r + xh)
-            );
-          })
-        )
+          h("h2", null, t("grandTotal") + " · " + colName()),
+          tiles(go, gr, totalHeldAll, true),
+          bar(go, gr + totalHeldAll),
+          h("div", { class: "mut" }, t("batchesOnlySub", db.batches.length)),
+          coopBoxes(db.donors)
+        ),
+        batchCoopGraph(db.batches),
+        h("div", { class: "card", style: "padding:12px 15px" },
+          h("h2", null, t("batchWiseInfo"))
+        ),
+        ...db.batches.map(x => {
+          const l = db.donors.filter(z => z.batch === x), o = sumO(l), r = sumR(l), xh = heldB(x), mine = x === b;
+          return h("div", { class: "card" + (mine ? " mine" : "") },
+            h("div", { class: "row" },
+              h("span", { style: "font-size:17px;font-weight:700;line-height:1.25" }, t("batch") + " " + x + (mine ? t("yourBatchTag") : "")),
+              h("span", { class: "mut", style: "font-size:13px" }, batchLeaderText(x))
+            ),
+            coopBoxes(l),
+            batchMiniBoxes(l, xh),
+            bar(o, r + xh)
+          );
+        })
       );
     }
 
@@ -1738,6 +2235,8 @@
   function ownerView() {
     const o = sumO(db.donors), r = sumR(db.donors);
     const pendingEntriesCount = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).length;
+    const pendingGpayList = (db.gpayEntries || []).filter(e => e.status === "pending" && e.colId === view.col);
+    const pendingGpayCount = pendingGpayList.length;
     const statusBadge = isCloudConnected
       ? h("span", { class: "badge ok" }, t("liveDbBadge"))
       : h("span", { class: "badge" }, t("localModeBadge"));
@@ -1753,6 +2252,7 @@
       { k: "dash", ic: "📊", l: t("tabTotal") },
       { k: "batches", ic: "🎓", l: t("tabBatch") },
       { k: "cash", ic: "💰", l: t("tabHandover"), badge: pendingEntriesCount || null },
+      { k: "gpay", ic: "💳", l: t("tabGpay"), badge: pendingGpayCount || null },
       { k: "members", ic: "👥", l: t("tabMembers") },
       { k: "settings", ic: "⚙️", l: t("tabSettings") }
     ], view.oSec, k => { view.oSec = k; view.edit = null; view.ledit = null; render(); });
@@ -1766,11 +2266,14 @@
           h("h2", null, t("grandTotal") + " · " + colName()),
           tiles(o, r, totalHeldAll, true),
           bar(o, r + totalHeldAll),
+          h("div", { class: "mut" }, t("batchesOnlySub", db.batches.length)),
+          coopBoxes(db.donors),
           h("div", { class: "row" },
             h("div", { class: "mut" }, t("batchesAndMembers", db.batches.length, db.donors.length)),
             db.donors.length > 0 && h("button", { class: "sec sm", on: { click: exportReportCSV } }, t("exportReportBtn"))
           )
-        )
+        ),
+        batchCoopGraph(db.batches)
       );
     } 
     else if (view.oSec === "batches") {
@@ -1798,7 +2301,8 @@
                 : h("span", { class: "pill" }, t("membersCountPill", bl.length))
             ),
             tiles(bo, br, bh),
-            bar(bo, br + bh)
+            bar(bo, br + bh),
+            coopBoxes(bl)
           );
         })
       );
@@ -1817,7 +2321,13 @@
           lines: [...list.map(en => (db.donors.find(x => x.id === en.donorId) || { name: "?" }).name + " · " + fmt(en.amount)), t("confirmHandoverLine", fmt(sum(list, "amount")), b)],
           needPw: false,
           run: () => {
-            list.forEach(en => { const d = db.donors.find(x => x.id === en.donorId); if (d) setC(d, O(d), R(d) + en.amount); en.status = "confirmed"; });
+            list.forEach(en => {
+              const curEntry = (db.entries || []).find(x => x.id === en.id);
+              if (!curEntry || curEntry.status !== "held") return;
+              const d = db.donors.find(x => x.id === curEntry.donorId);
+              if (d) setC(d, O(d), R(d) + Number(curEntry.amount || 0));
+              curEntry.status = "confirmed";
+            });
           }
         });
         ho.append(h("div", { class: "batch" }, h("div", { class: "row" }, h("b", null, t("batch") + " " + b + (ld ? " · " + ld.username : "")), h("span", { class: "pill am num" }, fmt(tot))),
@@ -1825,7 +2335,54 @@
           es.length > 1 && h("button", { class: "sm", on: { click: () => confirmE(es) } }, t("allBatchReceivedBtn", fmt(tot)))));
       });
       out.push(ho);
-    } 
+    }
+    else if (view.oSec === "gpay") {
+      const goCard = h("div", { class: "card" },
+        h("h2", null, t("gpayAdminTitle") + " · " + colName()),
+        h("p", { class: "sub" }, t("gpayAdminSub")),
+        db.gpayUpiId ? h("div", { class: "mut num" }, t("gpayCurLabel") + db.gpayUpiId) : null
+      );
+      if (!pendingGpayList.length) {
+        goCard.append(h("div", { class: "mut" }, t("noGpayPending")));
+      } else {
+        pendingGpayList.forEach(ge => {
+          const donor = db.donors.find(x => x.id === ge.donorId);
+          const dName = donor ? donor.name : (ge.donorName || t("removedTag"));
+          const dBatch = donor ? donor.batch : ge.batch;
+          const displayAmt = Number(ge.amount || 0);
+          const confirmGpay = () => ask({
+            title: t("confirmGpayHandoverTitle"),
+            lines: [
+              t("gpayBatchLabel", dBatch) + " · " + dName + " · " + fmt(displayAmt),
+              t("confirmGpayHandoverLine", fmt(displayAmt), dName)
+            ],
+            needPw: false,
+            run: () => {
+              const curGe = (db.gpayEntries || []).find(x => x.id === ge.id);
+              if (!curGe || curGe.status !== "pending") return;
+              const amtVal = Number(curGe.amount || 0);
+              if (donor) {
+                setC(donor, O(donor) + amtVal, R(donor) + amtVal);
+              }
+              curGe.status = "confirmed";
+            }
+          });
+          goCard.append(
+            h("div", { class: "ent" },
+              h("div", { style: "min-width:0" },
+                h("div", { class: "num" }, h("b", null, dName), " · " + t("gpayBatchLabel", dBatch) + " · " + fmt(displayAmt)),
+                h("div", { class: "mut" }, (ge.mobile || "") + (ge.at ? " · " + ge.at : "") + (ge.upiId ? " · " + ge.upiId : ""))
+              ),
+              h("div", { class: "row" },
+                h("span", { class: "pill am" }, t("gpayFromMember")),
+                h("button", { class: "sec sm", on: { click: confirmGpay } }, t("receivedBtn"))
+              )
+            )
+          );
+        });
+      }
+      out.push(goCard);
+    }
     else if (view.oSec === "members") {
       out.push(addMemberUI(null), searchCard(null));
       const list = h("div", { class: "card" }, h("h2", null, t("membersByBatchTitle", db.batches.length)));
@@ -1859,6 +2416,48 @@
       if (!view.ledit) lc.append(h("button", { on: { click: () => { const b0 = db.batches[0] || 1, m0 = db.donors.find(d => d.batch === b0); view.ledit = { id: null, username: "", mobile: m0 ? m0.mobile : "", donorId: m0 ? m0.id : "", batch: b0, pwText: "" }; view.lErr = ""; view.lscroll = true; render(); } } }, t("addNewLeaderBtn")));
       out.push(lc);
       if (view.ledit) out.push(leaderForm());
+
+      const upiInput = h("input", {
+        id: "gpayUpiInput",
+        type: "text",
+        placeholder: t("gpayUpiPh"),
+        value: db.gpayUpiId || ""
+      });
+      const upiErr = h("div", { class: "err", role: "alert", style: "display:none" });
+      out.push(
+        h("form", {
+          class: "card",
+          on: {
+            submit: ev => {
+              ev.preventDefault();
+              const val = upiInput.value.trim();
+              if (!val || !val.includes("@")) {
+                upiErr.textContent = t("errInvalidUpi");
+                upiErr.style.display = "block";
+                return;
+              }
+              upiErr.style.display = "none";
+              ask({
+                title: t("confirmGpayUpiTitle"),
+                lines: [
+                  t("gpayCurLabel") + (db.gpayUpiId || t("noneLabel")),
+                  t("gpayUpiLabel") + ": " + val
+                ],
+                needPw: true,
+                run: () => {
+                  db.gpayUpiId = val;
+                }
+              });
+            }
+          }
+        },
+          h("h2", null, t("gpaySettingsTitle")),
+          db.gpayUpiId ? h("div", { class: "mut num" }, t("gpayCurLabel") + db.gpayUpiId) : null,
+          h("label", { for: "gpayUpiInput" }, t("gpayUpiLabel"), upiInput),
+          upiErr,
+          h("button", { type: "submit" }, t("gpaySaveBtn"))
+        )
+      );
 
       out.push(collManager());
       out.push(pwChangeCard(true, false));
@@ -1904,6 +2503,9 @@
         }
         isCloudConnected = true;
         onSnapshot(cloudRef, docSnap => {
+          if (isCloudSaving || isSavingConfirm || view.confirm) return;
+          const activeTag = (document.activeElement && document.activeElement.tagName) || "";
+          if (activeTag === "INPUT" || activeTag === "SELECT") return;
           if (docSnap.exists()) {
             db = docSnap.data();
             localStorage.setItem(DATA_KEY, JSON.stringify(db));
