@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ml">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COLLECTIONS – Database Backup</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans Malayalam",sans-serif;color:#172033;background:#f3f6fb}
+*{box-sizing:border-box}body{margin:0;padding:22px}.wrap{max-width:650px;margin:30px auto;background:#fff;border-radius:20px;padding:26px;box-shadow:0 12px 36px #1c31501a}
+h1{font-size:24px;margin:0 0 8px;color:#173b70}p{line-height:1.7}.warn{background:#fff6df;border:1px solid #f1d48a;padding:14px;border-radius:12px;margin:18px 0}
+button{border:0;border-radius:12px;background:#174b8c;color:white;font-size:17px;font-weight:700;padding:15px 20px;width:100%;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}.status{margin-top:16px;padding:12px;border-radius:10px;background:#eef3fa;white-space:pre-wrap;overflow-wrap:anywhere}
+small{color:#5e6b7e}ul{line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>COLLECTIONS – ഡാറ്റ Backup</h1>
+<p>ഈ പേജ് നിങ്ങളുടെ Firestore-ലെ <b>collections_data / main</b> രേഖ വായിച്ച് JSON ഫയലായി നിങ്ങളുടെ ഫോണിലേക്കോ കമ്പ്യൂട്ടറിലേക്കോ ഡൗൺലോഡ് ചെയ്യും. ഇത് ഡാറ്റയിൽ മാറ്റം വരുത്തുകയോ Delete ചെയ്യുകയോ ഇല്ല.</p>
+<div class="warn"><b>സുരക്ഷാ മുന്നറിയിപ്പ്:</b> Backup ഫയലിൽ അംഗങ്ങളുടെ സ്വകാര്യ വിവരങ്ങളും പഴയ അഡ്മിൻ പരിശോധനാ മൂല്യവും ഉണ്ടായേക്കാം. ഈ ഫയൽ ആരുമായും പങ്കിടരുത്; WhatsApp-ലോ പൊതുവായ Drive ഫോൾഡറിലോ അപ്‌ലോഡ് ചെയ്യരുത്.</div>
+<button id="backup">Backup ഡൗൺലോഡ് ചെയ്യുക</button>
+<div id="status" class="status">തയ്യാറാണ്. ബട്ടൺ അമർത്തുക.</div>
+<p><small>ഈ പേജ് വായന (read) മാത്രം നടത്തുന്നു. Firebase Rules മാറ്റില്ല.</small></p>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyD-53Kz_6_8WfxXe3b76GyCu-alUaDfjFg",
+  authDomain: "collections-388ec.firebaseapp.com",
+  projectId: "collections-388ec",
+  storageBucket: "collections-388ec.firebasestorage.app",
+  messagingSenderId: "941364152647",
+  appId: "1:941364152647:web:bbb79a5c34e57a88f4a462"
+};
+const btn=document.getElementById("backup"), status=document.getElementById("status");
+btn.addEventListener("click",async()=>{
+ btn.disabled=true;status.textContent="Firebase-ൽ നിന്ന് ഡാറ്റ വായിക്കുന്നു...";
+ try{
+  const app=initializeApp(firebaseConfig);
+  const db=getFirestore(app);
+  const ref=doc(db,"collections_data","main");
+  const snap=await getDoc(ref);
+  if(!snap.exists()) throw new Error("collections_data/main രേഖ കണ്ടെത്തിയില്ല.");
+  const payload={backupType:"COLLECTIONS_FIRESTORE_DOCUMENT",projectId:"collections-388ec",collection:"collections_data",document:"main",exportedAt:new Date().toISOString(),data:snap.data()};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="COLLECTIONS_BACKUP_"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  status.textContent="Backup ഡൗൺലോഡ് ആരംഭിച്ചു. ഫയൽ നിങ്ങളുടെ Downloads ഫോൾഡറിൽ സൂക്ഷിക്കുക. ഫയൽ ഇവിടെ ചാറ്റിൽ അയക്കരുത്.";
+ }catch(e){
+  status.textContent="Backup ലഭിച്ചില്ല: "+(e?.message||String(e))+"\nFirebase Rules-ൽ read അനുവദിക്കുന്നുണ്ടോ എന്ന് പരിശോധിക്കണം. Rules മാറ്റരുത്; ഈ സന്ദേശത്തിന്റെ Screenshot അയക്കുക.";
+ }finally{btn.disabled=false}
+});
+</script>
+</body>
+</html>
