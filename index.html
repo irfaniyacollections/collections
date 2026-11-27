@@ -47,7 +47,7 @@
     .pitem .pl{font-size:11.5px;color:var(--mut);font-weight:500}
     .pitem .pv{font-weight:700;font-size:14px;color:var(--fg)}
 
-    .err{color:var(--warn);font-weight:600;font-size:13px}
+    .err{color:var(--warn);font-weight:600;font-size:13px;white-space:pre-line}
     .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
     .tile{border:1px solid var(--line);border-top:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px;min-width:0;background:var(--card);box-shadow:0 4px 10px rgba(0,0,0,0.22),0 2px 0 rgba(0,0,0,0.24)}
     .tile .l{font-size:12px;color:var(--mut)}.tile .v{font:700 17px/1.3 Inter,sans-serif;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
@@ -106,8 +106,9 @@
 <body>
 <div id="app"></div>
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  let initializeApp, getFirestore, doc, getDoc, onSnapshot, runTransaction, collection, query, where, getDocs, setDoc, deleteDoc, updateDoc;
+  let getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updatePassword, reauthenticateWithCredential, EmailAuthProvider, setPersistence, browserLocalPersistence;
+  let cloudFs = null, cloudError = false, unsubSnap = null, lastPull = 0;
 
   const firebaseConfig = {
     apiKey: "AIzaSyD-53Kz_6_8WfxXe3b76GyCu-alUaDfjFg",
@@ -135,7 +136,7 @@
       selectCol: "കളക്ഷൻ തിരഞ്ഞെടുക്കുക",
       offer: "വാഗ്ദാനം",
       paid: "നൽകിയത്",
-      pending: "ബാക്കി",
+      pending: "പെൻഡിങ്",
       receivedCentral: "കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ചത്",
       withLeaders: "ലീഡർമാരുടെ കയ്യിൽ",
       withLeader: "ലീഡറുടെ കയ്യിൽ",
@@ -189,8 +190,22 @@
       totalMembersInBatch: n => `ബാച്ചിലെ ആകെ അംഗങ്ങൾ: ${n}`,
       batchMembersList: b => `ബാച്ച് ${b} · അംഗങ്ങളുടെ ലിസ്റ്റ്`,
       makeNewPledge: "Google Pay / UPI പേയ്‌മെന്റ്",
-      pledgeDescLeader: "കേന്ദ്ര കമ്മിറ്റിയിലേക്ക് നേരിട്ട് പണം അയക്കാം. തുക ടൈപ്പ് ചെയ്ത് പേയ്‌മെന്റ് നടത്തുക.",
-      pledgeDescNoLeader: "കേന്ദ്ര കമ്മിറ്റിയിലേക്ക് നേരിട്ട് പണം അയക്കാം. തുക ടൈപ്പ് ചെയ്ത് പേയ്‌മെന്റ് നടത്തുക.",
+      pledgeDescLeader: "1. തുക നൽകി Google Pay വഴി പണമയക്കുക. 2. തുടർന്ന് പേയ്‌മെന്റ് സ്ക്രീൻഷോട്ട് അപ്‌ലോഡ് ചെയ്യുക — തീയതി, സമയം (15 മിനിറ്റിനുള്ളിൽ), UPI ID, 12-അക്ക UPI Transaction ID എന്നിവ ഒത്തുവന്നാൽ സ്ക്രീൻഷോട്ടിലുള്ള തുക നേരിട്ട് അഡ്മിന്റെ GPay ടാബിലേക്ക് പോകും.",
+      pledgeDescNoLeader: "1. തുക നൽകി Google Pay വഴി പണമയക്കുക. 2. തുടർന്ന് പേയ്‌മെന്റ് സ്ക്രീൻഷോട്ട് അപ്‌ലോഡ് ചെയ്യുക — തീയതി, സമയം (15 മിനിറ്റിനുള്ളിൽ), UPI ID, 12-അക്ക UPI Transaction ID എന്നിവ ഒത്തുവന്നാൽ സ്ക്രീൻഷോട്ടിലുള്ള തുക നേരിട്ട് അഡ്മിന്റെ GPay ടാബിലേക്ക് പോകും.",
+      ssUploadLabel: "പേയ്‌മെന്റ് സ്ക്രീൻഷോട്ട് അപ്‌ലോഡ് ചെയ്യുക (Screenshot)",
+      ssVerifyBtn: "🔍 സ്ക്രീൻഷോട്ട് പരിശോധിച്ച് അഡ്മിന് അയയ്ക്കുക",
+      ssScanning: "⏳ സ്ക്രീൻഷോട്ട് പരിശോധിക്കുന്നു (തുക, തീയതി, സമയം, UPI ID, 12-അക്ക ID)…",
+      errSelectSs: "പേയ്‌മെന്റ് സ്ക്രീൻഷോട്ട് തിരഞ്ഞെടുക്കുക.",
+      errOcrLoad: "സ്ക്രീൻഷോട്ട് റീഡർ ലോഡ് ആകുന്നില്ല. ഇന്റർനെറ്റ് കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.",
+      errSsNoSuccess: "ഒത്തുവരാത്തത്: പേയ്‌മെന്റ് പൂർത്തിയായ ('Completed' / 'Paid') വിവരം സ്ക്രീൻഷോട്ടിൽ കാണുന്നില്ല.",
+      errSsAmountMismatch: () => "ഒത്തുവരാത്തത്: സ്ക്രീൻഷോട്ടിൽ പേയ്‌മെന്റ് തുക (₹) വ്യക്തമായി കണ്ടെത്താനായില്ല.",
+      errSsUpiMismatch: u => `ഒത്തുവരാത്തത്: UPI ID (${u}) സ്ക്രീൻഷോട്ടിൽ കാണുന്നില്ല.`,
+      errSsDateMismatch: "ഒത്തുവരാത്തത്: സ്ക്രീൻഷോട്ടിലെ തീയതി ഇന്നത്തെ തീയതിയുമായി ഒത്തുവരുന്നില്ല.",
+      errSsTimeWindow: "ഒത്തുവരാത്തത്: സ്ക്രീൻഷോട്ടിലെ സമയം 15 മിനിറ്റ് സമയപരിധിക്കുള്ളിൽ അല്ല അല്ലെങ്കിൽ സമയം വ്യക്തമല്ല.",
+      errSsNoUtr: "ഒത്തുവരാത്തത്: സ്ക്രീൻഷോട്ടിൽ 12-അക്ക UPI Transaction ID കാണുന്നില്ല.",
+      errSsDupUtr: utr => `ഒത്തുവരാത്തത്: ഈ 12-അക്ക UPI Transaction ID (${utr}) മുമ്പ് ഉപയോഗിച്ചതാണ്.`,
+      errSsMultiMismatch: reasons => "ഒത്തുവരാത്ത കാര്യങ്ങൾ:\n• " + reasons.join("\n• "),
+      gpayVerifiedSentMsg: (amt, utr) => `✅ ${amt} (UPI Txn ID: ${utr}) — സ്ക്രീൻഷോട്ട് ശരിയാണെന്ന് ഉറപ്പാക്കി അഡ്മിനെ അറിയിച്ചു`,
       selfPledgeTitle: "വാഗ്ദാനം ചെയ്യുക",
       selfPledgePrompt: "വാഗ്ദാനം ഏറ്റെടുക്കേണ്ട തുക എന്റർ ചെയ്ത് ബട്ടൺ ഞെക്കുക.",
       selfPledgeNote: "വാഗ്ദാനം ഏറ്റെടുത്ത് പണം പിന്നീട് നൽകാനുള്ള ഓപ്ഷൻ ആണ് ഇത്.",
@@ -210,12 +225,12 @@
       gpayCurLabel: "നിലവിലെ UPI ID: ",
       gpaySaveBtn: "UPI ID സേവ് ചെയ്യുക",
       confirmGpayUpiTitle: "Google Pay UPI ID സ്ഥിരീകരിക്കുക",
-      errInvalidUpi: "സാധുവായ ഒരു UPI ID നൽകുക (ഉദാ: name@bank).",
+      errInvalidUpi: "സാധുവായ UPI ID (ഉദാ: name@bank) നൽകുക.",
       gpayAdminTitle: "Google Pay പേയ്‌മെന്റുകൾ",
-      gpayAdminSub: "അംഗങ്ങൾ Google Pay വഴി അയച്ചതായി അറിയിച്ച തുകകൾ താഴെ കാണാം. 'ലഭിച്ചു' അമർത്തുമ്പോൾ വാഗ്ദാനത്തിലും കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ചതിലും ആഡ് ആകും.",
+      gpayAdminSub: "അംഗങ്ങൾ Google Pay വഴി അയച്ചതായി അറിയിച്ച തുകകൾ താഴെ കാണാം. ബാങ്കിൽ UTR ഒത്തുനോക്കിയ ശേഷം 'ലഭിച്ചു' അമർത്തുക; തെറ്റായതാണെങ്കിൽ 'നിരസിക്കുക'.",
       noGpayPending: "നിലവിൽ സ്ഥിരീകരിക്കാൻ GPay എൻട്രികൾ ഇല്ല.",
       confirmGpayHandoverTitle: "ഈ GPay തുക ലഭിച്ചതായി കൺഫോം ആക്കണോ?",
-      confirmGpayHandoverLine: (amt, name) => `${name} · ${amt} — വാഗ്ദാനത്തിലും കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ചതിലും ആഡ് ആകും.`,
+      confirmGpayHandoverLine: (amt, name) => `${name} · ${amt} — കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ച തുകയിൽ ചേരും.`,
       gpayBatchLabel: b => `ബാച്ച് ${b}`,
       gpayFromMember: "അംഗം → GPay",
       memberGpayHistoryTitle: "Google Pay പേയ്‌മെന്റ് വിവരങ്ങൾ",
@@ -246,7 +261,7 @@
       adminOnlyNote: e => `കേന്ദ്ര കമ്മിറ്റിക്ക് ലഭിച്ചത്: ${e} (അഡ്മിൻ മാത്രം ചേർക്കും)`,
       pwOnlyIfChange: "മാറ്റണമെങ്കിൽ മാത്രം",
       loginPwPh: "ലോഗിൻ പാസ്‌വേഡ്",
-      errReqMemberFields: id => "പേര്, മൊബൈൽ" + (id ? "" : ", പാസ്‌വേഡ്") + " നൽകണം.",
+      errReqMemberFields: id => "പേര്, മൊബൈൽ നൽകണം.",
       errEnglishOnly: "പേര്, സ്ഥലം, ജില്ല എന്നിവ ഇംഗ്ലീഷിൽ (English) മാത്രമേ നൽകാൻ പാടുള്ളൂ.",
       errDupMobileBatch: "ഈ ബാച്ചിൽ ഈ മൊബൈൽ നമ്പർ ഇതിനകം ഉണ്ട്.",
       confirmEditMember: "മാറ്റങ്ങൾ സ്ഥിരീകരിക്കുക",
@@ -342,7 +357,7 @@
       localModeBadge: "● ലോക്കൽ മോഡ്",
       exportReportBtn: "📥 റിപ്പോർട്ട് (CSV/Excel)",
       batchFullDetailsTitle: "ബാച്ച് തിരിച്ചുള്ള പൂർണ്ണ വിവരങ്ങൾ",
-      batchFullDetailsSub: n => `ആകെ ${n} ബാച്ചുകൾ · ഓരോ ബാച്ചിന്റെയും വാഗ്ദാനം, കമ്മിറ്റിക്ക് ലഭിച്ചത്, ലീഡറുടെ കയ്യിലുള്ളത്, ബാക്കി എന്നിവ താഴെ കാണാം.`,
+      batchFullDetailsSub: n => `ആകെ ${n} ബാച്ചുകൾ · ഓരോ ബാച്ചിന്റെയും വാഗ്ദാനം, കമ്മിറ്റിക്ക് ലഭിച്ചത്, ലീഡറുടെ കയ്യിലുള്ളത്, പെൻഡിങ് എന്നിവ താഴെ കാണാം.`,
       leaderLabel: "ലീഡർ: ",
       leaderNotAssigned: "ലീഡറെ നിശ്ചയിച്ചിട്ടില്ല",
       fullyReceivedPill: "പൂർണ്ണമായി ലഭിച്ചു",
@@ -373,7 +388,72 @@
       placeLine: "സ്ഥലം",
       pwWillChange: "പാസ്‌വേഡ് മാറ്റും",
       pwWillSet: "പാസ്‌വേഡ് സെറ്റ് ചെയ്യും",
-      noneLabel: "ഇല്ല"
+      noneLabel: "ഇല്ല",
+      flashConflict: "മറ്റൊരാൾ അതിനിടയിൽ വിവരങ്ങൾ മാറ്റിയതിനാൽ നിങ്ങളുടെ മാറ്റം സേവ് ആയില്ല. ഏറ്റവും പുതിയ വിവരങ്ങൾ ലോഡ് ചെയ്തിട്ടുണ്ട്, ദയവായി ഒന്നുകൂടി ചെയ്യുക.",
+      flashSaveFail: "സേവ് ചെയ്യാൻ കഴിഞ്ഞില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.",
+      cloudErr: "ഡാറ്റാബേസുമായി ബന്ധപ്പെടാൻ കഴിഞ്ഞില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.",
+      retryBtn: "വീണ്ടും ശ്രമിക്കുക",
+      rejectBtn: "നിരസിക്കുക",
+      confirmRejectGpayTitle: "ഈ GPay എൻട്രി നിരസിക്കണോ?",
+      gpayStatusRejected: "❌ അഡ്മിൻ നിരസിച്ചു",
+      gpayHistoryTitle: "കഴിഞ്ഞ GPay എൻട്രികൾ",
+      colNamePh: "ഉദാ: കണ്യാല മൗല ആണ്ട് 2027",
+      errAmtInvalid: "തുക പൂർണ്ണസംഖ്യ (0 അല്ലെങ്കിൽ കൂടുതൽ) ആയിരിക്കണം.",
+      errOfferLow: min => `വാഗ്ദാനം ${min}-ൽ കുറയരുത് (ലഭിച്ചതും ലീഡറുടെ കയ്യിലുള്ളതും ചേർത്ത്).`,
+      gpayAmtLabel: "ബാങ്കിൽ ലഭിച്ച തുക (₹) — തെറ്റാണെങ്കിൽ തിരുത്തുക",
+      accTitle: "കണക്ക് പരിശോധന",
+      accOk: "✅ എല്ലാ കണക്കുകളും ശരിയാണ്",
+      accBad: n => `⚠️ ${n} പൊരുത്തക്കേട് കണ്ടെത്തി`,
+      accLow: (c, n, b, o, r, h) => `${c} · ${n} (ബാച്ച് ${b}): വാഗ്ദാനം ${o} < ലഭിച്ചത് ${r} + ലീഡറുടെ കയ്യിൽ ${h}`,
+      accTie: c => `${c}: ബാച്ച് തുകകളുടെ ആകെ ഗ്രാൻഡ് ടോട്ടലുമായി ഒത്തുവരുന്നില്ല`,
+      accEntry: id => `അസാധുവായ എൻട്രി: ${id}`,
+      accUtr: u => `ഒരേ UTR ഒന്നിലധികം തവണ: ${u}`,
+      accDup: n => `ഒരേ ബാച്ചിൽ ഒരേ മൊബൈൽ നമ്പർ: ${n}`,
+      accBatch: n => `ബാച്ച് ഇല്ലാത്ത അംഗം: ${n}`,
+      accNum: (c, n) => `${c} · ${n}: തുക പൂർണ്ണസംഖ്യയല്ല അല്ലെങ്കിൽ നെഗറ്റീവ് ആണ്`,
+      flashTooBig: "ഡാറ്റാബേസ് പരിധി (1 MB) അടുത്തതിനാൽ ഈ മാറ്റം സേവ് ചെയ്തില്ല. അഡ്മിനെ അറിയിക്കുക.",
+      backupTitle: "ബാക്കപ്പ്",
+      backupNote: "എല്ലാ വിവരങ്ങളും ഒരു ഫയലായി ഡൗൺലോഡ് ചെയ്യുക. ആഴ്ചയിലൊരിക്കലെങ്കിലും ചെയ്യുക. ഫയലിൽ പാസ്‌വേഡുകൾ ഇല്ല; എങ്കിലും സുരക്ഷിതമായി സൂക്ഷിക്കുക.",
+      sizeLabel: (kb, pct) => `ഡാറ്റാ വലുപ്പം: ${kb} KB (പരിധിയുടെ ${pct}%)`,
+      backupBtn: "📥 ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക",
+      restoreTitle: "ബാക്കപ്പ് ഫയലിൽ നിന്ന് പുനഃസ്ഥാപിക്കുക",
+      errPickFile: "ആദ്യം ബാക്കപ്പ് ഫയൽ തിരഞ്ഞെടുക്കുക.",
+      errBadBackup: "ഇത് സാധുവായ COLLECTIONS ബാക്കപ്പ് ഫയൽ അല്ല.",
+      confirmRestoreTitle: "ബാക്കപ്പിൽ നിന്ന് പുനഃസ്ഥാപിക്കണോ?",
+      restoreLine: (d, c, e) => `ഫയലിൽ: ${d} അംഗങ്ങൾ · ${c} കളക്ഷൻ · ${e} ക്യാഷ് എൻട്രി`,
+      restoreWarn: "⚠️ ഇപ്പോഴുള്ള എല്ലാ വിവരങ്ങളും ഈ ഫയലിലെ വിവരങ്ങൾ കൊണ്ട് മാറ്റപ്പെടും.",
+      restoreBtn: "ബാക്കപ്പിൽ നിന്ന് പുനഃസ്ഥാപിക്കുക",
+      errNetwork: "ഇന്റർനെറ്റ് കണക്ഷൻ പരിശോധിക്കുക.",
+      errTooMany: "വളരെയധികം ശ്രമങ്ങൾ. കുറച്ചു കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.",
+      errNoProfile: "ഈ അക്കൗണ്ട് ഇപ്പോൾ ആപ്പിൽ സജീവമല്ല. ലീഡറെയോ അഡ്മിനെയോ ബന്ധപ്പെടുക.",
+      forcedPwTitle: "പുതിയ പാസ്‌വേഡ് സെറ്റ് ചെയ്യുക",
+      forcedPwMsg: "സുരക്ഷയ്ക്കായി, ആദ്യത്തെ പാസ്‌വേഡ് (നിങ്ങളുടെ മൊബൈൽ നമ്പർ) മാറ്റിയ ശേഷമേ തുടരാനാകൂ. ഓർമ്മിക്കാവുന്ന ഒരു പുതിയ പാസ്‌വേഡ് നൽകുക.",
+      changePwTitle: "പാസ്‌വേഡ് മാറ്റുക",
+      pwChangedOk: "പാസ്‌വേഡ് മാറ്റി.",
+      errPwSame: "പുതിയ പാസ്‌വേഡ് ഇപ്പോഴത്തേതിൽ നിന്ന് വ്യത്യസ്തമാകണം.",
+      errPwMobile: "മൊബൈൽ നമ്പർ പാസ്‌വേഡ് ആക്കരുത്.",
+      errPwChangeFail: "പാസ്‌വേഡ് മാറ്റാനായില്ല. വീണ്ടും ശ്രമിക്കുക.",
+      initPwNote: "ആദ്യ പാസ്‌വേഡ് = മൊബൈൽ നമ്പർ. ആദ്യ ലോഗിനിൽ തന്നെ മാറ്റേണ്ടിവരും.",
+      errMobileFmt: "മൊബൈൽ നമ്പർ അക്കങ്ങൾ മാത്രം (6–15) ആയിരിക്കണം.",
+      errAcctFail: "ലോഗിൻ അക്കൗണ്ട് ഉണ്ടാക്കാനായില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.",
+      resetPwBtn: "പാസ്‌വേഡ് റീസെറ്റ് (മൊബൈൽ നമ്പറിലേക്ക്)",
+      confirmResetPw: "പാസ്‌വേഡ് റീസെറ്റ് ചെയ്യണോ?",
+      loginsTitle: "ലോഗിൻ അക്കൗണ്ടുകൾ",
+      loginsNote: "ലോഗിൻ ഇല്ലാത്തവർക്ക് ഒറ്റയടിക്ക് ഉണ്ടാക്കാം. ആദ്യ പാസ്‌വേഡ് = മൊബൈൽ നമ്പർ.",
+      loginsMissing: (m, l) => `ലോഗിൻ ഇല്ലാത്തവർ: ${m} അംഗങ്ങൾ, ${l} ലീഡർമാർ`,
+      loginsCreateBtn: "ലോഗിനുകൾ ഉണ്ടാക്കുക",
+      loginsConfirm: "ലോഗിൻ അക്കൗണ്ടുകൾ ഉണ്ടാക്കണോ?",
+      loginsDone: (o, b) => `ഉണ്ടാക്കി: ${o}, പരാജയം: ${b}`,
+      loginsAllOk: "✅ എല്ലാവർക്കും ലോഗിൻ ഉണ്ട്",
+      reqTitle: n => `വാഗ്ദാന അഭ്യർത്ഥനകൾ (${n})`,
+      reqAccept: "അംഗീകരിക്കുക",
+      reqReject: "നിരസിക്കുക",
+      reqAcceptTitle: "ഈ വാഗ്ദാനം അംഗീകരിക്കണോ?",
+      reqRejectTitle: "ഈ അഭ്യർത്ഥന നിരസിക്കണോ?",
+      reqSent: "അഭ്യർത്ഥന അയച്ചു. ലീഡർ/അഡ്മിൻ അംഗീകരിച്ചാൽ വാഗ്ദാനത്തിൽ ചേരും.",
+      reqInvalid: "ഈ അഭ്യർത്ഥന അസാധുവാണ്; ഒഴിവാക്കി.",
+      reqMine: "അംഗീകാരം കാത്തിരിക്കുന്ന നിങ്ങളുടെ അഭ്യർത്ഥനകൾ",
+      selfPledgeReqMsg: "ഇത് വാഗ്ദാനത്തിനുള്ള അഭ്യർത്ഥനയാണ്. ലീഡറോ അഡ്മിനോ അംഗീകരിച്ച ശേഷമേ തുക നിങ്ങളുടെ വാഗ്ദാനത്തിൽ ചേരൂ."
     },
     en: {
       selectLang: "Select Language",
@@ -438,8 +518,22 @@
       totalMembersInBatch: n => `Total members in batch: ${n}`,
       batchMembersList: b => `Batch ${b} · Members List`,
       makeNewPledge: "Google Pay / UPI Payment",
-      pledgeDescLeader: "Send directly to the Central Committee. Type the amount and make payment.",
-      pledgeDescNoLeader: "Send directly to the Central Committee. Type the amount and make payment.",
+      pledgeDescLeader: "1. Enter amount and pay via Google Pay. 2. Upload the payment screenshot below — if Today's Date, Time (within 15 mins), UPI ID, and 12-digit UPI Transaction ID match, the exact amount shown in the screenshot is sent to Admin's GPay tab.",
+      pledgeDescNoLeader: "1. Enter amount and pay via Google Pay. 2. Upload the payment screenshot below — if Today's Date, Time (within 15 mins), UPI ID, and 12-digit UPI Transaction ID match, the exact amount shown in the screenshot is sent to Admin's GPay tab.",
+      ssUploadLabel: "Upload Payment Screenshot",
+      ssVerifyBtn: "🔍 Verify Screenshot & Notify Admin",
+      ssScanning: "⏳ Scanning screenshot (Amount, Date, Time, UPI ID, 12-digit ID)…",
+      errSelectSs: "Please select the payment screenshot.",
+      errOcrLoad: "Screenshot scanner failed to load. Check internet connection and retry.",
+      errSsNoSuccess: "Mismatch: Payment completion ('Completed' / 'Paid') not found in screenshot.",
+      errSsAmountMismatch: () => "Mismatch: Payment amount (₹) could not be read clearly from screenshot.",
+      errSsUpiMismatch: u => `Mismatch: UPI ID (${u}) not found in screenshot.`,
+      errSsDateMismatch: "Mismatch: Screenshot date does not match today's date.",
+      errSsTimeWindow: "Mismatch: Screenshot time is outside the 15-minute window or unclear.",
+      errSsNoUtr: "Mismatch: 12-digit UPI Transaction ID not found in screenshot.",
+      errSsDupUtr: utr => `Mismatch: This 12-digit UPI Transaction ID (${utr}) was already used.`,
+      errSsMultiMismatch: reasons => "Mismatches found:\n• " + reasons.join("\n• "),
+      gpayVerifiedSentMsg: (amt, utr) => `✅ ${amt} (UPI Txn ID: ${utr}) — Screenshot verified & Admin notified`,
       selfPledgeTitle: "Make a Pledge",
       selfPledgePrompt: "Enter the pledge amount to take and tap the button.",
       selfPledgeNote: "This is the option to take a pledge and pay the amount later.",
@@ -461,10 +555,10 @@
       confirmGpayUpiTitle: "Confirm Google Pay UPI ID",
       errInvalidUpi: "Please enter a valid UPI ID (e.g. name@bank).",
       gpayAdminTitle: "Google Pay Payments",
-      gpayAdminSub: "Members who submitted GPay payments appear here. Clicking 'Received' adds the amount to Offer and Received by Central Committee.",
+      gpayAdminSub: "GPay payments reported by members appear here. Match the UTR in your bank statement, then press 'Received'; press 'Reject' if it is wrong.",
       noGpayPending: "No pending GPay entries right now.",
       confirmGpayHandoverTitle: "Confirm GPay Amount Received?",
-      confirmGpayHandoverLine: (amt, name) => `${name} · ${amt} will be added to Offer and Received by Central Committee.`,
+      confirmGpayHandoverLine: (amt, name) => `${name} · ${amt} will be added to Received by Central Committee.`,
       gpayBatchLabel: b => `Batch ${b}`,
       gpayFromMember: "Member → GPay",
       memberGpayHistoryTitle: "Google Pay Payment History",
@@ -495,7 +589,7 @@
       adminOnlyNote: e => `Received by Central Committee: ${e} (Updated by Admin only)`,
       pwOnlyIfChange: "Only if changing",
       loginPwPh: "Login Password",
-      errReqMemberFields: id => "Name, Mobile" + (id ? "" : ", Password") + " are required.",
+      errReqMemberFields: id => "Name and Mobile are required.",
       errEnglishOnly: "Name, Place, and District must be entered in English only.",
       errDupMobileBatch: "This mobile number already exists in this batch.",
       confirmEditMember: "Confirm Member Changes",
@@ -622,7 +716,72 @@
       placeLine: "Place",
       pwWillChange: "Password will be updated",
       pwWillSet: "Password will be set",
-      noneLabel: "None"
+      noneLabel: "None",
+      flashConflict: "Someone else changed the data meanwhile, so your change was not saved. The latest data has been loaded; please do it again.",
+      flashSaveFail: "Could not save. Check your internet connection and try again.",
+      cloudErr: "Could not connect to the database. Check your internet connection and try again.",
+      retryBtn: "Retry",
+      rejectBtn: "Reject",
+      confirmRejectGpayTitle: "Reject this GPay entry?",
+      gpayStatusRejected: "❌ Rejected by Admin",
+      gpayHistoryTitle: "Past GPay Entries",
+      colNamePh: "e.g. Kanyala Maula Aandu 2027",
+      errAmtInvalid: "Amount must be a whole number (0 or more).",
+      errOfferLow: min => `Offer cannot be less than ${min} (received + held with leader).`,
+      gpayAmtLabel: "Amount received in bank (₹) — correct it if wrong",
+      accTitle: "Accounts Check",
+      accOk: "✅ All figures are consistent",
+      accBad: n => `⚠️ ${n} inconsistencies found`,
+      accLow: (c, n, b, o, r, h) => `${c} · ${n} (Batch ${b}): Offer ${o} < Received ${r} + With Leader ${h}`,
+      accTie: c => `${c}: Sum of batch totals does not match Grand Total`,
+      accEntry: id => `Invalid entry: ${id}`,
+      accUtr: u => `Same UTR used more than once: ${u}`,
+      accDup: n => `Same mobile twice in one batch: ${n}`,
+      accBatch: n => `Member in a non-existent batch: ${n}`,
+      accNum: (c, n) => `${c} · ${n}: amount is not a whole number or is negative`,
+      flashTooBig: "This change was not saved because the database is near its 1 MB limit. Please inform the Admin.",
+      backupTitle: "Backup",
+      backupNote: "Download all data as one file. Do this at least once a week. The file has no passwords, but still keep it safe.",
+      sizeLabel: (kb, pct) => `Data size: ${kb} KB (${pct}% of the limit)`,
+      backupBtn: "📥 Download Backup",
+      restoreTitle: "Restore from backup file",
+      errPickFile: "Please choose a backup file first.",
+      errBadBackup: "This is not a valid COLLECTIONS backup file.",
+      confirmRestoreTitle: "Restore from backup?",
+      restoreLine: (d, c, e) => `File has: ${d} members · ${c} collections · ${e} cash entries`,
+      restoreWarn: "⚠️ All current data will be REPLACED by the data in this file.",
+      restoreBtn: "Restore from Backup",
+      errNetwork: "Network error. Check your internet connection.",
+      errTooMany: "Too many attempts. Please try again later.",
+      errNoProfile: "This account is not active in the app. Please contact your leader or admin.",
+      forcedPwTitle: "Set your new password",
+      forcedPwMsg: "For security, you must change your first password (your mobile number) before continuing. Choose a new password you can remember.",
+      changePwTitle: "Change Password",
+      pwChangedOk: "Password changed.",
+      errPwSame: "New password must differ from the current one.",
+      errPwMobile: "Password cannot be your mobile number.",
+      errPwChangeFail: "Could not change the password. Try again.",
+      initPwNote: "Initial password = mobile number. It must be changed at first login.",
+      errMobileFmt: "Mobile number must be digits only (6–15).",
+      errAcctFail: "Could not create the login account. Check internet and try again.",
+      resetPwBtn: "Reset password (to mobile number)",
+      confirmResetPw: "Reset this password?",
+      loginsTitle: "Login accounts",
+      loginsNote: "Create logins for everyone who does not have one yet. Initial password = mobile number.",
+      loginsMissing: (m, l) => `Without login: ${m} members, ${l} leaders`,
+      loginsCreateBtn: "Create logins",
+      loginsConfirm: "Create login accounts?",
+      loginsDone: (o, b) => `Created: ${o}, failed: ${b}`,
+      loginsAllOk: "✅ Everyone has a login",
+      reqTitle: n => `Pledge requests (${n})`,
+      reqAccept: "Accept",
+      reqReject: "Reject",
+      reqAcceptTitle: "Accept this pledge?",
+      reqRejectTitle: "Reject this request?",
+      reqSent: "Request sent. It will be added to your pledge once your leader/admin approves.",
+      reqInvalid: "This request is invalid and was discarded.",
+      reqMine: "Your requests awaiting approval",
+      selfPledgeReqMsg: "This is a request. The amount is added to your pledge only after your leader or admin approves."
     },
     kn: {
       selectLang: "Select Language",
@@ -687,8 +846,22 @@
       totalMembersInBatch: n => `ಬ್ಯಾಚ್‌ನಲ್ಲಿರುವ ಒಟ್ಟು ಸದಸ್ಯರು: ${n}`,
       batchMembersList: b => `ಬ್ಯಾಚ್ ${b} · ಸದಸ್ಯರ ಪಟ್ಟಿ`,
       makeNewPledge: "Google Pay / UPI ಪಾವತಿ",
-      pledgeDescLeader: "ಕೇಂದ್ರ ಸಮಿತಿಗೆ ನೇರವಾಗಿ ಹಣ ಕಳುಹಿಸಬಹುದು. ಮೊತ್ತವನ್ನು ಟೈಪ್ ಮಾಡಿ ಪಾವತಿ ಮಾಡಿ.",
-      pledgeDescNoLeader: "ಕೇಂದ್ರ ಸಮಿತಿಗೆ ನೇರವಾಗಿ ಹಣ ಕಳುಹಿಸಬಹುದು. ಮೊತ್ತವನ್ನು ಟೈಪ್ ಮಾಡಿ ಪಾವತಿ ಮಾಡಿ.",
+      pledgeDescLeader: "1. ಮೊತ್ತ ನಮೂದಿಸಿ Google Pay ಮೂಲಕ ಪಾವತಿಸಿ. 2. ನಂತರ ಪಾವತಿ ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ — ಇಂದಿನ ದಿನಾಂಕ, ಸಮಯ (15 ನಿಮಿಷಗಳ ಒಳಗೆ), UPI ID ಮತ್ತು 12-ಅಂಕಿಯ ID ಹೊಂದಾಣಿಕೆಯಾದರೆ ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ನಲ್ಲಿರುವ ಮೊತ್ತ ಅಡ್ಮಿನ್ GPay ಟ್ಯಾಬ್‌ಗೆ ಹೋಗುತ್ತದೆ.",
+      pledgeDescNoLeader: "1. ಮೊತ್ತ ನಮೂದಿಸಿ Google Pay ಮೂಲಕ ಪಾವತಿಸಿ. 2. ನಂತರ ಪಾವತಿ ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ — ಇಂದಿನ ದಿನಾಂಕ, ಸಮಯ (15 ನಿಮಿಷಗಳ ಒಳಗೆ), UPI ID ಮತ್ತು 12-ಅಂಕಿಯ ID ಹೊಂದಾಣಿಕೆಯಾದರೆ ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ನಲ್ಲಿರುವ ಮೊತ್ತ ಅಡ್ಮಿನ್ GPay ಟ್ಯಾಬ್‌ಗೆ ಹೋಗುತ್ತದೆ.",
+      ssUploadLabel: "ಪಾವತಿ ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
+      ssVerifyBtn: "🔍 ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಪರಿಶೀಲಿಸಿ ಅಡ್ಮಿನ್‌ಗೆ ತಿಳಿಸಿ",
+      ssScanning: "⏳ ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…",
+      errSelectSs: "ದಯವಿಟ್ಟು ಪಾವತಿ ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಆಯ್ಕೆಮಾಡಿ.",
+      errOcrLoad: "ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಸ್ಕ್ಯಾನರ್ ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ.",
+      errSsNoSuccess: "ಹೊಂದಾಣಿಕೆಯಾಗದ ಅಂಶ: ಪಾವತಿ ಪೂರ್ಣಗೊಂಡ ('Completed' / 'Paid') ಮಾಹಿತಿ ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ನಲ್ಲಿಲ್ಲ.",
+      errSsAmountMismatch: () => "ಹೊಂದಾಣಿಕೆಯಾಗದ ಅಂಶ: ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ನಲ್ಲಿ ಪಾವತಿ ಮೊತ್ತ (₹) ಸ್ಪಷ್ಟವಾಗಿ ಕಂಡುಬಂದಿಲ್ಲ.",
+      errSsUpiMismatch: u => `ಹೊಂದಾಣಿಕೆಯಾಗದ ಅಂಶ: UPI ID (${u}) ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ನಲ್ಲಿಲ್ಲ.`,
+      errSsDateMismatch: "ಹೊಂದಾಣಿಕೆಯಾಗದ ಅಂಶ: ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ದಿನಾಂಕ ಇಂದಿನ ದಿನಾಂಕಕ್ಕೆ ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ.",
+      errSsTimeWindow: "ಹೊಂದಾಣಿಕೆಯಾಗದ ಅಂಶ: ಸಮಯ 15 ನಿಮಿಷಗಳ ಮಿತಿಯಲ್ಲಿಲ್ಲ ಅಥವಾ ಸ್ಪಷ್ಟವಾಗಿಲ್ಲ.",
+      errSsNoUtr: "ಹೊಂದಾಣಿಕೆಯಾಗದ ಅಂಶ: ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ನಲ್ಲಿ 12-ಅಂಕಿಯ UPI Transaction ID ಕಂಡುಬಂದಿಲ್ಲ.",
+      errSsDupUtr: utr => `ಹೊಂದಾಣಿಕೆಯಾಗದ ಅಂಶ: ಈ 12-ಅಂಕಿಯ UPI Transaction ID (${utr}) ಈಗಾಗಲೇ ಬಳಸಲಾಗಿದೆ.`,
+      errSsMultiMismatch: reasons => "ಹೊಂದಾಣಿಕೆಯಾಗದ ಅಂಶಗಳು:\n• " + reasons.join("\n• "),
+      gpayVerifiedSentMsg: (amt, utr) => `✅ ${amt} (UPI Txn ID: ${utr}) — ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ದೃಢೀಕರಿಸಿ ಅಡ್ಮಿನ್‌ಗೆ ತಿಳಿಸಲಾಗಿದೆ`,
       selfPledgeTitle: "ವಾಗ್ದಾನ ಮಾಡಿ",
       selfPledgePrompt: "ವಹಿಸಿಕೊಳ್ಳಬೇಕಾದ ವಾಗ್ದಾನ ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ ಬಟನ್ ಒತ್ತಿರಿ.",
       selfPledgeNote: "ಇದು ವಾಗ್ದಾನ ವಹಿಸಿಕೊಂಡು ಹಣವನ್ನು ನಂತರ ಪಾವತಿಸುವ ಆಯ್ಕೆಯಾಗಿದೆ.",
@@ -708,12 +881,13 @@
       gpayCurLabel: "ಪ್ರಸ್ತುತ UPI ID: ",
       gpaySaveBtn: "UPI ID ಸೇವ್ ಮಾಡಿ",
       confirmGpayUpiTitle: "Google Pay UPI ID ದೃಢೀಕರಿಸಿ",
-      errInvalidUpi: "ಸರಿಯಾದ UPI ID ನಮೂದಿಸಿ (ಉದಾ: name@bank).",
+      errInvalidUpi: "ಸರಿಯಾದ UPI ID (ಉದಾ: name@bank) ನಮೂದಿಸಿ.",
       gpayAdminTitle: "Google Pay ಪಾವತಿಗಳು",
-      gpayAdminSub: "ಸದಸ್ಯರು Google Pay ಮೂಲಕ ಕಳುಹಿಸಿದ ಮೊತ್ತಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ. 'ತಲುಪಿದೆ' ಒತ್ತಿದಾಗ ವಾಗ್ದಾನ ಮತ್ತು ಕೇಂದ್ರ ಸಮಿತಿಗೆ ತಲುಪಿದ ಮೊತ್ತಕ್ಕೆ ಸೇರುತ್ತದೆ.",
+      gpayAdminSub: "ಸದಸ್ಯರು Google Pay ಮೂಲಕ ಕಳುಹಿಸಿದ ಮೊತ್ತಗಳು ಇಲ್ಲಿ ಕಾಣುತ್ತವೆ. ಬ್ಯಾಂಕ್‌ನಲ್ಲಿ UTR ಹೊಂದಿಸಿ 'ಲಭಿಸಿದೆ' ಒತ್ತಿ; ತಪ್ಪಾಗಿದ್ದರೆ 'ತಿರಸ್ಕರಿಸಿ'.",
       noGpayPending: "ಪ್ರಸ್ತುತ ದೃಢೀಕರಿಸಲು GPay ದಾಖಲೆಗಳಿಲ್ಲ.",
       confirmGpayHandoverTitle: "ಈ GPay ಮೊತ್ತ ತಲುಪಿದೆ ಎಂದು ದೃಢೀಕರಿಸಬೇಕೇ?",
       confirmHandoverLine: (tot, b) => `ಒಟ್ಟು ${tot} ಬ್ಯಾಚ್ ${b}-ന്റെയും ഗ്രാൻഡ് ടോട്ടലിന്റെയും ലഭിച്ച തുകയിൽ ചേരും.`,
+      confirmGpayHandoverLine: (amt, name) => `${name} · ${amt} — ಕೇಂದ್ರ ಸಮಿತಿಗೆ ಲಭಿಸಿದ ಮೊತ್ತಕ್ಕೆ ಸೇರುತ್ತದೆ.`,
       gpayBatchLabel: b => `ಬ್ಯಾಚ್ ${b}`,
       gpayFromMember: "ಸದಸ್ಯ → GPay",
       memberGpayHistoryTitle: "Google Pay ಪಾವತಿ ವಿವರಗಳು",
@@ -744,7 +918,7 @@
       adminOnlyNote: e => `ಕೇಂದ್ರ ಸಮಿತಿಗೆ ತಲುಪಿದ್ದು: ${e} (ಅಡ್ಮಿನ್ ಮಾತ್ರ ಸೇರಿಸುತ್ತಾರೆ)`,
       pwOnlyIfChange: "ಬದಲಾಯಿಸಬೇಕಿದ್ದರೆ ಮಾತ್ರ",
       loginPwPh: "ಲಾಗಿನ್ ಪಾಸ್‌ವರ್ಡ್",
-      errReqMemberFields: id => "ಹೆಸರು, ಮೊಬೈಲ್" + (id ? "" : ", ಪಾಸ್‌ವರ್ಡ್") + " ಕಡ್ಡಾಯವಾಗಿದೆ.",
+      errReqMemberFields: id => "ಹೆಸರು ಮತ್ತು ಮೊಬೈಲ್ ಕಡ್ಡಾಯವಾಗಿದೆ.",
       errEnglishOnly: "ಹೆಸರು, ಸ್ಥಳ ಮತ್ತು ಜಿಲ್ಲೆಯನ್ನು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ (English) ಮಾತ್ರ ನಮೂದಿಸಬೇಕು.",
       errDupMobileBatch: "ಈ ಬ್ಯಾಚ್‌ನಲ್ಲಿ ಈ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಈಗಾಗಲೇ ಇದೆ.",
       confirmEditMember: "ಬದಲಾವಣೆಗಳನ್ನು ದೃಢೀಕರಿಸಿ",
@@ -871,7 +1045,72 @@
       placeLine: "ಸ್ಥಳ",
       pwWillChange: "ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಲಾಗುತ್ತದೆ",
       pwWillSet: "ಪಾಸ್‌ವರ್ಡ್ ಹೊಂದಿಸಲಾಗುತ್ತದೆ",
-      noneLabel: "ಇಲ್ಲ"
+      noneLabel: "ಇಲ್ಲ",
+      flashConflict: "ಈ ನಡುವೆ ಬೇರೆಯವರು ಮಾಹಿತಿ ಬದಲಾಯಿಸಿದ್ದರಿಂದ ನಿಮ್ಮ ಬದಲಾವಣೆ ಉಳಿಸಲಾಗಿಲ್ಲ. ಇತ್ತೀಚಿನ ಮಾಹಿತಿ ಲೋಡ್ ಆಗಿದೆ, ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಮಾಡಿ.",
+      flashSaveFail: "ಉಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+      cloudErr: "ಡೇಟಾಬೇಸ್ ಸಂಪರ್ಕ ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+      retryBtn: "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ",
+      rejectBtn: "ತಿರಸ್ಕರಿಸಿ",
+      confirmRejectGpayTitle: "ಈ GPay ನಮೂದನ್ನು ತಿರಸ್ಕರಿಸಬೇಕೇ?",
+      gpayStatusRejected: "❌ ಅಡ್ಮಿನ್ ತಿರಸ್ಕರಿಸಿದ್ದಾರೆ",
+      gpayHistoryTitle: "ಹಿಂದಿನ GPay ನಮೂದುಗಳು",
+      colNamePh: "ಉದಾ: ಕನ್ಯಾಲ ಮೌಲ ಆಂಡು 2027",
+      errAmtInvalid: "ಮೊತ್ತ ಪೂರ್ಣ ಸಂಖ್ಯೆ (0 ಅಥವಾ ಹೆಚ್ಚು) ಆಗಿರಬೇಕು.",
+      errOfferLow: min => `ವಾಗ್ದಾನ ${min} ಗಿಂತ ಕಡಿಮೆ ಇರಬಾರದು (ಲಭಿಸಿದ್ದು + ಲೀಡರ್ ಬಳಿ ಇರುವುದು).`,
+      gpayAmtLabel: "ಬ್ಯಾಂಕ್‌ನಲ್ಲಿ ಲಭಿಸಿದ ಮೊತ್ತ (₹) — ತಪ್ಪಿದ್ದರೆ ಸರಿಪಡಿಸಿ",
+      accTitle: "ಲೆಕ್ಕ ಪರಿಶೀಲನೆ",
+      accOk: "✅ ಎಲ್ಲಾ ಲೆಕ್ಕಗಳು ಸರಿಯಾಗಿವೆ",
+      accBad: n => `⚠️ ${n} ಹೊಂದಾಣಿಕೆಯಿಲ್ಲದ ಅಂಶಗಳು ಕಂಡುಬಂದಿವೆ`,
+      accLow: (c, n, b, o, r, h) => `${c} · ${n} (ಬ್ಯಾಚ್ ${b}): ವಾಗ್ದಾನ ${o} < ಲಭಿಸಿದ್ದು ${r} + ಲೀಡರ್ ಬಳಿ ${h}`,
+      accTie: c => `${c}: ಬ್ಯಾಚ್ ಮೊತ್ತಗಳ ಒಟ್ಟು ಗ್ರ್ಯಾಂಡ್ ಟೋಟಲ್‌ಗೆ ಹೊಂದುತ್ತಿಲ್ಲ`,
+      accEntry: id => `ಅಮಾನ್ಯ ನಮೂದು: ${id}`,
+      accUtr: u => `ಒಂದೇ UTR ಒಂದಕ್ಕಿಂತ ಹೆಚ್ಚು ಬಾರಿ: ${u}`,
+      accDup: n => `ಒಂದೇ ಬ್ಯಾಚ್‌ನಲ್ಲಿ ಒಂದೇ ಮೊಬೈಲ್: ${n}`,
+      accBatch: n => `ಬ್ಯಾಚ್ ಇಲ್ಲದ ಸದಸ್ಯ: ${n}`,
+      accNum: (c, n) => `${c} · ${n}: ಮೊತ್ತ ಪೂರ್ಣ ಸಂಖ್ಯೆಯಲ್ಲ ಅಥವಾ ಋಣಾತ್ಮಕ`,
+      flashTooBig: "ಡೇಟಾಬೇಸ್ ಮಿತಿ (1 MB) ಸಮೀಪಿಸಿದ್ದರಿಂದ ಈ ಬದಲಾವಣೆ ಉಳಿಸಲಿಲ್ಲ. ಅಡ್ಮಿನ್‌ಗೆ ತಿಳಿಸಿ.",
+      backupTitle: "ಬ್ಯಾಕಪ್",
+      backupNote: "ಎಲ್ಲಾ ಮಾಹಿತಿಯನ್ನು ಒಂದು ಫೈಲ್ ಆಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ. ವಾರಕ್ಕೊಮ್ಮೆಯಾದರೂ ಮಾಡಿ. ಫೈಲ್‌ನಲ್ಲಿ ಪಾಸ್‌ವರ್ಡ್‌ಗಳಿಲ್ಲ, ಆದರೂ ಸುರಕ್ಷಿತವಾಗಿಡಿ.",
+      sizeLabel: (kb, pct) => `ಡೇಟಾ ಗಾತ್ರ: ${kb} KB (ಮಿತಿಯ ${pct}%)`,
+      backupBtn: "📥 ಬ್ಯಾಕಪ್ ಡೌನ್‌ಲೋಡ್",
+      restoreTitle: "ಬ್ಯಾಕಪ್ ಫೈಲ್‌ನಿಂದ ಮರುಸ್ಥಾಪಿಸಿ",
+      errPickFile: "ಮೊದಲು ಬ್ಯಾಕಪ್ ಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ.",
+      errBadBackup: "ಇದು ಮಾನ್ಯವಾದ COLLECTIONS ಬ್ಯಾಕಪ್ ಫೈಲ್ ಅಲ್ಲ.",
+      confirmRestoreTitle: "ಬ್ಯಾಕಪ್‌ನಿಂದ ಮರುಸ್ಥಾಪಿಸಬೇಕೇ?",
+      restoreLine: (d, c, e) => `ಫೈಲ್‌ನಲ್ಲಿ: ${d} ಸದಸ್ಯರು · ${c} ಸಂಗ್ರಹಗಳು · ${e} ನಗದು ನಮೂದುಗಳು`,
+      restoreWarn: "⚠️ ಪ್ರಸ್ತುತ ಎಲ್ಲಾ ಮಾಹಿತಿಯನ್ನು ಈ ಫೈಲ್‌ನ ಮಾಹಿತಿಯಿಂದ ಬದಲಾಯಿಸಲಾಗುತ್ತದೆ.",
+      restoreBtn: "ಬ್ಯಾಕಪ್‌ನಿಂದ ಮರುಸ್ಥಾಪಿಸಿ",
+      errNetwork: "ನೆಟ್‌ವರ್ಕ್ ದೋಷ. ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ.",
+      errTooMany: "ಹಲವು ಪ್ರಯತ್ನಗಳು. ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+      errNoProfile: "ಈ ಖಾತೆ ಈಗ ಸಕ್ರಿಯವಾಗಿಲ್ಲ. ನಿಮ್ಮ ಲೀಡರ್ ಅಥವಾ ಅಡ್ಮಿನ್ ಅವರನ್ನು ಸಂಪರ್ಕಿಸಿ.",
+      forcedPwTitle: "ಹೊಸ ಪಾಸ್‌ವರ್ಡ್ ಹೊಂದಿಸಿ",
+      forcedPwMsg: "ಸುರಕ್ಷತೆಗಾಗಿ, ಮುಂದುವರಿಯುವ ಮೊದಲು ನಿಮ್ಮ ಮೊದಲ ಪಾಸ್‌ವರ್ಡ್ (ಮೊಬೈಲ್ ಸಂಖ್ಯೆ) ಬದಲಾಯಿಸಬೇಕು. ನೆನಪಿಡಬಹುದಾದ ಹೊಸ ಪಾಸ್‌ವರ್ಡ್ ನೀಡಿ.",
+      changePwTitle: "ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಿ",
+      pwChangedOk: "ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಲಾಗಿದೆ.",
+      errPwSame: "ಹೊಸ ಪಾಸ್‌ವರ್ಡ್ ಈಗಿನದಕ್ಕಿಂತ ಭಿನ್ನವಾಗಿರಬೇಕು.",
+      errPwMobile: "ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ಪಾಸ್‌ವರ್ಡ್ ಆಗಿ ಬಳಸಬೇಡಿ.",
+      errPwChangeFail: "ಪಾಸ್‌ವರ್ಡ್ ಬದಲಾಯಿಸಲು ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+      initPwNote: "ಆರಂಭಿಕ ಪಾಸ್‌ವರ್ಡ್ = ಮೊಬೈಲ್ ಸಂಖ್ಯೆ. ಮೊದಲ ಲಾಗಿನ್‌ನಲ್ಲೇ ಬದಲಾಯಿಸಬೇಕು.",
+      errMobileFmt: "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಅಂಕೆಗಳು ಮಾತ್ರ (6–15) ಇರಬೇಕು.",
+      errAcctFail: "ಲಾಗಿನ್ ಖಾತೆ ರಚಿಸಲು ಆಗಲಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
+      resetPwBtn: "ಪಾಸ್‌ವರ್ಡ್ ರೀಸೆಟ್ (ಮೊಬೈಲ್ ಸಂಖ್ಯೆಗೆ)",
+      confirmResetPw: "ಪಾಸ್‌ವರ್ಡ್ ರೀಸೆಟ್ ಮಾಡಬೇಕೇ?",
+      loginsTitle: "ಲಾಗಿನ್ ಖಾತೆಗಳು",
+      loginsNote: "ಲಾಗಿನ್ ಇಲ್ಲದವರಿಗೆ ಒಮ್ಮೆಲೇ ರಚಿಸಿ. ಆರಂಭಿಕ ಪಾಸ್‌ವರ್ಡ್ = ಮೊಬೈಲ್ ಸಂಖ್ಯೆ.",
+      loginsMissing: (m, l) => `ಲಾಗಿನ್ ಇಲ್ಲದವರು: ${m} ಸದಸ್ಯರು, ${l} ಲೀಡರ್‌ಗಳು`,
+      loginsCreateBtn: "ಲಾಗಿನ್‌ಗಳನ್ನು ರಚಿಸಿ",
+      loginsConfirm: "ಲಾಗಿನ್ ಖಾತೆಗಳನ್ನು ರಚಿಸಬೇಕೇ?",
+      loginsDone: (o, b) => `ರಚಿಸಲಾಗಿದೆ: ${o}, ವಿಫಲ: ${b}`,
+      loginsAllOk: "✅ ಎಲ್ಲರಿಗೂ ಲಾಗಿನ್ ಇದೆ",
+      reqTitle: n => `ವಾಗ್ದಾನ ವಿನಂತಿಗಳು (${n})`,
+      reqAccept: "ಒಪ್ಪಿಕೊಳ್ಳಿ",
+      reqReject: "ತಿರಸ್ಕರಿಸಿ",
+      reqAcceptTitle: "ಈ ವಾಗ್ದಾನವನ್ನು ಒಪ್ಪಬೇಕೇ?",
+      reqRejectTitle: "ಈ ವಿನಂತಿಯನ್ನು ತಿರಸ್ಕರಿಸಬೇಕೇ?",
+      reqSent: "ವಿನಂತಿ ಕಳುಹಿಸಲಾಗಿದೆ. ಲೀಡರ್/ಅಡ್ಮಿನ್ ಒಪ್ಪಿದ ನಂತರ ನಿಮ್ಮ ವಾಗ್ದಾನಕ್ಕೆ ಸೇರುತ್ತದೆ.",
+      reqInvalid: "ಈ ವಿನಂತಿ ಅಮಾನ್ಯ; ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
+      reqMine: "ಅನುಮೋದನೆಗೆ ಕಾಯುತ್ತಿರುವ ನಿಮ್ಮ ವಿನಂತಿಗಳು",
+      selfPledgeReqMsg: "ಇದು ವಿನಂತಿ. ಲೀಡರ್ ಅಥವಾ ಅಡ್ಮಿನ್ ಒಪ್ಪಿದ ನಂತರವೇ ಮೊತ್ತ ನಿಮ್ಮ ವಾಗ್ದಾನಕ್ಕೆ ಸೇರುತ್ತದೆ."
     }
   };
 
@@ -908,21 +1147,120 @@
     }
   };
 
-  const loadSession = () => {
-    for (const st of ["sessionStorage", "localStorage"]) {
-      try { const s = window[st].getItem(SESSION_KEY); if (s) return JSON.parse(s); } catch (e) {}
-    }
-    return {};
-  };
+  // Login state is kept by Firebase Auth (persistent in the browser until Logout is pressed).
+  const loadSession = () => ({});
+  const saveSession = () => {};
 
-  const saveSession = () => {
-    try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
-    try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
-    try {
-      if (view.role) {
-        localStorage.setItem(SESSION_KEY, JSON.stringify({ role: view.role, user: view.user, asMember: view.asMember }));
+  const ADMIN_EMAIL = "admin@collections.app";
+  const MAIL_DOM = "@collections.app";
+  let auth = null, secAuth = null, authReady = false, profile = null, authSeq = 0, loginBusy = false;
+  let reqs = [], unsubReqs = null;
+  const keyH = async s => (await sha(s)).slice(0, 24);
+  const keyM = (b, m) => keyH("M|" + Number(b) + "|" + String(m).trim());
+  const keyL = u => keyH("L|" + String(u).trim().toLowerCase());
+  const mailOf = (key, v) => "u" + key + "_v" + v + MAIL_DOM;
+  const goodMobile = m => /^\d{6,15}$/.test(String(m || ""));
+  const getVer = async key => {
+    try { const sn = await getDoc(doc(cloudFs, "ver", key)); return sn.exists() ? (Number(sn.data().v) || 1) : 1; } catch (e) { return 1; }
+  };
+  const secondary = () => {
+    if (!secAuth) secAuth = getAuth(initializeApp(firebaseConfig, "sec"));
+    return secAuth;
+  };
+  // Creates a brand-new login (initial password = mobile) and its role profile. Returns the new uid.
+  const provision = async (key, mobile, prof) => {
+    if (!goodMobile(mobile)) { const e = new Error("bad-mobile"); e.code = "app/bad-mobile"; throw e; }
+    let v = await getVer(key);
+    for (let i = 0; i < 5; i++) {
+      let uid;
+      try {
+        const cr = await createUserWithEmailAndPassword(secondary(), mailOf(key, v), String(mobile));
+        uid = cr.user.uid;
+      } catch (e) {
+        if (e && e.code === "auth/email-already-in-use") { v++; continue; }
+        throw e;
       }
-    } catch (e) {}
+      try { await signOut(secondary()); } catch (e) {}
+      await setDoc(doc(cloudFs, "ver", key), { v });
+      await setDoc(doc(cloudFs, "users", uid), { ...prof, mustChange: true });
+      return uid;
+    }
+    throw new Error("provision-exhausted");
+  };
+  const dropProfile = async uid => { if (!uid) return; try { await deleteDoc(doc(cloudFs, "users", uid)); } catch (e) { console.error(e); } };
+  const reauth = async pw => {
+    try {
+      const u = auth.currentUser;
+      await reauthenticateWithCredential(u, EmailAuthProvider.credential(u.email, pw));
+      return true;
+    } catch (e) { return false; }
+  };
+  const teardown = () => {
+    if (unsubSnap) { unsubSnap(); unsubSnap = null; }
+    if (unsubReqs) { unsubReqs(); unsubReqs = null; }
+    reqs = [];
+  };
+  const reqRef = id => doc(cloudFs, "pledgeReq", id);
+  const refreshReqs = async () => {
+    if (!auth || !auth.currentUser || !profile) return;
+    try {
+      const q = (view.role === "owner" || view.role === "leader")
+        ? collection(cloudFs, "pledgeReq")
+        : query(collection(cloudFs, "pledgeReq"), where("uid", "==", auth.currentUser.uid));
+      const sn = await getDocs(q);
+      reqs = sn.docs.map(x => ({ id: x.id, ...x.data() }));
+      const tg = (document.activeElement && document.activeElement.tagName) || "";
+      if (tg !== "INPUT" && tg !== "SELECT" && !view.confirm) render();
+    } catch (e) { console.error(e); }
+  };
+  const kick = msg => { view = { ...V0, err: msg || "" }; setTimeout(() => { try { signOut(auth); } catch (e) {} }, 0); };
+
+  const afterAuth = async user => {
+    const my = ++authSeq;
+    const bail = async msg => { view.err = msg; try { await signOut(auth); } catch (e) {} };
+    try {
+      if (!user) {
+        teardown(); const e0 = view.err;
+        view = { ...V0, err: e0 || "" }; db = null; profile = null; authReady = true; render(); return;
+      }
+      let prof;
+      if (user.email === ADMIN_EMAIL) prof = { role: "owner" };
+      else {
+        const ps = await getDoc(doc(cloudFs, "users", user.uid));
+        if (my !== authSeq) return;
+        if (!ps.exists()) { await bail(t("errNoProfile")); return; }
+        prof = ps.data();
+      }
+      const sn = await getDoc(cloudRef);
+      if (my !== authSeq) return;
+      if (!sn.exists()) {
+        if (prof.role !== "owner") { await bail(t("cloudErr")); return; }
+        db = await defaultDB(); db.rev = 0;
+        if (!(await save())) throw new Error("init save failed");
+      } else db = sn.data();
+      profile = prof;
+      if (prof.role === "member" && !db.donors.some(x => x.id === prof.id)) { db = null; profile = null; await bail(t("errNoProfile")); return; }
+      if (prof.role === "leader") {
+        const l = db.leaders.find(x => x.id === prof.id);
+        if (!l) { db = null; profile = null; await bail(t("errNoProfile")); return; }
+        const pm = view.pendingMobile;
+        if (pm && l.mobile !== pm) { db = null; profile = null; await bail(t("errCheckLeader")); return; }
+      }
+      if (prof.role === "owner") {
+        const dirty = ("admin" in db) || db.donors.some(d => "pw" in d) || db.leaders.some(l => "pw" in l);
+        if (dirty) { delete db.admin; db.donors.forEach(d => { delete d.pw; }); db.leaders.forEach(l => { delete l.pw; }); await save(); }
+      }
+      view.pendingMobile = null;
+      view.role = prof.role; view.user = prof.id || null; view.err = "";
+      view.mustChange = !!prof.mustChange;
+      view.oSec = "dash"; view.lSec = "total"; view.mSec = "me";
+      authReady = true; cloudError = false;
+      render();
+      if (prof.role !== "owner" && prof.role !== "leader") refreshReqs();
+    } catch (e) {
+      console.error("Auth/load error:", e);
+      db = null; profile = null; cloudError = true; authReady = true; render();
+    }
   };
 
   const V0 = {
@@ -936,23 +1274,52 @@
 
   const defaultDB = async () => ({
     admin: null,
-    gpayUpiId: "",
     batches: Array.from({ length: BATCH_COUNT }, (_, i) => i + 1),
     collections: [{ id: "c1", name: FIRST_COLLECTION, hidden: false }],
     donors: [],
     leaders: [],
-    entries: [],
-    gpayEntries: []
+    entries: []
   });
 
   let isCloudSaving = false;
+  const dbSize = () => new Blob([JSON.stringify(db)]).size;
+  const reloadFromCloud = async () => {
+    const sn = await getDoc(cloudRef);
+    if (sn.exists()) db = sn.data();
+  };
+  // Optimistic-concurrency save: never overwrites someone else's newer changes.
   const save = async () => {
-    try { localStorage.setItem(DATA_KEY, JSON.stringify(db)); } catch (e) {}
-    if (cloudRef) {
-      isCloudSaving = true;
-      try { await setDoc(cloudRef, db); } catch (e) { console.error("Cloud save error:", e); }
-      finally { isCloudSaving = false; }
+    if (!cloudRef) {
+      try { localStorage.setItem(DATA_KEY, JSON.stringify(db)); } catch (e) {}
+      return true;
     }
+    const prevRev = Number(db.rev || 0);
+    if (dbSize() > 950000) {
+      try { await reloadFromCloud(); } catch (_) {}
+      view.flash = t("flashTooBig"); view.edit = null; view.ledit = null; view.confirm = null;
+      return false;
+    }
+    isCloudSaving = true;
+    try {
+      await runTransaction(cloudFs, async tx => {
+        const sn = await tx.get(cloudRef);
+        const cr = sn.exists() ? Number(sn.data().rev || 0) : 0;
+        if (cr !== prevRev) { const err = new Error("conflict"); err.conflict = true; throw err; }
+        db.rev = prevRev + 1;
+        tx.set(cloudRef, JSON.parse(JSON.stringify(db)));
+      });
+      return true;
+    } catch (e) {
+      db.rev = prevRev;
+      if (e && e.conflict) {
+        try { await reloadFromCloud(); } catch (_) {}
+        view.flash = t("flashConflict"); view.edit = null; view.ledit = null; view.confirm = null;
+      } else {
+        console.error("Cloud save error:", e);
+        view.flash = t("flashSaveFail");
+      }
+      return false;
+    } finally { isCloudSaving = false; }
   };
 
   const nowStamp = () => {
@@ -966,6 +1333,8 @@
   const O = d => Number(((d.cols || {})[view.col] || {}).offer || 0);
   const R = d => Number(((d.cols || {})[view.col] || {}).received || 0);
   const setC = (d, o, r) => { d.cols = d.cols || {}; d.cols[view.col] = { offer: o, received: r }; };
+  const withCol = (cid, fn) => { const p = view.col; view.col = cid; try { return fn(); } finally { view.col = p; } };
+  const validAmt = v => Number.isInteger(v) && v > 0 && v <= 10000000;
   const sumO = l => l.reduce((a, d) => a + O(d), 0), sumR = l => l.reduce((a, d) => a + R(d), 0);
   const visCols = () => (db.collections || []).filter(c => view.role === "owner" || !c.hidden);
   const ensureCol = () => {
@@ -977,6 +1346,12 @@
     return c ? c.name : "";
   };
 
+  // One global lock: while any action runs (and for 0.7s after), every other button / form submit is ignored.
+  let uiBusy = false, uiLockUntil = 0;
+  const uiLocked = () => uiBusy || Date.now() < uiLockUntil;
+  const uiRelease = ms => { uiBusy = false; uiLockUntil = Date.now() + (ms || 700); };
+  const newId = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
   function h(tag, attrs, ...kids) {
     const e = document.createElement(tag);
     for (const k in (attrs || {})) {
@@ -985,32 +1360,37 @@
         for (const ev in v) {
           const origHandler = v[ev];
           if (tag === "button" && ev === "click") {
-            let busy = false;
             e.addEventListener(ev, async evt => {
-              if (busy || e.disabled) return;
-              busy = true;
+              if (e.disabled) return;
+              if (attrs.own) {            // long-running button (OCR): only locks itself
+                try { await origHandler(evt); } catch (x) { console.error(x); }
+                return;
+              }
+              if (uiLocked()) return;
+              uiBusy = true;
               e.disabled = true;
               try {
                 await origHandler(evt);
               } finally {
-                setTimeout(() => { busy = false; e.disabled = false; }, 220);
+                uiRelease(700);
+                setTimeout(() => { if (e.isConnected) e.disabled = false; }, 700);
               }
             });
           } else if (tag === "form" && ev === "submit") {
-            let subBusy = false;
             e.addEventListener(ev, async evt => {
-              if (subBusy) { evt.preventDefault(); return; }
-              subBusy = true;
+              if (uiLocked()) { evt.preventDefault(); return; }
+              uiBusy = true;
               try {
                 await origHandler(evt);
               } finally {
-                setTimeout(() => { subBusy = false; }, 220);
+                uiRelease(700);
               }
             });
           } else {
             e.addEventListener(ev, origHandler);
           }
         }
+      } else if (k === "own") { /* flag only */
       } else if (k === "class") e.className = v;
       else if (v !== false && v != null) e.setAttribute(k, v);
     }
@@ -1168,16 +1548,62 @@
   };
   const bar = (o, r) => h("div", { class: "bar" }, h("i", { style: "width:" + (o ? Math.min(100, r / o * 100) : 0) + "%" }));
 
+  function onRemote(docSnap) {
+    if (isCloudSaving || isSavingConfirm || view.confirm || !docSnap.exists()) return;
+    if (docSnap.metadata && docSnap.metadata.hasPendingWrites) return;
+    const nd = docSnap.data();
+    if (Number(nd.rev || 0) === Number(db.rev || 0)) return;
+    db = nd;
+    const activeTag = (document.activeElement && document.activeElement.tagName) || "";
+    if (activeTag === "INPUT" || activeTag === "SELECT" || activeTag === "TEXTAREA") return;
+    render();
+  }
+  // Live listener only for Admin / Leaders (keeps free-plan read quota safe); members refresh on app focus.
+  function syncListener() {
+    if (!cloudRef || !onSnapshot || !auth || !auth.currentUser) return;
+    const want = view.role === "owner" || view.role === "leader";
+    if (want && !unsubSnap) unsubSnap = onSnapshot(cloudRef, onRemote);
+    else if (!want && unsubSnap) { unsubSnap(); unsubSnap = null; }
+    if (want && !unsubReqs) {
+      unsubReqs = onSnapshot(collection(cloudFs, "pledgeReq"), sn => {
+        reqs = sn.docs.map(x => ({ id: x.id, ...x.data() }));
+        const tg = (document.activeElement && document.activeElement.tagName) || "";
+        if (tg !== "INPUT" && tg !== "SELECT" && !view.confirm && !isSavingConfirm) render();
+      }, e => console.error(e));
+    } else if (!want && unsubReqs) { unsubReqs(); unsubReqs = null; reqs = []; }
+  }
+  document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState !== "visible" || !cloudRef || unsubSnap || isCloudSaving || view.confirm || !db || !auth || !auth.currentUser) return;
+    if (Date.now() - lastPull < 60000) return;
+    lastPull = Date.now();
+    try {
+      const sn = await getDoc(cloudRef);
+      if (sn.exists() && Number(sn.data().rev || 0) !== Number(db.rev || 0)) {
+        db = sn.data();
+        const tg = (document.activeElement && document.activeElement.tagName) || "";
+        if (tg !== "INPUT" && tg !== "SELECT") render();
+      }
+      if (view.role === "member") refreshReqs();
+    } catch (e) {}
+  });
+
   function render() {
     const app = document.getElementById("app");
     app.replaceChildren();
-    if (!db) { app.append(langBar(), h("div", { class: "card" }, h("p", { class: "mut" }, t("loading")))); return; }
-    if (view.role) ensureCol();
-    if (!view.role) app.append(...loginView());
-    else if (view.role === "member" || (view.role === "leader" && view.asMember)) app.append(...memberView());
+    if (cloudError) { app.append(langBar(), h("div", { class: "card" }, h("p", { class: "err" }, t("cloudErr")), h("button", { on: { click: () => location.reload() } }, t("retryBtn")))); return; }
+    if (!authReady || (view.role && !db)) { app.append(langBar(), h("div", { class: "card" }, h("p", { class: "mut" }, t("loading")))); return; }
+    if (!view.role) { app.append(...loginView()); syncListener(); return; }
+    ensureCol();
+    if (view.mustChange) {
+      app.append(langBar(), h("div", { class: "top" }, h("div", null, h("h1", null, "COLLECTIONS")), logout()), pwChangeCard(true, true));
+      return;
+    }
+    if (view.role === "member" || (view.role === "leader" && view.asMember)) app.append(...memberView());
     else if (view.role === "leader") app.append(...leaderView());
     else app.append(...ownerView());
 
+    syncListener();
+    if (view.flash) { const fl = view.flash; view.flash = ""; app.prepend(h("div", { class: "card", style: "background:var(--warnbg);color:var(--warn);font-weight:600", role: "alert" }, fl)); window.scrollTo(0, 0); }
     if (view.scroll) { view.scroll = false; const el = document.getElementById("en"); if (el) el.scrollIntoView({ block: "center" }); }
     if (view.lscroll) { view.lscroll = false; const el = document.getElementById("lu"); if (el) el.scrollIntoView({ block: "center" }); }
   }
@@ -1185,36 +1611,41 @@
   function loginView() {
     const tab = view.tab, f = {};
     const mk = (id, lab, el) => h("label", { for: id }, lab, el);
-    f.batch = h("select", { id: "bt" }, h("option", { value: "" }, t("choose")), ...db.batches.map(b => h("option", { value: b }, t("batch") + " " + b)));
+    f.batch = h("input", { id: "bt", type: "tel", inputmode: "numeric", placeholder: t("batchNum") });
     f.mobile = h("input", { id: "mb", type: "tel", inputmode: "numeric", autocomplete: "tel", placeholder: t("mobileNum") });
     f.uid = h("input", { id: "ui", autocomplete: "username", placeholder: t("username") });
     f.lm = h("input", { id: "lmb", type: "tel", inputmode: "numeric", autocomplete: "tel", placeholder: t("mobileNum") });
     f.pw = h("input", { id: "pw", type: "password", autocomplete: "current-password", placeholder: t("password") });
-    f.pw2 = h("input", { id: "pw2", type: "password", autocomplete: "new-password", placeholder: t("repeatPassword") });
-    const setup = tab === "owner" && !db.admin;
 
     const go = async () => {
+      if (loginBusy || !auth) return;
+      loginBusy = true;
+      const btn = document.getElementById("loginGo"); if (btn) btn.disabled = true;
       view.err = "";
-      const p = await sha(f.pw.value);
-      if (tab === "owner") {
-        if (!db.admin) {
-          if (f.pw.value.length < 6) view.err = t("errPwMin6");
-          else if (f.pw.value !== f.pw2.value) view.err = t("errPwMismatch");
-          else { db.admin = p; await save(); view.role = "owner"; view.oSec = "dash"; saveSession(); }
-        } else if (p === db.admin) { view.role = "owner"; view.oSec = "dash"; saveSession(); }
-        else view.err = t("errWrongPw");
-      } else if (tab === "leader") {
-        const v = f.uid.value.trim().toLowerCase(), lm = f.lm.value.trim();
-        const l = db.leaders.find(x => x.username.toLowerCase() === v && x.mobile === lm && x.pw === p);
-        if (l) { view.role = "leader"; view.user = l.id; view.lSec = "total"; saveSession(); }
-        else view.err = t("errCheckLeader");
-      } else {
-        const b = Number(f.batch.value), m = f.mobile.value.trim();
-        const d = db.donors.find(x => x.batch === b && x.mobile === m && x.pw === p);
-        if (d) { view.role = "member"; view.user = d.id; view.mSec = "me"; saveSession(); }
-        else view.err = t("errCheckMember");
+      try {
+        const pwv = f.pw.value;
+        let email, bad = t("errWrongPw");
+        view.pendingMobile = null;
+        if (!pwv) { view.err = bad; return; }
+        if (tab === "owner") email = ADMIN_EMAIL;
+        else if (tab === "leader") {
+          const un = f.uid.value.trim(), lm = f.lm.value.trim(); bad = t("errCheckLeader");
+          if (!un || !lm) { view.err = bad; return; }
+          const key = await keyL(un); email = mailOf(key, await getVer(key)); view.pendingMobile = lm;
+        } else {
+          const b = Number(f.batch.value), m = f.mobile.value.trim(); bad = t("errCheckMember");
+          if (!Number.isInteger(b) || b < 1 || !m) { view.err = bad; return; }
+          const key = await keyM(b, m); email = mailOf(key, await getVer(key));
+        }
+        try { await signInWithEmailAndPassword(auth, email, pwv); return; }
+        catch (e) {
+          const c = (e && e.code) || "";
+          view.err = c === "auth/network-request-failed" ? t("errNetwork") : c === "auth/too-many-requests" ? t("errTooMany") : bad;
+        }
+      } finally {
+        loginBusy = false;
+        if (view.err) { render(); }
       }
-      render();
     };
 
     const tb = (k, l) => h("button", { type: "button", class: tab === k ? "on" : "", on: { click: () => { view.tab = k; view.err = ""; render(); } } }, l);
@@ -1229,11 +1660,9 @@
           tab === "member" && mk("mb", t("mobileNum"), f.mobile),
           tab === "leader" && mk("ui", t("username"), f.uid),
           tab === "leader" && mk("lmb", t("mobileNum"), f.lm),
-          setup && h("div", { class: "mut" }, t("firstSetupMsg")),
-          mk("pw", setup ? t("newAdminPwLabel") : t("password"), f.pw),
-          setup && mk("pw2", t("repeatPassword"), f.pw2),
+          mk("pw", t("password"), f.pw),
           view.err && h("div", { class: "err", role: "alert" }, view.err),
-          h("button", { type: "submit" }, setup ? t("setPwAndLogin") : t("loginBtn"))
+          h("button", { type: "submit", id: "loginGo" }, t("loginBtn"))
         )
       )
     ];
@@ -1243,7 +1672,10 @@
   const curDonor = () => view.asMember ? linked(me()) : db.donors.find(x => x.id === view.user);
   const logout = () => h("button", {
     class: "sec sm",
-    on: { click: () => { view = { ...V0 }; saveSession(); render(); } }
+    on: { click: async () => {
+      try { teardown(); if (auth) await signOut(auth); } catch (e) { console.error(e); }
+      view = { ...V0 }; db = null; profile = null; render();
+    } }
   }, t("logoutBtn"));
 
   function peerRow(p, isMe) {
@@ -1261,7 +1693,7 @@
     const d = curDonor();
     if (!d) {
       if (view.role === "leader") { view.asMember = false; saveSession(); return leaderView(); }
-      view = { ...V0 }; saveSession(); return loginView();
+      kick(t("errNoProfile")); return [langBar(), h("div", { class: "card" }, h("p", { class: "mut" }, t("loading")))];
     }
     
     const mtop = h("div", { class: "top" },
@@ -1297,45 +1729,10 @@
       { k: "grand", ic: "📊", l: t("tabGrandTotal") }
     ], view.mSec, k => { view.mSec = k; render(); });
 
-    const out = [langBar(), mtop, profileCard, collTabs(t("selectCol")), nav];
+    const out = [langBar(), mtop, profileCard, pwToggle(), collTabs(t("selectCol")), nav];
 
     if (view.mSec === "me") {
       const hd = heldD(d.id), pd = Math.max(0, O(d) - R(d) - hd);
-      const myGpayList = (db.gpayEntries || [])
-        .filter(e => e.donorId === d.id && e.colId === view.col)
-        .slice()
-        .reverse();
-
-      const buildGpayHistoryRow = ge => {
-        const isConfirmed = ge.status === "confirmed";
-        return h("div", { class: "ent" },
-          h("div", { style: "min-width:0" },
-            h("div", { class: "num" }, h("b", null, fmt(ge.amount))),
-            h("div", { class: "mut" }, (ge.at || "") + (ge.upiId ? " · " + ge.upiId : ""))
-          ),
-          h("span", { class: isConfirmed ? "pill ok" : "pill am" },
-            isConfirmed ? t("gpayStatusConfirmed") : t("gpayStatusPending")
-          )
-        );
-      };
-
-      const historyTitleEl = h("h2", null, t("memberGpayHistoryTitle") + " (" + myGpayList.length + ")");
-      const historyItemsContainer = h("div", { style: "display:grid;gap:8px" }, ...myGpayList.map(buildGpayHistoryRow));
-      const historyCardEl = h("div", {
-        class: "card",
-        style: myGpayList.length > 0 ? "" : "display:none"
-      }, historyTitleEl, historyItemsContainer);
-
-      const onGpayNotifiedLive = newEntry => {
-        const updatedList = (db.gpayEntries || [])
-          .filter(e => e.donorId === d.id && e.colId === view.col)
-          .slice()
-          .reverse();
-        historyTitleEl.textContent = t("memberGpayHistoryTitle") + " (" + updatedList.length + ")";
-        historyItemsContainer.prepend(buildGpayHistoryRow(newEntry));
-        historyCardEl.style.display = "";
-      };
-
       out.push(
         h("div", { class: "card mine" },
           h("div", { class: "mut" }, colName()),
@@ -1349,9 +1746,10 @@
           )
         )
       );
-      out.push(pledgeCard(d, onGpayNotifiedLive));
       out.push(selfPledgeCard(d));
-      out.push(historyCardEl);
+      { const mine = reqs.filter(r => r.donorId === d.id && r.status === "pending");
+        if (mine.length) out.push(h("div", { class: "card" }, h("h2", null, t("reqMine")),
+          ...mine.map(r => h("div", { class: "mut num" }, fmt(r.amount) + " · " + ((db.collections.find(c => c.id === r.colId) || {}).name || "") + " · " + (r.at || ""))))); }
       const myPledgeLogs = (db.pledgeLogs || [])
         .filter(p => p.donorId === d.id && p.colId === view.col)
         .slice()
@@ -1374,7 +1772,6 @@
     else if (view.mSec === "grand") {
       const go = sumO(db.donors), gr = sumR(db.donors);
       const totalHeld = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).reduce((a, e) => a + e.amount, 0);
-      const remPledgeLabel = curLang === "ml" ? "ബാക്കി വാഗ്ദാനം" : t("pending");
       const totalMembersCount = db.donors.length;
       const totalCooperated = db.donors.filter(z => O(z) > 0).length;
       const overallPct = totalMembersCount > 0 ? Math.round((totalCooperated / totalMembersCount) * 100) : 0;
@@ -1424,105 +1821,6 @@
     return out;
   }
 
-  function fmtWaPhone(raw) {
-    let n = (raw || "").replace(/\D/g, "");
-    if (n.length === 10) n = "91" + n;
-    return n;
-  }
-
-  function pledgeCard(d, onNotified) {
-    const upiId = (db.gpayUpiId || "").trim();
-    const amt = h("input", { id: "pa", type: "number", inputmode: "numeric", min: 1, placeholder: t("pledgeAmtPh") });
-    const errEl = h("div", { class: "err", role: "alert", style: "display:none" });
-    const notifiedEl = h("div", { class: "pill ok", style: "display:none;border-radius:8px;padding:8px 10px" });
-    const waitingEl = h("div", { class: "pill am", style: "display:none;border-radius:8px;padding:8px 10px" }, t("gpayWaitingAdminMsg"));
-
-    const buildUpiUrl = v => {
-      const params = new URLSearchParams({
-        pa: upiId,
-        pn: "COLLECTIONS",
-        am: String(v),
-        cu: "INR",
-        tn: (colName() || "COLLECTIONS") + " - Batch " + d.batch
-      });
-      return "upi://pay?" + params.toString();
-    };
-
-    const payBtn = h("a", { class: "btn", href: "#", style: "cursor:pointer" }, t("pledgeWaBtn"));
-    let payBusy = false;
-    payBtn.addEventListener("click", async ev => {
-      ev.preventDefault();
-      if (payBusy) return;
-      payBusy = true;
-      setTimeout(() => { payBusy = false; }, 500);
-
-      const v = Number(amt.value);
-      if (!(v > 0)) {
-        errEl.textContent = t("errEnterPledgeAmt");
-        errEl.style.display = "block";
-        notifiedEl.style.display = "none";
-        waitingEl.style.display = "none";
-        return;
-      }
-      if (!upiId) {
-        errEl.textContent = t("errNoUpiConfigured");
-        errEl.style.display = "block";
-        notifiedEl.style.display = "none";
-        waitingEl.style.display = "none";
-        return;
-      }
-
-      errEl.style.display = "none";
-      const newEntry = {
-        id: "gp" + Date.now(),
-        colId: view.col,
-        batch: d.batch,
-        donorId: d.id,
-        donorName: d.name,
-        mobile: d.mobile,
-        upiId: upiId,
-        amount: v,
-        at: nowStamp(),
-        status: "pending"
-      };
-      db.gpayEntries = db.gpayEntries || [];
-      const nowMs = Date.now();
-      const recentDup = db.gpayEntries.find(
-        x => x.donorId === d.id && x.colId === view.col && x.amount === v && x.status === "pending" && (nowMs - Number((x.id || "").replace("gp", "") || 0)) < 2000
-      );
-      const entryToUse = recentDup || newEntry;
-      if (!recentDup) {
-        db.gpayEntries.push(newEntry);
-        await save();
-      }
-
-      notifiedEl.textContent = t("gpayNotifiedMsg", fmt(v));
-      notifiedEl.style.display = "block";
-      waitingEl.textContent = t("gpayWaitingAdminMsg");
-      waitingEl.style.display = "block";
-      if (typeof onNotified === "function") onNotified(entryToUse);
-
-      const upiUrl = buildUpiUrl(v);
-      payBtn.href = upiUrl;
-      window.location.href = upiUrl;
-    });
-
-    amt.addEventListener("input", () => {
-      errEl.style.display = "none";
-    });
-
-    return h("div", { class: "card" },
-      h("h2", null, t("makeNewPledge")),
-      h("p", { class: "sub" }, t("pledgeDescLeader")),
-      upiId && h("div", { class: "mut num" }, "UPI ID: " + upiId),
-      h("label", { for: "pa" }, t("pledgeAmtLabel"), amt),
-      errEl,
-      payBtn,
-      notifiedEl,
-      waitingEl
-    );
-  }
-
   function selfPledgeCard(d) {
     const amt = h("input", { id: "sp_amt", type: "number", inputmode: "numeric", min: 1, placeholder: t("pledgeAmtPh") });
     const errEl = h("div", { class: "err", role: "alert", style: "display:none" });
@@ -1532,36 +1830,28 @@
       on: {
         click: () => {
           const v = Number(amt.value);
-          if (!(v > 0)) {
+          if (!validAmt(v)) {
             errEl.textContent = t("errEnterPledgeAmt");
             errEl.style.display = "block";
             return;
           }
           errEl.style.display = "none";
-          const curOffer = O(d);
-          const nextOffer = curOffer + v;
+          const opId = newId("pl");
+          const colId = view.col;
           ask({
             title: t("confirmAddPledge"),
             lines: [
-              d.name + " · " + t("offer") + ": " + fmt(curOffer) + " → " + fmt(nextOffer),
-              t("selfPledgeConfirmMsg")
+              d.name + " · +" + fmt(v) + " · " + colName(),
+              t("selfPledgeReqMsg")
             ],
             needPw: false,
-            run: () => {
-              const targetDonor = (db.donors || []).find(x => x.id === d.id) || d;
-              const curR = Number(((targetDonor.cols || {})[view.col] || {}).received || 0);
-              setC(targetDonor, nextOffer, curR);
-              db.pledgeLogs = db.pledgeLogs || [];
-              db.pledgeLogs.push({
-                id: "pl" + Date.now(),
-                colId: view.col,
-                batch: targetDonor.batch,
-                donorId: targetDonor.id,
-                donorName: targetDonor.name,
-                amount: v,
-                by: "member",
-                at: nowStamp()
-              });
+            run: async () => {
+              try {
+                await setDoc(reqRef(opId), { uid: auth.currentUser.uid, donorId: d.id, batch: d.batch, colId, amount: v, name: d.name, status: "pending", at: nowStamp() });
+                view.flash = t("reqSent");
+                await refreshReqs();
+              } catch (e) { console.error(e); view.flash = t("flashSaveFail"); }
+              return false;
             }
           });
         }
@@ -1580,9 +1870,53 @@
     );
   }
 
+  function reqCard(scope) {
+    const list = reqs.filter(r => r.status === "pending" && (scope == null || r.batch === scope));
+    if (!list.length) return null;
+    return h("div", { class: "card" }, h("h2", null, t("reqTitle", list.length)),
+      ...list.map(r => {
+        const colN = (db.collections.find(c => c.id === r.colId) || {}).name || "?";
+        const ln = [`${r.name} · ${t("batch")} ${r.batch} · ${fmt(r.amount)}`, `${colN} · ${r.at || ""}`];
+        return h("div", { style: "border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px" },
+          h("div", { class: "num" }, ln[0]), h("div", { class: "mut" }, ln[1]),
+          h("div", { class: "row", style: "justify-content:flex-start" },
+            h("button", { class: "sm", on: { click: () => ask({
+              title: t("reqAcceptTitle"), lines: ln, needPw: false,
+              run: async () => {
+                const dn = db.donors.find(x => x.id === r.donorId), amt = Number(r.amount);
+                if (!dn || !db.collections.some(c => c.id === r.colId) || !validAmt(amt)) {
+                  try { await deleteDoc(reqRef(r.id)); } catch (e) {}
+                  view.flash = t("reqInvalid"); return false;
+                }
+                const prev = view.col; view.col = r.colId;
+                try {
+                  db.pledgeLogs = db.pledgeLogs || [];
+                  if (!db.pledgeLogs.some(x => x.id === r.id)) {
+                    setC(dn, O(dn) + amt, R(dn));
+                    db.pledgeLogs.push({ id: r.id, colId: r.colId, batch: dn.batch, donorId: dn.id, donorName: dn.name, amount: amt, by: "member", at: nowStamp() });
+                  }
+                } finally { view.col = prev; }
+              },
+              after: async () => { await deleteDoc(reqRef(r.id)); }
+            }) } }, t("reqAccept")),
+            h("button", { class: "dng sm", on: { click: () => ask({
+              title: t("reqRejectTitle"), lines: ln, needPw: false,
+              run: async () => {
+                try { await deleteDoc(reqRef(r.id)); } catch (e) { console.error(e); view.flash = t("flashSaveFail"); }
+                return false;
+              }
+            }) } }, t("reqReject"))
+          ));
+      }));
+  }
+
+  function pwToggle() {
+    if (view.showPw) return pwChangeCard(true, false);
+    return h("button", { class: "sec sm", style: "width:100%", on: { click: () => { view.showPw = true; render(); } } }, "🔒 " + t("changePwTitle"));
+  }
+
   /* ==================== SHARED HELPERS ==================== */
   const me = () => view.role === "leader" ? db.leaders.find(x => x.id === view.user) : null;
-  const authHash = () => view.role === "leader" ? me().pw : db.admin;
   let isSavingConfirm = false;
   let confirmSeq = 0;
   const ask = c => {
@@ -1607,31 +1941,43 @@
     }, t("goBackBtn"));
 
     let confirmBtnBusy = false;
+    const inp = c.input ? h("input", { id: "cin", type: "number", inputmode: "numeric", min: 1, value: String(c.input.value) }) : null;
     confirmBtn.addEventListener("click", async () => {
-      if (confirmBtnBusy || isSavingConfirm || c._done || !view.confirm || view.confirm._seq !== expectedSeq) return;
+      if (confirmBtnBusy || isSavingConfirm || uiLocked() || c._done || !view.confirm || view.confirm._seq !== expectedSeq) return;
       confirmBtnBusy = true;
       isSavingConfirm = true;
+      uiBusy = true;
       confirmBtn.disabled = true;
+      cancelBtn.disabled = true;
       try {
-        if (c.needPw && (await sha(ap.value)) !== authHash()) {
+        if (c.needPw && !(await reauth(ap.value))) {
           view.cerr = t("errWrongPw");
           render();
           return;
         }
+        let val = null;
+        if (inp) {
+          val = Number(inp.value);
+          if (!validAmt(val)) { view.cerr = t("errEnterPledgeAmt"); render(); return; }
+        }
         c._done = true;
         view.confirm = null;
         view.cerr = "";
-        await c.run();
-        await save();
+        const rr = await c.run(val);
+        if (rr === false) { render(); return; }
+        const okSave = await save();
+        if (okSave && c.after) { try { await c.after(); } catch (e) { console.error(e); view.flash = t("flashSaveFail"); } }
         render();
       } finally {
         isSavingConfirm = false;
-        setTimeout(() => { confirmBtnBusy = false; }, 220);
+        uiRelease(900);
+        setTimeout(() => { confirmBtnBusy = false; }, 900);
       }
     });
 
     return h("div", { class: "card" }, h("h2", null, c.title),
       h("div", { style: "display:grid;gap:4px" }, ...c.lines.map(l => h("div", { class: "num" }, l))),
+      inp && h("label", { for: "cin" }, c.input.label, inp),
       c.needPw && h("label", { for: "ap" }, view.role === "leader" ? t("confirmLeaderPw") : t("confirmAdminPw"), ap),
       view.cerr && h("div", { class: "err", role: "alert" }, view.cerr),
       h("div", { class: "row" }, confirmBtn, cancelBtn)
@@ -1683,7 +2029,6 @@
     f.batch = h("select", { id: "eb" }, ...(lead ? [LB] : db.batches).map(b => { const o = h("option", { value: b }, t("batch") + " " + b); if (b === Number(e.batch)) o.selected = true; return o; }));
     f.offer = h("input", { id: "eo", type: "number", inputmode: "numeric", min: 0, value: e.offer });
     f.rec = h("input", { id: "er", type: "number", inputmode: "numeric", min: 0, value: e.received });
-    f.pw = h("input", { id: "ep", type: "text", placeholder: e.id ? t("pwOnlyIfChange") : t("loginPwPh"), autocomplete: "off", value: view.editPw || "" });
     const L = (i, t, c) => h("label", { for: i }, t, c);
 
     return h("form", {
@@ -1701,16 +2046,18 @@
             offer: Number(f.offer.value) || 0,
             received: lead ? (old ? R(old) : 0) : (Number(f.rec.value) || 0)
           };
-          const pwText = f.pw.value;
-          view.edit = { ...e, ...rec }; view.editPw = pwText;
-          if (!rec.name || !rec.mobile || (!e.id && !pwText)) { view.editErr = t("errReqMemberFields", e.id); render(); return; }
-          if (!isEnglishOnly(rec.name) || (rec.place && !isEnglishOnly(rec.place)) || (rec.district && !isEnglishOnly(rec.district))) {
+          view.edit = { ...e, ...rec };
+          if (!rec.name || !rec.mobile) { view.editErr = t("errReqMemberFields", e.id); render(); return; }
+          if (((!old || old.name !== rec.name) && !isEnglishOnly(rec.name)) || ((!old || (old.place || "") !== rec.place) && rec.place && !isEnglishOnly(rec.place)) || ((!old || (old.district || "") !== rec.district) && rec.district && !isEnglishOnly(rec.district))) {
             view.editErr = t("errEnglishOnly");
             render(); return;
           }
+          if ((!old || old.mobile !== rec.mobile) && !goodMobile(rec.mobile)) { view.editErr = t("errMobileFmt"); render(); return; }
+          if (!Number.isInteger(rec.offer) || !Number.isInteger(rec.received) || rec.offer < 0 || rec.received < 0 || rec.offer > 10000000 || rec.received > 10000000) { view.editErr = t("errAmtInvalid"); render(); return; }
+          { const need = rec.received + (old ? heldD(old.id) : 0); if (rec.offer < need) { view.editErr = t("errOfferLow", fmt(need)); render(); return; } }
           if (db.donors.some(x => x.batch === rec.batch && x.mobile === rec.mobile && x.id !== e.id)) { view.editErr = t("errDupMobileBatch"); render(); return; }
           view.editErr = "";
-          const sens = !old || old.name !== rec.name || old.mobile !== rec.mobile || old.batch !== rec.batch || (old.place || "") !== rec.place || (old.district || "") !== rec.district || !!pwText;
+          const sens = !old || old.name !== rec.name || old.mobile !== rec.mobile || old.batch !== rec.batch || (old.place || "") !== rec.place || (old.district || "") !== rec.district;
           const locNew = [rec.place, rec.district].filter(Boolean).join(", ");
           const locOld = old ? [old.place, old.district].filter(Boolean).join(", ") : "";
           const lines = [];
@@ -1723,25 +2070,34 @@
             if (old.batch !== rec.batch) lines.push(`${t("batchLine")}: ${old.batch} → ${rec.batch}`);
             if (old.mobile !== rec.mobile) lines.push(`${t("mobileLine")}: ${old.mobile} → ${rec.mobile}`);
             if (locOld !== locNew) lines.push(`${t("placeLine")}: ${locOld || t("noneLabel")} → ${locNew || t("noneLabel")}`);
-            if (pwText) lines.push(t("pwWillChange"));
           }
           if (!old || O(old) !== rec.offer) lines.push(`${t("offer")}: ${old ? fmt(O(old)) + " → " : ""}${fmt(rec.offer)}`);
           if (!old || R(old) !== rec.received) lines.push(`${t("receivedCentral")}: ${old ? fmt(R(old)) + " → " : ""}${fmt(rec.received)}`);
           lines.push(`${t("pending")}: ${fmt(Math.max(0, rec.offer - rec.received))}`);
           if (old && lines.length <= 2) { view.edit = null; render(); return; }
+          const opId = newId("d");
           ask({
             title: old ? t("confirmEditMember") : t("confirmNewMember"),
             lines, needPw: sens,
             run: async () => {
-              if (old) {
-                old.name = rec.name; old.mobile = rec.mobile; old.place = rec.place; old.district = rec.district; old.batch = rec.batch;
-                setC(old, rec.offer, rec.received);
-                if (pwText) old.pw = await sha(pwText);
-              } else {
-                const nd = { id: "d" + Date.now(), name: rec.name, mobile: rec.mobile, place: rec.place, district: rec.district, batch: rec.batch, pw: await sha(pwText), cols: {} };
-                setC(nd, rec.offer, rec.received);
-                db.donors.push(nd);
-              }
+              try {
+                if (old) {
+                  let newUid = old.uid || null;
+                  if (old.uid && (old.mobile !== rec.mobile || old.batch !== rec.batch)) {
+                    newUid = await provision(await keyM(rec.batch, rec.mobile), rec.mobile, { role: "member", id: old.id, batch: rec.batch });
+                    await dropProfile(old.uid);
+                  }
+                  old.name = rec.name; old.mobile = rec.mobile; old.place = rec.place; old.district = rec.district; old.batch = rec.batch;
+                  if (newUid) old.uid = newUid;
+                  setC(old, rec.offer, rec.received);
+                } else {
+                  if (db.donors.some(x => x.id === opId || (x.batch === rec.batch && x.mobile === rec.mobile))) { view.edit = null; return; }
+                  const uid = await provision(await keyM(rec.batch, rec.mobile), rec.mobile, { role: "member", id: opId, batch: rec.batch });
+                  const nd = { id: opId, name: rec.name, mobile: rec.mobile, place: rec.place, district: rec.district, batch: rec.batch, uid, cols: {} };
+                  setC(nd, rec.offer, rec.received);
+                  db.donors.push(nd);
+                }
+              } catch (er) { console.error(er); view.flash = t("errAcctFail"); return false; }
               view.edit = null; view.editPw = "";
             }
           });
@@ -1754,12 +2110,19 @@
       h("div", { class: "g2" }, L("eb", t("batch"), f.batch), L("em", t("mobileNum"), f.mobile)),
       h("div", { class: "g2" }, L("epl", t("placeEnLabel"), f.place), L("eds", t("distEnLabel"), f.dist)),
       h("div", { class: "g2" }, L("eo", t("offerRsLabel"), f.offer), lead ? h("div", { class: "mut" }, t("adminOnlyNote", fmt(e.received))) : L("er", t("receivedCentralRsLabel"), f.rec)),
-      L("ep", t("password"), f.pw),
+      !e.id && h("div", { class: "mut" }, t("initPwNote")),
       view.editErr && h("div", { class: "err", role: "alert" }, view.editErr),
       h("div", { class: "row" },
         h("button", { type: "submit" }, t("saveBtn")),
         h("button", { type: "button", class: "sec", on: { click: () => { view.edit = null; view.editErr = ""; render(); } } }, t("cancelBtn")),
-        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveMember"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`], needPw: true, run: () => { db.donors = db.donors.filter(x => x.id !== e.id); db.entries = db.entries.filter(x => x.donorId !== e.id); view.edit = null; } }) } }, t("removeBtn"))
+        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveMember"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`], needPw: true, run: () => { db.donors = db.donors.filter(x => x.id !== e.id); db.entries = db.entries.filter(x => x.donorId !== e.id); db.gpayEntries = (db.gpayEntries || []).filter(x => x.donorId !== e.id); db.pledgeLogs = (db.pledgeLogs || []).filter(x => x.donorId !== e.id); view.edit = null; }, after: async () => { const cur = (db.donors || []); await dropProfile(e.uid); } }) } }, t("removeBtn")),
+        e.id && e.uid && h("button", { type: "button", class: "sec", on: { click: () => ask({ title: t("confirmResetPw"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`, t("initPwNote")], needPw: true, run: async () => {
+          try {
+            const dn = db.donors.find(x => x.id === e.id); if (!dn) return false;
+            const nu = await provision(await keyM(dn.batch, dn.mobile), dn.mobile, { role: "member", id: dn.id, batch: dn.batch });
+            await dropProfile(dn.uid); dn.uid = nu; view.edit = null;
+          } catch (er) { console.error(er); view.flash = t("errAcctFail"); return false; }
+        } }) } }, t("resetPwBtn"))
       )
     );
   }
@@ -1775,7 +2138,7 @@
   /* ==================== LEADER VIEW ==================== */
   function leaderView() {
     const l = me();
-    if (!l) { view = { ...V0 }; saveSession(); return loginView(); }
+    if (!l) { kick(t("errNoProfile")); return [langBar(), h("div", { class: "card" }, h("p", { class: "mut" }, t("loading")))]; }
     const b = l.batch, bl = db.donors.filter(x => x.batch === b), bo = sumO(bl), br = sumR(bl), bh = heldB(b);
     const go = sumO(db.donors), gr = sumR(db.donors);
     const totalHeldAll = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).reduce((a, e) => a + e.amount, 0);
@@ -1801,9 +2164,10 @@
       { k: "batches", ic: "📊", l: t("tabGrandTotal") }
     ], view.lSec, k => { view.lSec = k; view.edit = null; render(); });
 
-    const out = [langBar(), top, asM, collTabs(t("selectCol")), nav];
+    const out = [langBar(), top, asM, pwToggle(), collTabs(t("selectCol")), nav];
 
     if (view.lSec === "total") {
+      { const rc = reqCard(b); if (rc) out.push(rc); }
       out.push(
         h("div", { class: "card" },
           h("h2", null, t("batchTotalInfo", b) + " · " + colName()),
@@ -1842,21 +2206,25 @@
             submit: ev => {
               ev.preventDefault();
               const a = Number(amt.value);
-              if (!sel.value || !(a > 0)) { view.cashErr = t("errCashInput"); render(); return; }
+              if (!sel.value || !validAmt(a)) { view.cashErr = t("errCashInput"); render(); return; }
               view.cashErr = "";
               const d = db.donors.find(x => x.id === sel.value);
               const curOffer = O(d);
-              const nextOffer = curOffer + a;
+              const nextOffer = Math.max(curOffer, R(d) + heldD(d.id) + a);
+              const opId = newId("x");
               ask({
                 title: t("confirmAddCash"),
                 lines: [
                   d.name + " → " + fmt(a) + (note.value ? " · " + note.value : ""),
-                  t("willRecordWithLeaderAndOffer", fmt(curOffer), fmt(nextOffer))
+                  nextOffer > curOffer ? t("willRecordWithLeaderAndOffer", fmt(curOffer), fmt(nextOffer)) : t("willRecordWithLeader")
                 ],
                 needPw: false,
                 run: () => {
-                  setC(d, nextOffer, R(d));
-                  db.entries.push({ id: "x" + Date.now(), colId: view.col, batch: b, donorId: d.id, amount: a, at: nowStamp(), note: note.value.trim(), status: "held" });
+                  const dd = db.donors.find(x => x.id === d.id);
+                  if (!dd || db.entries.some(x => x.id === opId)) return;
+                  const cur = O(dd), nx = Math.max(cur, R(dd) + heldD(dd.id) + a);
+                  setC(dd, nx, R(dd));
+                  db.entries.push({ id: opId, colId: view.col, batch: b, donorId: dd.id, amount: a, at: nowStamp(), note: note.value.trim(), status: "held", offerAdded: nx - cur });
                 }
               });
             }
@@ -1881,11 +2249,12 @@
             submit: ev => {
               ev.preventDefault();
               const a = Number(pamt.value);
-              if (!psel.value || !(a > 0)) { view.pledgeErr = t("errCashInput"); render(); return; }
+              if (!psel.value || !validAmt(a)) { view.pledgeErr = t("errCashInput"); render(); return; }
               view.pledgeErr = "";
               const d = db.donors.find(x => x.id === psel.value);
               const curOffer = O(d);
               const newOffer = curOffer + a;
+              const opId = newId("pl");
               ask({
                 title: t("confirmAddPledge"),
                 lines: [
@@ -1894,10 +2263,13 @@
                 ],
                 needPw: false,
                 run: () => {
-                  setC(d, newOffer, R(d));
                   db.pledgeLogs = db.pledgeLogs || [];
+                  if (db.pledgeLogs.some(x => x.id === opId)) return;
+                  const dd = db.donors.find(x => x.id === d.id);
+                  if (!dd) return;
+                  setC(dd, O(dd) + a, R(dd));
                   db.pledgeLogs.push({
-                    id: "pl" + Date.now(),
+                    id: opId,
                     colId: view.col,
                     batch: b,
                     donorId: d.id,
@@ -1921,7 +2293,7 @@
 
       const ents = db.entries.filter(x => x.batch === b && x.colId === view.col).slice().reverse();
       out.push(h("div", { class: "card" }, h("h2", null, t("cashRecordsTitle")),
-        ents.length ? ents.slice(0, 30).map(en => entryRow(en, en.status === "held" && h("button", { class: "dng sm", on: { click: () => ask({ title: t("confirmDelRecord"), lines: [(db.donors.find(x => x.id === en.donorId) || { name: "" }).name + " · " + fmt(en.amount)], needPw: true, run: () => { db.entries = db.entries.filter(z => z.id !== en.id); } }) } }, t("removeBtn")))) : h("div", { class: "mut" }, t("noRecordsYet"))));
+        ents.length ? ents.slice(0, 30).map(en => entryRow(en, en.status === "held" && h("button", { class: "dng sm", on: { click: () => ask({ title: t("confirmDelRecord"), lines: [(db.donors.find(x => x.id === en.donorId) || { name: "" }).name + " · " + fmt(en.amount)], needPw: true, run: () => { const dd = db.donors.find(x => x.id === en.donorId); if (dd && en.offerAdded) withCol(en.colId, () => setC(dd, Math.max(0, O(dd) - en.offerAdded), R(dd))); db.entries = db.entries.filter(z => z.id !== en.id); } }) } }, t("removeBtn")))) : h("div", { class: "mut" }, t("noRecordsYet"))));
       const bPledges = (db.pledgeLogs || []).filter(x => x.batch === b && x.colId === view.col).slice().reverse();
       if (bPledges.length > 0) {
         out.push(h("div", { class: "card" },
@@ -1950,7 +2322,6 @@
       );
     } 
     else if (view.lSec === "batches") {
-      const remPledgeLabel = curLang === "ml" ? "ബാക്കി വാഗ്ദാനം" : t("pending");
       out.push(
         h("div", { class: "card" },
           h("h2", null, t("grandTotal") + " · " + colName()),
@@ -2060,13 +2431,6 @@
       style: matchedMember ? "opacity:0.75;cursor:not-allowed" : null
     });
     f.wa = h("input", { id: "lw", type: "tel", inputmode: "numeric", placeholder: t("waNumPh"), value: e.wa || "" });
-    f.pw = h("input", {
-      id: "lp",
-      type: "text",
-      autocomplete: "off",
-      placeholder: e.id ? t("pwOnlyIfChange") : t("leaderPwPh"),
-      value: e.pwText || ""
-    });
 
     return h("form", {
       class: "card",
@@ -2080,30 +2444,19 @@
             batch: Number(f.bt.value),
             wa: f.wa.value.trim()
           };
-          const pwText = f.pw.value;
-          view.ledit = { ...e, ...rec, donorId: f.mem.value, pwText };
+          view.ledit = { ...e, ...rec, donorId: f.mem.value };
 
           if (!rec.username || !rec.mobile) {
             view.lErr = t("errLeaderReq");
             render(); return;
           }
-          if (!e.id && !pwText) {
-            view.lErr = t("errNewLeaderPwReq");
-            render(); return;
-          }
+          if ((!e.id || (db.leaders.find(x => x.id === e.id) || {}).mobile !== rec.mobile) && !goodMobile(rec.mobile)) { view.lErr = t("errMobileFmt"); render(); return; }
           if (db.leaders.some(x => x.id !== e.id && (x.username.toLowerCase() === rec.username.toLowerCase() || x.mobile === rec.mobile))) {
             view.lErr = t("errDupLeader");
             render(); return;
           }
-          if (pwText) {
-            if (pwText.length < 4) { view.lErr = t("errLeaderPwMin4"); render(); return; }
-            const h1 = await sha(pwText);
-            if (db.donors.some(d => d.mobile === rec.mobile && d.batch === rec.batch && d.pw === h1)) {
-              view.lErr = t("errLeaderPwDiff"); render(); return;
-            }
-          }
           view.lErr = "";
-          const pwNote = pwText ? " · " + (e.id ? t("pwWillChange") : t("pwWillSet")) : "";
+          const pwNote = e.id ? "" : " · " + t("initPwNote");
 
           ask({
             title: e.id ? t("confirmEditLeader") : t("confirmNewLeader"),
@@ -2113,14 +2466,26 @@
             ],
             needPw: true,
             run: async () => {
-              const finalPwHash = pwText ? await sha(pwText) : null;
-              if (e.id) {
-                const l = db.leaders.find(x => x.id === e.id);
-                Object.assign(l, rec);
-                if (finalPwHash) l.pw = finalPwHash;
-              } else {
-                db.leaders.push({ id: "l" + Date.now(), ...rec, pw: finalPwHash });
-              }
+              try {
+                if (e.id) {
+                  const l = db.leaders.find(x => x.id === e.id);
+                  if (!l) return false;
+                  let nu = l.uid || null;
+                  if (l.uid && l.username.toLowerCase() !== rec.username.toLowerCase()) {
+                    nu = await provision(await keyL(rec.username), rec.mobile, { role: "leader", id: l.id, batch: rec.batch });
+                    await dropProfile(l.uid);
+                  } else if (l.uid && l.batch !== rec.batch) {
+                    await updateDoc(doc(cloudFs, "users", l.uid), { batch: rec.batch });
+                  }
+                  Object.assign(l, rec);
+                  if (nu) l.uid = nu;
+                } else {
+                  if (db.leaders.some(x => x.username.toLowerCase() === rec.username.toLowerCase() || x.mobile === rec.mobile)) { view.ledit = null; return; }
+                  const lid = newId("l");
+                  const uid = await provision(await keyL(rec.username), rec.mobile, { role: "leader", id: lid, batch: rec.batch });
+                  db.leaders.push({ id: lid, ...rec, uid });
+                }
+              } catch (er) { console.error(er); view.flash = t("errAcctFail"); return false; }
               view.ledit = null;
             }
           });
@@ -2135,12 +2500,19 @@
         h("label", { for: "lm" }, t("mobileNum"), f.mb),
         h("label", { for: "lw" }, t("waNumLabel"), f.wa)
       ),
-      h("label", { for: "lp" }, t("password"), f.pw),
+      !e.id && h("div", { class: "mut" }, t("initPwNote")),
       view.lErr && h("div", { class: "err", role: "alert" }, view.lErr),
       h("div", { class: "row" },
         h("button", { type: "submit" }, t("saveBtn")),
         h("button", { type: "button", class: "sec", on: { click: () => { view.ledit = null; view.lErr = ""; render(); } } }, t("cancelBtn")),
-        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveLeader"), lines: [`${e.username} · ${t("batch")} ${e.batch}`], needPw: true, run: () => { db.leaders = db.leaders.filter(x => x.id !== e.id); view.ledit = null; } }) } }, t("removeBtn"))
+        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveLeader"), lines: [`${e.username} · ${t("batch")} ${e.batch}`], needPw: true, run: () => { db.leaders = db.leaders.filter(x => x.id !== e.id); view.ledit = null; }, after: async () => { await dropProfile(e.uid); } }) } }, t("removeBtn")),
+        e.id && e.uid && h("button", { type: "button", class: "sec", on: { click: () => ask({ title: t("confirmResetPw"), lines: [`${e.username} · ${t("batch")} ${e.batch}`, t("initPwNote")], needPw: true, run: async () => {
+          try {
+            const l = db.leaders.find(x => x.id === e.id); if (!l) return false;
+            const nu = await provision(await keyL(l.username), l.mobile, { role: "leader", id: l.id, batch: l.batch });
+            await dropProfile(l.uid); l.uid = nu; view.ledit = null;
+          } catch (er) { console.error(er); view.flash = t("errAcctFail"); return false; }
+        } }) } }, t("resetPwBtn"))
       )
     );
   }
@@ -2151,30 +2523,45 @@
     const n2 = h("input", { id: "pn2", type: "password", autocomplete: "new-password" });
     const L = (i, t, c) => h("label", { for: i }, t, c);
     const msg = view.pwMsg; view.pwMsg = null;
+    let busy = false;
+    const myMobile = () => view.role === "leader" ? (me() || {}).mobile : (curDonor() || {}).mobile;
     return h("form", { class: "card", on: { submit: async ev => {
       ev.preventDefault();
+      if (busy) return;
+      busy = true;
       const fail = txt => { view.pwMsg = { e: true, t: txt }; render(); };
-      if (requireCur && (await sha(cur.value)) !== db.admin) return fail(t("errCurPwWrong"));
-      if (n1.value.length < 6) return fail(t("errPwMin6"));
-      if (n1.value !== n2.value) return fail(t("errPwMismatch"));
-      const hh = await sha(n1.value);
-      if (hh === LEGACY_DEFAULT_HASH) return fail(t("errNoDefaultPw"));
-      db.admin = hh; await save();
-      view.pwMsg = { e: false, t: t("adminPwChanged") }; render();
+      try {
+        if (!(await reauth(cur.value))) return fail(t("errCurPwWrong"));
+        if (n1.value.length < 6) return fail(t("errPwMin6"));
+        if (n1.value !== n2.value) return fail(t("errPwMismatch"));
+        if (n1.value === cur.value) return fail(t("errPwSame"));
+        if (view.role !== "owner" && n1.value === String(myMobile() || "")) return fail(t("errPwMobile"));
+        try { await updatePassword(auth.currentUser, n1.value); }
+        catch (e) { console.error(e); return fail(t("errPwChangeFail")); }
+        if (profile && profile.mustChange) {
+          try { await updateDoc(doc(cloudFs, "users", auth.currentUser.uid), { mustChange: false }); profile.mustChange = false; }
+          catch (e) { console.error(e); return fail(t("errPwChangeFail")); }
+        }
+        view.mustChange = false; view.showPw = false;
+        view.flash = t("pwChangedOk"); view.pwMsg = null; render();
+      } finally { busy = false; }
     } } },
-      h("h2", null, forced ? t("changeAdminPwForced") : t("changeAdminPwTitle")),
-      forced && h("p", { class: "sub" }, t("forcedPwNote")),
-      requireCur && L("pcur", t("curPwLabel"), cur),
+      h("h2", null, forced ? t("forcedPwTitle") : t("changePwTitle")),
+      forced && h("p", { class: "sub" }, t("forcedPwMsg")),
+      L("pcur", t("curPwLabel"), cur),
       L("pn1", t("newPwLabel"), n1),
       L("pn2", t("repeatPassword"), n2),
       msg && h("div", { class: msg.e ? "err" : "mut", role: "alert" }, msg.t),
-      h("button", { type: "submit" }, t("changePwBtn"))
+      h("div", { class: "row" },
+        h("button", { type: "submit" }, t("changePwBtn")),
+        !forced && view.role !== "owner" && h("button", { type: "button", class: "sec", on: { click: () => { view.showPw = false; render(); } } }, t("cancelBtn"))
+      )
     );
   }
 
   function collManager() {
     const vis = db.collections.filter(c => !c.hidden), hid = db.collections.filter(c => c.hidden);
-    const nm = h("input", { id: "cname", placeholder: "ഉദാ: കണ്യാല മൗല ആണ്ട് 2027" });
+    const nm = h("input", { id: "cname", placeholder: t("colNamePh") });
     const show = h("input", { id: "cshow", type: "checkbox", style: "width:auto" });
     const card = h("div", { class: "card" }, h("h2", null, t("collectionsTitle")),
       h("div", { class: "vis" },
@@ -2186,7 +2573,7 @@
       h("div", { class: "row" }, h("b", null, c.name), c.hidden ? h("span", { class: "pill am" }, t("hiddenPill")) : h("span", { class: "pill ok" }, t("visiblePill"))),
       h("div", { class: "row", style: "justify-content:flex-start" },
         h("button", { class: "sec sm", on: { click: () => ask({ title: c.hidden ? t("confirmShowCol") : t("confirmHideCol"), lines: [c.name, c.hidden ? t("showColDesc") : t("hideColDesc")], needPw: false, run: () => { c.hidden = !c.hidden; } }) } }, c.hidden ? t("showBtn") : t("hideBtn")),
-        h("button", { class: "dng sm", disabled: db.collections.length < 2 ? "true" : null, on: { click: () => ask({ title: t("confirmDelCol"), lines: [c.name, t("delColWarn")], needPw: true, run: () => { db.collections = db.collections.filter(x => x.id !== c.id); db.donors.forEach(d => { if (d.cols) delete d.cols[c.id]; }); db.entries = db.entries.filter(x => x.colId !== c.id); } }) } }, t("removeBtn"))
+        h("button", { class: "dng sm", disabled: db.collections.length < 2 ? "true" : null, on: { click: () => ask({ title: t("confirmDelCol"), lines: [c.name, t("delColWarn")], needPw: true, run: () => { db.collections = db.collections.filter(x => x.id !== c.id); db.donors.forEach(d => { if (d.cols) delete d.cols[c.id]; }); db.entries = db.entries.filter(x => x.colId !== c.id); db.gpayEntries = (db.gpayEntries || []).filter(x => x.colId !== c.id); db.pledgeLogs = (db.pledgeLogs || []).filter(x => x.colId !== c.id); } }) } }, t("removeBtn"))
       )
     )));
     card.append(h("form", {
@@ -2202,7 +2589,7 @@
             title: t("confirmNewCol"),
             lines: [n, sh ? t("willShowImmediate") : t("willAddHidden")],
             needPw: true,
-            run: () => { const id = "c" + Date.now(); db.collections.push({ id, name: n, hidden: !sh }); view.col = id; }
+            run: () => { if (db.collections.some(c => c.name.toLowerCase() === n.toLowerCase())) return; const id = newId("c"); db.collections.push({ id, name: n, hidden: !sh }); view.col = id; }
           });
         }
       }
@@ -2224,19 +2611,121 @@
         rows.push([b, d.name, d.mobile, d.place || "", d.district || "", o, r, hd, pend]);
       });
     });
-    const csv = "\uFEFF" + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const csv = "\uFEFF" + rows.map(r => r.map(v => { let x = String(v); if (/^[=+\-@]/.test(x)) x = "'" + x; return `"${x.replace(/"/g, '""')}"`; }).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = `COLLECTIONS_${colName().replace(/\s+/g, "_")}.csv`;
     a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+
+  function auditAccounts() {
+    const iss = [];
+    const intOk = v => Number.isInteger(v) && v >= 0;
+    (db.collections || []).forEach(c => withCol(c.id, () => {
+      let so = 0, sr = 0, sh = 0;
+      db.donors.forEach(d => {
+        const o = O(d), r = R(d), hd = heldD(d.id);
+        so += o; sr += r; sh += hd;
+        if (!intOk(o) || !intOk(r)) iss.push(t("accNum", c.name, d.name));
+        else if (o < r + hd) iss.push(t("accLow", c.name, d.name, d.batch, fmt(o), fmt(r), fmt(hd)));
+      });
+      let bo = 0, br = 0, bh = 0;
+      db.batches.forEach(b => { const l = db.donors.filter(z => z.batch === b); bo += sumO(l); br += sumR(l); bh += heldB(b); });
+      if (bo !== so || br !== sr || bh !== sh) iss.push(t("accTie", c.name));
+    }));
+    const seen = new Set();
+    (db.entries || []).forEach(e => {
+      if (!validAmt(Number(e.amount)) || !["held", "confirmed"].includes(e.status) || !db.donors.some(d => d.id === e.donorId) || seen.has(e.id)) iss.push(t("accEntry", e.id));
+      seen.add(e.id);
+    });
+    const keys = new Set();
+    db.donors.forEach(d => {
+      const k = d.batch + "/" + d.mobile;
+      if (keys.has(k)) iss.push(t("accDup", d.name)); keys.add(k);
+      if (!db.batches.includes(d.batch)) iss.push(t("accBatch", d.name));
+    });
+    return iss;
+  }
+
+  function accountsCard() {
+    const iss = auditAccounts();
+    return h("div", { class: "card", style: "padding:12px 15px" },
+      h("h2", null, t("accTitle")),
+      iss.length === 0
+        ? h("div", { class: "pill ok", style: "border-radius:8px;padding:8px 10px" }, t("accOk"))
+        : h("div", { style: "display:grid;gap:6px" },
+            h("div", { class: "err" }, t("accBad", iss.length)),
+            ...iss.slice(0, 20).map(x => h("div", { class: "mut" }, "• " + x)))
+    );
+  }
+
+  function loginsCard() {
+    const miss = db.donors.filter(d => !d.uid), missL = db.leaders.filter(l => !l.uid);
+    if (!miss.length && !missL.length) return h("div", { class: "card", style: "padding:12px 15px" }, h("div", { class: "pill ok", style: "border-radius:8px;padding:8px 10px" }, t("loginsAllOk")));
+    return h("div", { class: "card" },
+      h("h2", null, t("loginsTitle")),
+      h("p", { class: "sub" }, t("loginsNote")),
+      h("div", { class: "err" }, t("loginsMissing", miss.length, missL.length)),
+      h("button", { on: { click: () => ask({
+        title: t("loginsConfirm"), lines: [t("loginsMissing", miss.length, missL.length), t("initPwNote")], needPw: true,
+        run: async () => {
+          let ok = 0, bad = 0, stop = false;
+          for (const d of db.donors.filter(x => !x.uid)) {
+            if (stop) { bad++; continue; }
+            try { d.uid = await provision(await keyM(d.batch, d.mobile), d.mobile, { role: "member", id: d.id, batch: d.batch }); ok++; }
+            catch (e) { bad++; console.error(e); if (e && e.code === "auth/too-many-requests") stop = true; }
+          }
+          for (const l of db.leaders.filter(x => !x.uid)) {
+            if (stop) { bad++; continue; }
+            try { l.uid = await provision(await keyL(l.username), l.mobile, { role: "leader", id: l.id, batch: l.batch }); ok++; }
+            catch (e) { bad++; console.error(e); if (e && e.code === "auth/too-many-requests") stop = true; }
+          }
+          view.flash = t("loginsDone", ok, bad);
+        }
+      }) } }, t("loginsCreateBtn"))
+    );
+  }
+
+  function exportBackup() {
+    const blob = new Blob([JSON.stringify(db, null, 1)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "COLLECTIONS_backup_" + new Date().toISOString().slice(0, 10) + ".json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+
+  function backupCard() {
+    const sz = dbSize(), pct = Math.round(sz / 10485.76);
+    const fileIn = h("input", { id: "rst", type: "file", accept: "application/json,.json" });
+    return h("div", { class: "card" },
+      h("h2", null, t("backupTitle")),
+      h("p", { class: "sub" }, t("backupNote")),
+      h("div", { class: pct >= 70 ? "err" : "mut" }, t("sizeLabel", Math.round(sz / 1024), pct)),
+      h("button", { class: "sec", on: { click: exportBackup } }, t("backupBtn")),
+      h("hr", { style: "border:0;border-top:1px dashed var(--line);width:100%" }),
+      h("label", { for: "rst" }, t("restoreTitle"), fileIn),
+      h("button", { class: "dng", on: { click: async () => {
+        const f = fileIn.files && fileIn.files[0];
+        if (!f) { view.flash = t("errPickFile"); render(); return; }
+        let obj = null;
+        try { obj = JSON.parse(await f.text()); } catch (e) {}
+        if (!obj || !Array.isArray(obj.donors) || !Array.isArray(obj.leaders) || !Array.isArray(obj.batches) || !Array.isArray(obj.collections) || !Array.isArray(obj.entries)) { view.flash = t("errBadBackup"); render(); return; }
+        ask({
+          title: t("confirmRestoreTitle"),
+          lines: [t("restoreLine", obj.donors.length, obj.collections.length, obj.entries.length), t("restoreWarn")],
+          needPw: true,
+          run: () => { const rev = db.rev; delete obj.admin; obj.donors.forEach(d => { delete d.pw; }); obj.leaders.forEach(l => { delete l.pw; }); db = obj; db.rev = rev; }
+        });
+      } } }, t("restoreBtn"))
+    );
   }
 
   function ownerView() {
     const o = sumO(db.donors), r = sumR(db.donors);
     const pendingEntriesCount = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).length;
-    const pendingGpayList = (db.gpayEntries || []).filter(e => e.status === "pending" && e.colId === view.col);
-    const pendingGpayCount = pendingGpayList.length;
     const statusBadge = isCloudConnected
       ? h("span", { class: "badge ok" }, t("liveDbBadge"))
       : h("span", { class: "badge" }, t("localModeBadge"));
@@ -2246,13 +2735,11 @@
       logout()
     );
     if (view.confirm) return [langBar(), top, confirmCard()];
-    if (db.admin === LEGACY_DEFAULT_HASH) return [langBar(), top, pwChangeCard(false, true)];
 
     const nav = navBar([
       { k: "dash", ic: "📊", l: t("tabTotal") },
       { k: "batches", ic: "🎓", l: t("tabBatch") },
       { k: "cash", ic: "💰", l: t("tabHandover"), badge: pendingEntriesCount || null },
-      { k: "gpay", ic: "💳", l: t("tabGpay"), badge: pendingGpayCount || null },
       { k: "members", ic: "👥", l: t("tabMembers") },
       { k: "settings", ic: "⚙️", l: t("tabSettings") }
     ], view.oSec, k => { view.oSec = k; view.edit = null; view.ledit = null; render(); });
@@ -2261,6 +2748,9 @@
 
     if (view.oSec === "dash") {
       const totalHeldAll = (db.entries || []).filter(e => e.status === "held" && e.colId === view.col).reduce((a, e) => a + e.amount, 0);
+      out.push(accountsCard());
+      out.push(loginsCard());
+      { const rc = reqCard(null); if (rc) out.push(rc); }
       out.push(
         h("div", { class: "card" },
           h("h2", null, t("grandTotal") + " · " + colName()),
@@ -2336,53 +2826,6 @@
       });
       out.push(ho);
     }
-    else if (view.oSec === "gpay") {
-      const goCard = h("div", { class: "card" },
-        h("h2", null, t("gpayAdminTitle") + " · " + colName()),
-        h("p", { class: "sub" }, t("gpayAdminSub")),
-        db.gpayUpiId ? h("div", { class: "mut num" }, t("gpayCurLabel") + db.gpayUpiId) : null
-      );
-      if (!pendingGpayList.length) {
-        goCard.append(h("div", { class: "mut" }, t("noGpayPending")));
-      } else {
-        pendingGpayList.forEach(ge => {
-          const donor = db.donors.find(x => x.id === ge.donorId);
-          const dName = donor ? donor.name : (ge.donorName || t("removedTag"));
-          const dBatch = donor ? donor.batch : ge.batch;
-          const displayAmt = Number(ge.amount || 0);
-          const confirmGpay = () => ask({
-            title: t("confirmGpayHandoverTitle"),
-            lines: [
-              t("gpayBatchLabel", dBatch) + " · " + dName + " · " + fmt(displayAmt),
-              t("confirmGpayHandoverLine", fmt(displayAmt), dName)
-            ],
-            needPw: false,
-            run: () => {
-              const curGe = (db.gpayEntries || []).find(x => x.id === ge.id);
-              if (!curGe || curGe.status !== "pending") return;
-              const amtVal = Number(curGe.amount || 0);
-              if (donor) {
-                setC(donor, O(donor) + amtVal, R(donor) + amtVal);
-              }
-              curGe.status = "confirmed";
-            }
-          });
-          goCard.append(
-            h("div", { class: "ent" },
-              h("div", { style: "min-width:0" },
-                h("div", { class: "num" }, h("b", null, dName), " · " + t("gpayBatchLabel", dBatch) + " · " + fmt(displayAmt)),
-                h("div", { class: "mut" }, (ge.mobile || "") + (ge.at ? " · " + ge.at : "") + (ge.upiId ? " · " + ge.upiId : ""))
-              ),
-              h("div", { class: "row" },
-                h("span", { class: "pill am" }, t("gpayFromMember")),
-                h("button", { class: "sec sm", on: { click: confirmGpay } }, t("receivedBtn"))
-              )
-            )
-          );
-        });
-      }
-      out.push(goCard);
-    }
     else if (view.oSec === "members") {
       out.push(addMemberUI(null), searchCard(null));
       const list = h("div", { class: "card" }, h("h2", null, t("membersByBatchTitle", db.batches.length)));
@@ -2417,49 +2860,8 @@
       out.push(lc);
       if (view.ledit) out.push(leaderForm());
 
-      const upiInput = h("input", {
-        id: "gpayUpiInput",
-        type: "text",
-        placeholder: t("gpayUpiPh"),
-        value: db.gpayUpiId || ""
-      });
-      const upiErr = h("div", { class: "err", role: "alert", style: "display:none" });
-      out.push(
-        h("form", {
-          class: "card",
-          on: {
-            submit: ev => {
-              ev.preventDefault();
-              const val = upiInput.value.trim();
-              if (!val || !val.includes("@")) {
-                upiErr.textContent = t("errInvalidUpi");
-                upiErr.style.display = "block";
-                return;
-              }
-              upiErr.style.display = "none";
-              ask({
-                title: t("confirmGpayUpiTitle"),
-                lines: [
-                  t("gpayCurLabel") + (db.gpayUpiId || t("noneLabel")),
-                  t("gpayUpiLabel") + ": " + val
-                ],
-                needPw: true,
-                run: () => {
-                  db.gpayUpiId = val;
-                }
-              });
-            }
-          }
-        },
-          h("h2", null, t("gpaySettingsTitle")),
-          db.gpayUpiId ? h("div", { class: "mut num" }, t("gpayCurLabel") + db.gpayUpiId) : null,
-          h("label", { for: "gpayUpiInput" }, t("gpayUpiLabel"), upiInput),
-          upiErr,
-          h("button", { type: "submit" }, t("gpaySaveBtn"))
-        )
-      );
-
       out.push(collManager());
+      out.push(backupCard());
       out.push(pwChangeCard(true, false));
 
       const nb = h("input", { id: "nb", type: "number", inputmode: "numeric", min: 1, placeholder: t("batchNum") });
@@ -2473,7 +2875,7 @@
             else if (db.batches.includes(n)) { view.bErr = t("errBatchExists", n); render(); }
             else {
               view.bErr = "";
-              ask({ title: t("confirmNewBatch"), lines: [t("batch") + " " + n], needPw: true, run: () => { db.batches.push(n); db.batches.sort((a, b) => a - b); view.open = n; } });
+              ask({ title: t("confirmNewBatch"), lines: [t("batch") + " " + n], needPw: true, run: () => { if (db.batches.includes(n)) return; db.batches.push(n); db.batches.sort((a, b) => a - b); view.open = n; } });
             }
           }
         }
@@ -2489,49 +2891,25 @@
 
   (async () => {
     render();
-    if (firebaseConfig.apiKey && firebaseConfig.projectId) {
-      try {
-        const app = initializeApp(firebaseConfig);
-        const firestore = getFirestore(app);
-        cloudRef = doc(firestore, "collections_data", "main");
-        const snap = await getDoc(cloudRef);
-        if (!snap.exists()) {
-          db = await defaultDB();
-          await setDoc(cloudRef, db);
-        } else {
-          db = snap.data();
-        }
-        isCloudConnected = true;
-        onSnapshot(cloudRef, docSnap => {
-          if (isCloudSaving || isSavingConfirm || view.confirm) return;
-          const activeTag = (document.activeElement && document.activeElement.tagName) || "";
-          if (activeTag === "INPUT" || activeTag === "SELECT") return;
-          if (docSnap.exists()) {
-            db = docSnap.data();
-            localStorage.setItem(DATA_KEY, JSON.stringify(db));
-            render();
-          }
-        });
-      } catch (err) {
-        console.error("Firebase init failed, using local storage:", err);
-      }
+    try {
+      const A = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      const F = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      const AU = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+      ({ initializeApp } = A);
+      ({ getFirestore, doc, getDoc, onSnapshot, runTransaction, collection, query, where, getDocs, setDoc, deleteDoc, updateDoc } = F);
+      ({ getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updatePassword, reauthenticateWithCredential, EmailAuthProvider, setPersistence, browserLocalPersistence } = AU);
+      const app = initializeApp(firebaseConfig);
+      cloudFs = getFirestore(app);
+      cloudRef = doc(cloudFs, "collections_data", "main");
+      auth = getAuth(app);
+      try { await setPersistence(auth, browserLocalPersistence); } catch (e) {}
+      isCloudConnected = true;
+      onAuthStateChanged(auth, u => { afterAuth(u); });
+    } catch (err) {
+      console.error("Firebase init failed:", err);
+      cloudError = true; authReady = true; render();
     }
-
-    if (!db) {
-      try {
-        const saved = localStorage.getItem(DATA_KEY);
-        db = saved ? JSON.parse(saved) : await defaultDB();
-      } catch (e) {
-        db = await defaultDB();
-      }
-      await save();
-    }
-    render();
   })();
-
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  }
 </script>
 </body>
 </html>
