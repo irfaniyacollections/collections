@@ -29,6 +29,17 @@
     button:active{opacity:0.85}
     button.sec{background:transparent;color:var(--pri)}button.dng{background:transparent;color:var(--warn);border-color:var(--warn)}
     button.sm{padding:6px 10px;font-size:13px}
+    .lg{display:grid;gap:16px;padding:22px 18px;margin-top:4vh}
+    .lg .brand{text-align:center;display:grid;gap:4px;padding:4px 0 0}
+    .lg .logo{width:58px;height:58px;border-radius:18px;margin:0 auto 6px;display:grid;place-items:center;background:var(--pri);color:var(--onpri);font-size:30px;font-weight:800;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+    .lg h1{font-size:22px;letter-spacing:.6px}
+    .lg .tabs button{min-height:48px;padding:8px 4px;font-size:14px;line-height:1.2;display:flex;align-items:center;justify-content:center;text-align:center}
+    .lform{display:grid;gap:14px;margin-top:2px}
+    .lform input{font-size:16px;padding:13px 14px}
+    .lform button[type=submit]{padding:14px;font-size:16px;margin-top:2px}
+    .lform .hint{font-size:12.5px;color:var(--mut);line-height:1.5;text-align:center}
+    .pwrap{position:relative}.pwrap input{padding-right:50px}
+    .pwrap .eye{position:absolute;right:3px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:var(--mut);padding:8px 11px;font-size:18px;line-height:1}
     .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.tabs button{background:transparent;color:var(--pri)}.tabs button.on{background:var(--pri);color:var(--onpri)}
     
     /* Language Switcher Bar */
@@ -102,6 +113,12 @@
     .badge.ok{background:var(--okbg);color:var(--ok)}
     .nbadge{background:var(--acc);color:#fff;font-size:10px;padding:1px 5px;border-radius:99px;margin-left:3px;font-weight:700}
   </style>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js">
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js">
 </head>
 <body>
 <div id="app"></div>
@@ -1226,15 +1243,20 @@
         teardown(); const e0 = view.err;
         view = { ...V0, err: e0 || "" }; db = null; profile = null; authReady = true; render(); return;
       }
-      let prof;
-      if (user.email === ADMIN_EMAIL) prof = { role: "owner" };
+      let prof, sn;
+      if (user.email === ADMIN_EMAIL) { prof = { role: "owner" }; sn = await getDoc(cloudRef); }
       else {
-        const ps = await getDoc(doc(cloudFs, "users", user.uid));
+        // profile and data are fetched at the same time (saves one network round trip)
+        let mainErr = null;
+        const [ps, sn0] = await Promise.all([
+          getDoc(doc(cloudFs, "users", user.uid)),
+          getDoc(cloudRef).catch(e => { mainErr = e; return null; })
+        ]);
         if (my !== authSeq) return;
         if (!ps.exists()) { await bail(t("errNoProfile")); return; }
-        prof = ps.data();
+        if (mainErr || !sn0) throw (mainErr || new Error("no data"));
+        prof = ps.data(); sn = sn0;
       }
-      const sn = await getDoc(cloudRef);
       if (my !== authSeq) return;
       if (!sn.exists()) {
         if (prof.role !== "owner") { await bail(t("cloudErr")); return; }
@@ -1375,8 +1397,8 @@
               try {
                 await origHandler(evt);
               } finally {
-                uiRelease(700);
-                setTimeout(() => { if (e.isConnected) e.disabled = false; }, 700);
+                uiRelease(450);
+                setTimeout(() => { if (e.isConnected) e.disabled = false; }, 450);
               }
             });
           } else if (tag === "form" && ev === "submit") {
@@ -1614,16 +1636,16 @@
   function loginView() {
     const tab = view.tab, f = {};
     const mk = (id, lab, el) => h("label", { for: id }, lab, el);
-    f.batch = h("input", { id: "bt", type: "tel", inputmode: "numeric", placeholder: t("batchNum") });
-    f.mobile = h("input", { id: "mb", type: "tel", inputmode: "numeric", autocomplete: "tel", placeholder: t("mobileNum") });
-    f.uid = h("input", { id: "ui", autocomplete: "username", placeholder: t("username") });
-    f.lm = h("input", { id: "lmb", type: "tel", inputmode: "numeric", autocomplete: "tel", placeholder: t("mobileNum") });
-    f.pw = h("input", { id: "pw", type: "password", autocomplete: "current-password", placeholder: t("password") });
+    f.batch = h("input", { id: "bt", type: "tel", inputmode: "numeric" });
+    f.mobile = h("input", { id: "mb", type: "tel", inputmode: "numeric", autocomplete: "tel" });
+    f.uid = h("input", { id: "ui", autocomplete: "username" });
+    f.lm = h("input", { id: "lmb", type: "tel", inputmode: "numeric", autocomplete: "tel" });
+    f.pw = h("input", { id: "pw", type: "password", autocomplete: "current-password" });
 
     const go = async () => {
       if (loginBusy || !auth) return;
       loginBusy = true;
-      const btn = document.getElementById("loginGo"); if (btn) btn.disabled = true;
+      const btn = document.getElementById("loginGo"); if (btn) { btn.disabled = true; btn.textContent = "⏳"; }
       view.err = "";
       try {
         const pwv = f.pw.value;
@@ -1653,19 +1675,21 @@
 
     const tb = (k, l) => h("button", { type: "button", class: tab === k ? "on" : "", on: { click: () => { view.tab = k; view.err = ""; render(); } } }, l);
 
+    const eye = h("button", { type: "button", class: "eye", "aria-label": "show password", on: { click: () => { f.pw.type = f.pw.type === "password" ? "text" : "password"; } } }, "👁");
     return [
       langBar(),
-      h("div", { class: "card" },
-        h("div", null, h("h1", null, "COLLECTIONS"), h("div", { class: "mut" }, t("loginSub"))),
+      h("div", { class: "card lg" },
+        h("div", { class: "brand" }, h("div", { class: "logo" }, "₹"), h("h1", null, "COLLECTIONS"), h("div", { class: "mut" }, t("loginSub"))),
         h("div", { class: "tabs" }, tb("member", t("member")), tb("leader", t("batchLeader")), tb("owner", t("admin"))),
-        h("form", { class: "card", style: "border:0;padding:0", on: { submit: e => { e.preventDefault(); go(); } } },
+        h("form", { class: "lform", on: { submit: e => { e.preventDefault(); go(); } } },
           tab === "member" && mk("bt", t("batchNum"), f.batch),
           tab === "member" && mk("mb", t("mobileNum"), f.mobile),
           tab === "leader" && mk("ui", t("username"), f.uid),
           tab === "leader" && mk("lmb", t("mobileNum"), f.lm),
-          mk("pw", t("password"), f.pw),
+          mk("pw", t("password"), h("div", { class: "pwrap" }, f.pw, eye)),
           view.err && h("div", { class: "err", role: "alert" }, view.err),
-          h("button", { type: "submit", id: "loginGo" }, t("loginBtn"))
+          h("button", { type: "submit", id: "loginGo" }, t("loginBtn")),
+          tab !== "owner" && h("div", { class: "hint" }, t("initPwNote"))
         )
       )
     ];
@@ -1961,6 +1985,7 @@
       isSavingConfirm = true;
       uiBusy = true;
       confirmBtn.disabled = true;
+      confirmBtn.textContent = "⏳ " + confirmBtn.textContent;
       cancelBtn.disabled = true;
       try {
         if (c.needPw && !(await reauth(ap.value))) {
@@ -1983,8 +2008,8 @@
         render();
       } finally {
         isSavingConfirm = false;
-        uiRelease(900);
-        setTimeout(() => { confirmBtnBusy = false; }, 900);
+        uiRelease(500);
+        setTimeout(() => { confirmBtnBusy = false; }, 500);
       }
     });
 
@@ -2877,7 +2902,7 @@
       out.push(backupCard());
       out.push(pwChangeCard(true, false));
 
-      const nb = h("input", { id: "nb", type: "number", inputmode: "numeric", min: 1, placeholder: t("batchNum") });
+      const nb = h("input", { id: "nb", type: "number", inputmode: "numeric", min: 1 });
       out.push(h("form", {
         class: "card",
         on: {
@@ -2905,9 +2930,11 @@
   (async () => {
     render();
     try {
-      const A = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-      const F = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-      const AU = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+      const [A, F, AU] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"),
+        import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js")
+      ]);
       ({ initializeApp } = A);
       ({ getFirestore, doc, getDoc, onSnapshot, runTransaction, collection, query, where, getDocs, setDoc, deleteDoc, updateDoc } = F);
       ({ getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, updatePassword, reauthenticateWithCredential, EmailAuthProvider, setPersistence, browserLocalPersistence } = AU);
@@ -2918,6 +2945,7 @@
       try { await setPersistence(auth, browserLocalPersistence); } catch (e) {}
       isCloudConnected = true;
       onAuthStateChanged(auth, u => { afterAuth(u); });
+      setTimeout(() => { if (!authReady) { cloudError = true; render(); } }, 15000);
     } catch (err) {
       console.error("Firebase init failed:", err);
       cloudError = true; authReady = true; render();
