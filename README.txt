@@ -1,8 +1,15 @@
-COLLECTIONS - മൊബൈൽ ആപ്പ് സജ്ജമാക്കുന്ന വിധം
-===========================================
+COLLECTIONS - മൊബൈൽ ആപ്പ്
+===========================
 
-ഈ ZIP ഫയലിൽ പുതിയ ആപ്പ് ഐക്കണുകൾ (icon-192.png, icon-512.png), manifest.json, sw.js, index.html എന്നിവ ഉൾപ്പെടുത്തിയിട്ടുണ്ട്.
+ആപ്പ് GitHub Pages വഴിയാണ് പ്രവർത്തിക്കുന്നത്. ഡാറ്റ Firebase (Firestore) ൽ.
 
 അപ്‌ഡേറ്റ് ചെയ്യാൻ:
-1. ഈ ZIP ഫയൽ Extract ചെയ്യുക.
-2. https://app.netlify.com/drop തുറന്ന് COLLECTIONS ഫോൾഡർ Drag & Drop ചെയ്യുക.
+1. GitHub repo (irfaniyacollections/collections) തുറക്കുക.
+2. Add file > Upload files ൽ പുതിയ index.html (മറ്റു ഫയലുകളും) ഇടുക, Commit ചെയ്യുക.
+3. 1-2 മിനിറ്റ് കഴിഞ്ഞ് ആപ്പ് റിഫ്രഷ് ചെയ്യുക.
+
+ബാക്കപ്പ്:
+- ആപ്പിനുള്ളിൽ (അഡ്മിൻ) "ബാക്കപ്പ് ഡൗൺലോഡ്" ബട്ടൺ ഉണ്ട്.
+- ദിവസേന ഓട്ടോമാറ്റിക് ബാക്കപ്പ്: BackupToDrive.gs ഗൂഗിൾ Apps Script ൽ (script.google.com) സെറ്റ് ചെയ്യണം.
+  GitHub ൽ ഈ ഫയൽ ഒരു കോപ്പി മാത്രമാണ്; അവിടെ ബാക്കപ്പ് നടക്കില്ല.
+  ബാക്കപ്പ് പാസ്‌വേഡ് ഒരിക്കലും GitHub ൽ ഇടരുത്.

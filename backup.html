@@ -18,13 +18,17 @@ small{color:#5e6b7e}ul{line-height:1.8}
 <h1>COLLECTIONS – ഡാറ്റ Backup</h1>
 <p>ഈ പേജ് നിങ്ങളുടെ Firestore-ലെ <b>collections_data / main</b> രേഖ വായിച്ച് JSON ഫയലായി നിങ്ങളുടെ ഫോണിലേക്കോ കമ്പ്യൂട്ടറിലേക്കോ ഡൗൺലോഡ് ചെയ്യും. ഇത് ഡാറ്റയിൽ മാറ്റം വരുത്തുകയോ Delete ചെയ്യുകയോ ഇല്ല.</p>
 <div class="warn"><b>സുരക്ഷാ മുന്നറിയിപ്പ്:</b> Backup ഫയലിൽ അംഗങ്ങളുടെ സ്വകാര്യ വിവരങ്ങളും പഴയ അഡ്മിൻ പരിശോധനാ മൂല്യവും ഉണ്ടായേക്കാം. ഈ ഫയൽ ആരുമായും പങ്കിടരുത്; WhatsApp-ലോ പൊതുവായ Drive ഫോൾഡറിലോ അപ്‌ലോഡ് ചെയ്യരുത്.</div>
+<p><b>അഡ്മിൻ ലോഗിൻ</b> (admin@collections.app) ആവശ്യമാണ്:</p>
+<input id="em" type="email" value="admin@collections.app" autocomplete="username" style="width:100%;padding:12px;margin-bottom:8px;border:1px solid #c9d4e5;border-radius:10px;font-size:16px">
+<input id="pw" type="password" placeholder="അഡ്മിൻ പാസ്‌വേഡ്" autocomplete="current-password" style="width:100%;padding:12px;margin-bottom:12px;border:1px solid #c9d4e5;border-radius:10px;font-size:16px">
 <button id="backup">Backup ഡൗൺലോഡ് ചെയ്യുക</button>
 <div id="status" class="status">തയ്യാറാണ്. ബട്ടൺ അമർത്തുക.</div>
 <p><small>ഈ പേജ് വായന (read) മാത്രം നടത്തുന്നു. Firebase Rules മാറ്റില്ല.</small></p>
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const firebaseConfig = {
   apiKey: "AIzaSyD-53Kz_6_8WfxXe3b76GyCu-alUaDfjFg",
   authDomain: "collections-388ec.firebaseapp.com",
@@ -38,6 +42,8 @@ btn.addEventListener("click",async()=>{
  btn.disabled=true;status.textContent="Firebase-ൽ നിന്ന് ഡാറ്റ വായിക്കുന്നു...";
  try{
   const app=initializeApp(firebaseConfig);
+  const auth=getAuth(app);
+  await signInWithEmailAndPassword(auth,document.getElementById("em").value.trim(),document.getElementById("pw").value);
   const db=getFirestore(app);
   const ref=doc(db,"collections_data","main");
   const snap=await getDoc(ref);
@@ -47,9 +53,10 @@ btn.addEventListener("click",async()=>{
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");a.href=url;a.download="COLLECTIONS_BACKUP_"+new Date().toISOString().slice(0,10)+".json";
   document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  try{await signOut(auth)}catch(_){}
   status.textContent="Backup ഡൗൺലോഡ് ആരംഭിച്ചു. ഫയൽ നിങ്ങളുടെ Downloads ഫോൾഡറിൽ സൂക്ഷിക്കുക. ഫയൽ ഇവിടെ ചാറ്റിൽ അയക്കരുത്.";
  }catch(e){
-  status.textContent="Backup ലഭിച്ചില്ല: "+(e?.message||String(e))+"\nFirebase Rules-ൽ read അനുവദിക്കുന്നുണ്ടോ എന്ന് പരിശോധിക്കണം. Rules മാറ്റരുത്; ഈ സന്ദേശത്തിന്റെ Screenshot അയക്കുക.";
+  status.textContent="Backup ലഭിച്ചില്ല: "+(e?.message||String(e))+"\nഇമെയിൽ/പാസ്‌വേഡ് ശരിയാണോ എന്ന് പരിശോധിക്കുക.";
  }finally{btn.disabled=false}
 });
 </script>

@@ -451,6 +451,7 @@
       reqAcceptTitle: "ഈ വാഗ്ദാനം അംഗീകരിക്കണോ?",
       reqRejectTitle: "ഈ അഭ്യർത്ഥന നിരസിക്കണോ?",
       reqSent: "അഭ്യർത്ഥന അയച്ചു. ലീഡർ/അഡ്മിൻ അംഗീകരിച്ചാൽ വാഗ്ദാനത്തിൽ ചേരും.",
+      pledgeDone: "വാഗ്ദാനം രേഖപ്പെടുത്തി. തുക നിങ്ങളുടെ വാഗ്ദാനത്തിൽ ചേർന്നിട്ടുണ്ട്.",
       reqInvalid: "ഈ അഭ്യർത്ഥന അസാധുവാണ്; ഒഴിവാക്കി.",
       reqMine: "അംഗീകാരം കാത്തിരിക്കുന്ന നിങ്ങളുടെ അഭ്യർത്ഥനകൾ",
       selfPledgeReqMsg: "ഇത് വാഗ്ദാനത്തിനുള്ള അഭ്യർത്ഥനയാണ്. ലീഡറോ അഡ്മിനോ അംഗീകരിച്ച ശേഷമേ തുക നിങ്ങളുടെ വാഗ്ദാനത്തിൽ ചേരൂ."
@@ -779,6 +780,7 @@
       reqAcceptTitle: "Accept this pledge?",
       reqRejectTitle: "Reject this request?",
       reqSent: "Request sent. It will be added to your pledge once your leader/admin approves.",
+      pledgeDone: "Pledge recorded. The amount has been added to your pledge.",
       reqInvalid: "This request is invalid and was discarded.",
       reqMine: "Your requests awaiting approval",
       selfPledgeReqMsg: "This is a request. The amount is added to your pledge only after your leader or admin approves."
@@ -1108,6 +1110,7 @@
       reqAcceptTitle: "ಈ ವಾಗ್ದಾನವನ್ನು ಒಪ್ಪಬೇಕೇ?",
       reqRejectTitle: "ಈ ವಿನಂತಿಯನ್ನು ತಿರಸ್ಕರಿಸಬೇಕೇ?",
       reqSent: "ವಿನಂತಿ ಕಳುಹಿಸಲಾಗಿದೆ. ಲೀಡರ್/ಅಡ್ಮಿನ್ ಒಪ್ಪಿದ ನಂತರ ನಿಮ್ಮ ವಾಗ್ದಾನಕ್ಕೆ ಸೇರುತ್ತದೆ.",
+      pledgeDone: "ವಾಗ್ದಾನ ದಾಖಲಾಗಿದೆ. ಮೊತ್ತ ನಿಮ್ಮ ವಾಗ್ದಾನಕ್ಕೆ ಸೇರಿದೆ.",
       reqInvalid: "ಈ ವಿನಂತಿ ಅಮಾನ್ಯ; ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
       reqMine: "ಅನುಮೋದನೆಗೆ ಕಾಯುತ್ತಿರುವ ನಿಮ್ಮ ವಿನಂತಿಗಳು",
       selfPledgeReqMsg: "ಇದು ವಿನಂತಿ. ಲೀಡರ್ ಅಥವಾ ಅಡ್ಮಿನ್ ಒಪ್ಪಿದ ನಂತರವೇ ಮೊತ್ತ ನಿಮ್ಮ ವಾಗ್ದಾನಕ್ಕೆ ಸೇರುತ್ತದೆ."
@@ -1842,14 +1845,24 @@
             title: t("confirmAddPledge"),
             lines: [
               d.name + " · +" + fmt(v) + " · " + colName(),
-              t("selfPledgeReqMsg")
+              t("selfPledgeConfirmMsg")
             ],
             needPw: false,
             run: async () => {
               try {
-                await setDoc(reqRef(opId), { uid: auth.currentUser.uid, donorId: d.id, batch: d.batch, colId, amount: v, name: d.name, status: "pending", at: nowStamp() });
-                view.flash = t("reqSent");
-                await refreshReqs();
+                // Direct pledge: no leader/admin approval. Load the latest data, add the amount, save.
+                try { await reloadFromCloud(); } catch (e) {}
+                const dn = db.donors.find(x => x.id === d.id);
+                if (!dn || !db.collections.some(c => c.id === colId)) { view.flash = t("reqInvalid"); return false; }
+                const prev = view.col; view.col = colId;
+                try {
+                  db.pledgeLogs = db.pledgeLogs || [];
+                  setC(dn, O(dn) + v, R(dn));
+                  db.pledgeLogs.push({ id: opId, colId, batch: dn.batch, donorId: dn.id, donorName: dn.name, amount: v, by: "member", at: nowStamp() });
+                } finally { view.col = prev; }
+                const ok = await save();
+                if (ok) view.flash = t("pledgeDone");
+                else { try { await reloadFromCloud(); } catch (e) {} }
               } catch (e) { console.error(e); view.flash = t("flashSaveFail"); }
               return false;
             }
