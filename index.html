@@ -488,9 +488,9 @@
       errCheckAdmin: "ഉപയോക്തൃനാമം, മൊബൈൽ നമ്പർ, പാസ്‌വേഡ് എന്നിവ പരിശോധിക്കുക.",
       adminsTitle: "അഡ്മിൻമാർ",
       adminsNote: "പ്രധാന അഡ്മിന് മറ്റ് അഡ്മിൻമാരെ ചേർക്കാം. ആദ്യ പാസ്‌വേഡ് = മൊബൈൽ നമ്പർ. ഒരേ മൊബൈൽ നമ്പർ രണ്ട് അഡ്മിൻമാർക്ക് പാടില്ല.",
-      adminMainLabel: "പ്രധാന അഡ്മിൻ (ഉപയോക്തൃനാമം: admin)",
-      adminSaveMobile: "മൊബൈൽ സേവ് ചെയ്യുക",
-      adminSaveConfirm: "പ്രധാന അഡ്മിന്റെ മൊബൈൽ സേവ് ചെയ്യണോ?",
+      adminMainLabel: "പ്രധാന അഡ്മിൻ വിവരങ്ങൾ",
+      adminSaveMobile: "വിവരങ്ങൾ സേവ് ചെയ്യുക",
+      adminSaveConfirm: "പ്രധാന അഡ്മിന്റെ ഉപയോക്തൃനാമവും മൊബൈലും മാറ്റണോ?",
       adminAddTitle: "പുതിയ അഡ്മിനെ ചേർക്കുക",
       adminAddBtn: "അഡ്മിനെ ചേർക്കുക",
       adminAddConfirm: "ഈ അഡ്മിനെ ചേർക്കണോ?",
@@ -840,9 +840,9 @@
       errCheckAdmin: "Check username, mobile number and password.",
       adminsTitle: "Admins",
       adminsNote: "The main admin can add other admins. Initial password = mobile number. Two admins cannot share a mobile number.",
-      adminMainLabel: "Main admin (username: admin)",
-      adminSaveMobile: "Save mobile",
-      adminSaveConfirm: "Save the main admin's mobile number?",
+      adminMainLabel: "Main admin details",
+      adminSaveMobile: "Save details",
+      adminSaveConfirm: "Change the main admin's username and mobile?",
       adminAddTitle: "Add a new admin",
       adminAddBtn: "Add admin",
       adminAddConfirm: "Add this admin?",
@@ -1193,9 +1193,9 @@
       errCheckAdmin: "ಬಳಕೆದಾರ ಹೆಸರು, ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಮತ್ತು ಪಾಸ್‌ವರ್ಡ್ ಪರಿಶೀಲಿಸಿ.",
       adminsTitle: "ಅಡ್ಮಿನ್‌ಗಳು",
       adminsNote: "ಮುಖ್ಯ ಅಡ್ಮಿನ್ ಇತರ ಅಡ್ಮಿನ್‌ಗಳನ್ನು ಸೇರಿಸಬಹುದು. ಆರಂಭಿಕ ಪಾಸ್‌ವರ್ಡ್ = ಮೊಬೈಲ್ ಸಂಖ್ಯೆ. ಇಬ್ಬರು ಅಡ್ಮಿನ್‌ಗಳಿಗೆ ಒಂದೇ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಇರಬಾರದು.",
-      adminMainLabel: "ಮುಖ್ಯ ಅಡ್ಮಿನ್ (ಬಳಕೆದಾರ ಹೆಸರು: admin)",
-      adminSaveMobile: "ಮೊಬೈಲ್ ಉಳಿಸಿ",
-      adminSaveConfirm: "ಮುಖ್ಯ ಅಡ್ಮಿನ್ ಮೊಬೈಲ್ ಉಳಿಸಬೇಕೇ?",
+      adminMainLabel: "ಮುಖ್ಯ ಅಡ್ಮಿನ್ ವಿವರಗಳು",
+      adminSaveMobile: "ವಿವರಗಳನ್ನು ಉಳಿಸಿ",
+      adminSaveConfirm: "ಮುಖ್ಯ ಅಡ್ಮಿನ್ ಬಳಕೆದಾರ ಹೆಸರು ಮತ್ತು ಮೊಬೈಲ್ ಬದಲಾಯಿಸಬೇಕೇ?",
       adminAddTitle: "ಹೊಸ ಅಡ್ಮಿನ್ ಸೇರಿಸಿ",
       adminAddBtn: "ಅಡ್ಮಿನ್ ಸೇರಿಸಿ",
       adminAddConfirm: "ಈ ಅಡ್ಮಿನ್ ಅನ್ನು ಸೇರಿಸಬೇಕೇ?",
@@ -1245,6 +1245,9 @@
 
   const ADMIN_EMAIL = "admin@collections.app";
   const MAIL_DOM = "@collections.app";
+  const DEFAULT_MAIN_USER = "ajumtl", DEFAULT_MAIN_MOBILE = "9061862696";
+  const mainUser = () => String((db && db.adminUser) || DEFAULT_MAIN_USER).toLowerCase();
+  const mainMobile = () => String((db && db.adminMobile) || DEFAULT_MAIN_MOBILE);
   let auth = null, secAuth = null, authReady = false, profile = null, authSeq = 0, loginBusy = false;
   let reqs = [], unsubReqs = null;
   const keyH = async s => (await sha(s)).slice(0, 24);
@@ -1350,7 +1353,7 @@
         if (view.pendingMobile && a.mobile !== view.pendingMobile) { db = null; profile = null; await bail(t("errCheckAdmin")); return; }
       }
       if (prof.role === "owner") {
-        if (view.pendingMobile && db.adminMobile && db.adminMobile !== view.pendingMobile) { db = null; profile = null; await bail(t("errCheckAdmin")); return; }
+        if (view.pendingMobile && mainMobile() !== view.pendingMobile) { db = null; profile = null; await bail(t("errCheckAdmin")); return; }
         const dirty = ("admin" in db) || db.donors.some(d => "pw" in d) || db.leaders.some(l => "pw" in l);
         if (dirty) { delete db.admin; db.donors.forEach(d => { delete d.pw; }); db.leaders.forEach(l => { delete l.pw; }); await save(); }
       }
@@ -1737,12 +1740,13 @@
         if (!pwv) { view.err = bad; return; }
         if (tab === "owner") {
           const un = f.ou.value.trim().toLowerCase(), om = f.om.value.trim(); bad = t("errCheckAdmin");
-          if (!un) { view.err = bad; return; }
-          if (un === "admin") { email = ADMIN_EMAIL; view.pendingMobile = om || null; }
-          else {
-            if (!om) { view.err = bad; return; }
-            const key = await keyA(un); email = mailOf(key, await getVer(key)); view.pendingMobile = om;
-          }
+          if (!un || !om) { view.err = bad; return; }
+          const key = await keyA(un);
+          let vd = null;
+          try { const sn = await getDoc(doc(cloudFs, "ver", key)); vd = sn.exists() ? sn.data() : null; } catch (e) {}
+          const isMainName = vd ? vd.main === true : un === DEFAULT_MAIN_USER;
+          email = isMainName ? ADMIN_EMAIL : mailOf(key, vd ? (Number(vd.v) || 1) : 1);
+          view.pendingMobile = om;
         }
         else if (tab === "leader") {
           const un = f.uid.value.trim(), lm = f.lm.value.trim(); bad = t("errCheckLeader");
@@ -2656,7 +2660,7 @@
     const L = (i, t, c) => h("label", { for: i }, t, c);
     const msg = view.pwMsg; view.pwMsg = null;
     let busy = false;
-    const myMobile = () => view.role === "leader" ? (me() || {}).mobile : view.role === "owner" ? (profile && profile.role === "admin" ? ((db.admins || []).find(x => x.id === profile.id) || {}).mobile : db.adminMobile) : (curDonor() || {}).mobile;
+    const myMobile = () => view.role === "leader" ? (me() || {}).mobile : view.role === "owner" ? (profile && profile.role === "admin" ? ((db.admins || []).find(x => x.id === profile.id) || {}).mobile : mainMobile()) : (curDonor() || {}).mobile;
     return h("form", { class: "card", on: { submit: async ev => {
       ev.preventDefault();
       if (busy) return;
@@ -2826,19 +2830,32 @@
   function adminsCard() {
     if (!profile || profile.role !== "owner") return null;
     const list = db.admins || [];
-    const mob = h("input", { id: "amain", type: "tel", inputmode: "numeric", value: db.adminMobile || "" });
+    const mu = h("input", { id: "amu", autocomplete: "off", value: mainUser() });
+    const mob = h("input", { id: "amain", type: "tel", inputmode: "numeric", value: mainMobile() });
     const nu = h("input", { id: "anu", autocomplete: "off" });
     const nm = h("input", { id: "anm", type: "tel", inputmode: "numeric", autocomplete: "off" });
-    const used = (m, exceptId) => (m === (db.adminMobile || "") && exceptId !== "main") || list.some(a => a.mobile === m && a.id !== exceptId);
+    const used = (m, exceptId) => (m === mainMobile() && exceptId !== "main") || list.some(a => a.mobile === m && a.id !== exceptId);
     return h("div", { class: "card" },
       h("h2", null, t("adminsTitle")),
       h("p", { class: "sub" }, t("adminsNote")),
-      h("label", { for: "amain" }, t("adminMainLabel") + " · " + t("mobileNum"), mob),
+      h("h2", { style: "font-size:15px" }, t("adminMainLabel")),
+      h("label", { for: "amu" }, t("username"), mu),
+      h("label", { for: "amain" }, t("mobileNum"), mob),
       h("button", { class: "sec", on: { click: () => {
-        const m = mob.value.replace(/\D/g, "");
+        const m = mob.value.replace(/\D/g, ""), un = mu.value.trim().toLowerCase();
+        if (un.length < 3 || /\s/.test(un) || list.some(a => a.username.toLowerCase() === un)) { view.flash = t("errAdminName"); render(); return; }
         if (!goodMobile(m)) { view.flash = t("errMobileFmt"); render(); return; }
         if (used(m, "main")) { view.flash = t("errAdminMobileDup"); render(); return; }
-        ask({ title: t("adminSaveConfirm"), lines: [m], needPw: true, run: () => { db.adminMobile = m; } });
+        ask({ title: t("adminSaveConfirm"), lines: [un + " · " + m], needPw: true, run: async () => {
+          const old = mainUser();
+          if (un !== old) {
+            try {
+              await setDoc(doc(cloudFs, "ver", await keyA(un)), { v: 1, main: true });
+              await setDoc(doc(cloudFs, "ver", await keyA(old)), { v: 1, main: false });
+            } catch (er) { console.error(er); view.flash = t("errAcctFail"); return false; }
+          }
+          db.adminUser = un; db.adminMobile = m;
+        } });
       } } }, t("adminSaveMobile")),
       ...list.map(a => h("div", { style: "border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px" },
         h("div", { class: "num" }, a.username + " · " + a.mobile),
@@ -2861,14 +2878,14 @@
       h("div", { class: "mut" }, t("initPwNote")),
       h("button", { on: { click: () => {
         const un = nu.value.trim(), m = nm.value.replace(/\D/g, "");
-        if (un.length < 3 || /\s/.test(un) || un.toLowerCase() === "admin") { view.flash = t("errAdminName"); render(); return; }
+        if (un.length < 3 || /\s/.test(un) || un.toLowerCase() === "admin" || un.toLowerCase() === mainUser()) { view.flash = t("errAdminName"); render(); return; }
         if (list.some(a => a.username.toLowerCase() === un.toLowerCase())) { view.flash = t("errAdminNameDup"); render(); return; }
         if (!goodMobile(m)) { view.flash = t("errMobileFmt"); render(); return; }
         if (used(m, null)) { view.flash = t("errAdminMobileDup"); render(); return; }
         ask({ title: t("adminAddConfirm"), lines: [un + " · " + m, t("initPwNote")], needPw: true, run: async () => {
           try {
             db.admins = db.admins || [];
-            if (db.admins.some(a => a.username.toLowerCase() === un.toLowerCase() || a.mobile === m) || db.adminMobile === m) { view.flash = t("errAdminMobileDup"); return false; }
+            if (db.admins.some(a => a.username.toLowerCase() === un.toLowerCase() || a.mobile === m) || mainMobile() === m) { view.flash = t("errAdminMobileDup"); return false; }
             const id = newId("a");
             const uid = await provision(await keyA(un), m, { role: "admin", id });
             db.admins.push({ id, username: un, mobile: m, uid });
