@@ -46,7 +46,9 @@
     .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.tabs button{background:transparent;color:var(--pri)}.tabs button.on{background:var(--pri);color:var(--onpri)}
     
     /* Language Switcher Bar */
-    .lbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;font-size:12.5px;color:var(--mut)}
+    .lbar{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:6px 10px;font-size:12.5px;color:var(--mut)}
+    .lgrp{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;white-space:nowrap;flex:none}
+    .lbar .lgrp:last-child{margin-left:auto}
     .lbar select{width:auto;padding:5px 10px;font-size:12.5px;font-weight:600;border-radius:8px;background:var(--card);color:var(--fg);border:1px solid var(--line)}
 
     /* Sub-navigation menu bar */
@@ -1617,12 +1619,9 @@
         return opt;
       })
     );
-    if (left) return h("div", { class: "lbar", style: "justify-content:space-between" }, left,
-      h("div", { style: "display:flex;align-items:center;gap:8px" }, h("span", null, "🌐 " + t("selectLang") + ":"), sel));
-    return h("div", { class: "lbar" },
-      h("span", null, "🌐 " + t("selectLang") + ":"),
-      sel
-    );
+    const langGrp = h("div", { class: "lgrp" }, h("span", null, "🌐 " + t("selectLang") + ":"), sel);
+    if (left) return h("div", { class: "lbar", style: "justify-content:space-between" }, left, langGrp);
+    return h("div", { class: "lbar" }, langGrp);
   }
 
   function navBar(items, activeKey, onSelect) {
@@ -3132,13 +3131,13 @@
           });
         } } }, t("histDeleteSel")),
         h("button", { class: "sec", on: { click: () => { view.hClear = false; view.hSel = {}; render(); } } }, t("histCancel"))));
-    const typeSel = h("select", { style: "width:auto;margin:0", "aria-label": t("pageHist") },
+    const typeSel = h("select", { style: "width:auto;margin:0;min-width:0;max-width:100%;font-size:12px;padding:5px 8px", "aria-label": t("pageHist") },
       ...[["all", "histAll"], ["pledge", "histPledge"], ["handover", "histHandover"]].map(([k, lk]) => { const o = h("option", { value: k }, t(lk)); if (view.hType === k) o.selected = true; return o; }));
     typeSel.addEventListener("change", () => { view.hType = typeSel.value; view.hN = 100; render(); });
-    const bySel = h("select", { style: "width:auto;margin:0", "aria-label": t("histFilter") },
+    const bySel = h("select", { style: "width:auto;margin:0;min-width:0;max-width:100%;font-size:12px;padding:5px 8px", "aria-label": t("histFilter") },
       ...[["date", "histByDate"], ["batch", "histByBatch"]].map(([k, lk]) => { const o = h("option", { value: k }, t(lk)); if (view.hBy === k) o.selected = true; return o; }));
     bySel.addEventListener("change", () => { view.hBy = bySel.value; view.hN = 100; render(); });
-    const out = [h("div", { class: "card" }, h("div", { class: "row" }, typeSel, h("div", { style: "display:flex;align-items:center;gap:6px" }, h("span", { class: "mut" }, t("histFilter") + ":"), bySel)))];
+    const out = [h("div", { class: "card", style: "padding:10px 12px" }, h("div", { style: "display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px;min-width:0" }, typeSel, h("div", { style: "display:flex;flex-wrap:nowrap;align-items:center;gap:5px;min-width:0" }, h("span", { class: "mut", style: "font-size:11.5px;white-space:nowrap" }, t("histFilter") + ":"), bySel)))];
     if (view.hClear && all.length) out.push(clearBar());
     const row = it => h("div", { class: "ent" },
       view.hClear && h("div", { style: "flex:none" }, it.held ? h("span", { title: t("histKeepNote") }, "🔒") : chk(!!selMap[it.key], on => tog([it], on))),
@@ -3197,7 +3196,7 @@
     const pageSel = h("select", { style: "width:auto;margin:0", "aria-label": "Select Page" },
       ...[["main", "Home"], ["hist", "History"]].map(([k, lk]) => { const o = h("option", { value: k }, lk); if (view.oPage === k) o.selected = true; return o; }));
     pageSel.addEventListener("change", () => { view.oPage = pageSel.value; view.edit = null; view.ledit = null; view.hN = 100; render(); window.scrollTo(0, 0); });
-    const pageBox = h("div", { style: "display:flex;align-items:center;gap:8px" }, h("span", null, "📄 Select Page:"), pageSel);
+    const pageBox = h("div", { class: "lgrp" }, h("span", null, "📄 Select Page:"), pageSel);
     if (view.oPage === "hist") return [langBar(pageBox), top, collTabs(t("selectCol")), ...histView()];
     const out = [langBar(pageBox), top, collTabs(t("selectCol")), nav];
 
@@ -3283,10 +3282,10 @@
     }
     else if (view.oSec === "members") {
       out.push(addMemberUI(null), searchCard(null));
-      const list = h("div", { class: "card" }, h("h2", null, t("membersByBatchTitle", db.batches.length)));
+      out.push(h("h2", { style: "padding:0 4px" }, t("membersByBatchTitle", db.batches.length)));
       for (const b of db.batches) {
         const bl = db.donors.filter(x => x.batch === b), bo = sumO(bl), br = sumR(bl), open = view.open === b;
-        const w = h("div", { class: "batch" },
+        const w = h("div", { class: "card" },
           h("div", { class: "row" }, h("b", null, t("batch") + " " + b), h("span", { class: "mut num" }, fmt(br) + " / " + fmt(bo))),
           h("div", { class: "row", style: "justify-content:flex-start" },
             h("button", { class: "sec sm", on: { click: () => { view.open = open ? null : b; render(); } } }, open ? t("closeBtn") : t("viewMembersBtn", bl.length)),
@@ -3294,9 +3293,8 @@
           )
         );
         if (open) { w.append(h("div", { class: "row", style: "justify-content:flex-end" }, fltBar("a" + b, bl))); fltApply("a" + b, bl).forEach(d => w.append(memberRow(d, false))); }
-        list.append(w);
+        out.push(w);
       }
-      out.push(list);
     } 
     else if (view.oSec === "settings") {
       const lc = h("div", { class: "card" }, h("h2", null, t("batchLeadersTitle")));
