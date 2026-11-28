@@ -319,6 +319,10 @@
       cashRecordsTitle: "തുക രേഖകൾ",
       noRecordsYet: "ഇതുവരെ രേഖകൾ ഇല്ല.",
       confirmDelRecord: "ഈ രേഖ ഒഴിവാക്കണോ?",
+      fltAll: "മുഴുവൻ അംഗങ്ങൾ",
+      fltDone: "വാഗ്ദാനം പൂർത്തിയാക്കിയവർ",
+      fltPend: "വാഗ്ദാനം ബാക്കിയുള്ളവർ",
+      fltNone: "സഹകരിക്കാത്തവർ",
       batchMembersCount: (b, n) => `ബാച്ച് ${b} അംഗങ്ങൾ (${n})`,
       noMembersYet: "ഇതുവരെ അംഗങ്ങളെ ചേർത്തിട്ടില്ല.",
       batchesInfoTitle: "ബാച്ചുകളുടെ വിവരങ്ങൾ",
@@ -671,6 +675,10 @@
       cashRecordsTitle: "Cash Records",
       noRecordsYet: "No records yet.",
       confirmDelRecord: "Delete this record?",
+      fltAll: "All members",
+      fltDone: "Pledge completed",
+      fltPend: "Pledge pending",
+      fltNone: "Not cooperating",
       batchMembersCount: (b, n) => `Batch ${b} Members (${n})`,
       noMembersYet: "No members added yet.",
       batchesInfoTitle: "Batches Overview",
@@ -1024,6 +1032,10 @@
       cashRecordsTitle: "ಹಣದ ದಾಖಲೆಗಳು",
       noRecordsYet: "ಇನ್ನೂ ಯಾವುದೇ ದಾಖಲೆಗಳಿಲ್ಲ.",
       confirmDelRecord: "ಈ ದಾಖಲೆಯನ್ನು ತೆಗೆದುಹಾಕಬೇಕೇ?",
+      fltAll: "ಎಲ್ಲಾ ಸದಸ್ಯರು",
+      fltDone: "ವಾಗ್ದಾನ ಪೂರ್ಣಗೊಳಿಸಿದವರು",
+      fltPend: "ವಾಗ್ದಾನ ಬಾಕಿ ಇರುವವರು",
+      fltNone: "ಸಹಕರಿಸದವರು",
       batchMembersCount: (b, n) => `ಬ್ಯಾಚ್ ${b} ಸದಸ್ಯರು (${n})`,
       noMembersYet: "ಇನ್ನೂ ಸದಸ್ಯರನ್ನು ಸೇರಿಸಲಾಗಿಲ್ಲ.",
       batchesInfoTitle: "ಬ್ಯಾಚ್‌ಗಳ ವಿವರಗಳು",
@@ -1443,6 +1455,20 @@
   const withCol = (cid, fn) => { const p = view.col; view.col = cid; try { return fn(); } finally { view.col = p; } };
   const validAmt = v => Number.isInteger(v) && v > 0 && v <= 10000000;
   const sumO = l => l.reduce((a, d) => a + O(d), 0), sumR = l => l.reduce((a, d) => a + R(d), 0);
+  // member status filter (pledge completed / pending / not cooperating)
+  const stOf = d => { const o = O(d), r = R(d); return o <= 0 ? "none" : (r >= o ? "done" : "pend"); };
+  const fltBar = (key, list, onPick) => {
+    const cnt = { all: list.length, done: 0, pend: 0, none: 0 };
+    list.forEach(d => { cnt[stOf(d)]++; });
+    const cur = (view.flt && view.flt[key]) || "all";
+    const sel = h("select", { class: "fsel", style: "width:auto;max-width:100%;margin:0", "aria-label": "filter" });
+    [["all", "fltAll"], ["done", "fltDone"], ["pend", "fltPend"], ["none", "fltNone"]].forEach(([k, lk]) => {
+      const o = h("option", { value: k }, t(lk) + " (" + cnt[k] + ")"); if (k === cur) o.selected = true; sel.append(o);
+    });
+    sel.addEventListener("change", () => { view.flt = view.flt || {}; view.flt[key] = sel.value; render(); });
+    return sel;
+  };
+  const fltApply = (key, list) => { const c = (view.flt && view.flt[key]) || "all"; return c === "all" ? list : list.filter(d => stOf(d) === c); };
   const visCols = () => (db.collections || []).filter(c => view.role === "owner" || !c.hidden);
   const ensureCol = () => {
     const v = visCols();
@@ -1937,8 +1963,8 @@
           coopBoxes(bl)
         ),
         h("div", { class: "card" },
-          h("h2", null, t("batchMembersList", d.batch)),
-          ...bl.map(p => peerRow(p, p.id === d.id))
+          h("div", { class: "row" }, h("h2", { style: "margin:0" }, t("batchMembersList", d.batch)), fltBar("m", bl)),
+          ...fltApply("m", bl).map(p => peerRow(p, p.id === d.id))
         )
       );
     }
@@ -2452,8 +2478,8 @@
         addMemberUI(b),
         searchCard(b),
         h("div", { class: "card" },
-          h("h2", null, t("batchMembersCount", b, bl.length)),
-          bl.length ? bl.map(d => memberRow(d, false)) : h("div", { class: "mut" }, t("noMembersYet"))
+          h("div", { class: "row" }, h("h2", { style: "margin:0" }, t("batchMembersCount", b, bl.length)), fltBar("l", bl)),
+          bl.length ? fltApply("l", bl).map(d => memberRow(d, false)) : h("div", { class: "mut" }, t("noMembersYet"))
         )
       );
     } 
@@ -2512,7 +2538,7 @@
             donorId: firstM ? firstM.id : "",
             mobile: firstM ? firstM.mobile : "",
             wa: f.wa.value,
-            pwText: f.pw.value
+            pwText: e.pwText || ""
           };
           view.lErr = "";
           render();
@@ -2537,7 +2563,7 @@
             donorId: mid,
             mobile: m ? m.mobile : "",
             wa: f.wa.value,
-            pwText: f.pw.value
+            pwText: e.pwText || ""
           };
           view.lErr = "";
           render();
@@ -3093,7 +3119,7 @@
             !bl.length && h("button", { class: "dng sm", on: { click: () => ask({ title: t("confirmDelBatch"), lines: [t("delBatchLine", b)], needPw: true, run: () => { db.batches = db.batches.filter(z => z !== b); } }) } }, t("removeBtn"))
           )
         );
-        if (open) bl.forEach(d => w.append(memberRow(d, false)));
+        if (open) { w.append(h("div", { class: "row", style: "justify-content:flex-end" }, fltBar("a" + b, bl))); fltApply("a" + b, bl).forEach(d => w.append(memberRow(d, false))); }
         list.append(w);
       }
       out.push(list);
