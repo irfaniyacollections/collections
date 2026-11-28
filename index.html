@@ -334,6 +334,15 @@
       histByDate: "ബൈ ഡേറ്റ്",
       histByBatch: "ബൈ ബാച്ച്",
       histEmpty: "ഹിസ്റ്ററി ഒന്നുമില്ല.",
+      histClearBtn: "🗑️ ഹിസ്റ്ററി ക്ലിയർ ചെയ്യുക",
+      histSelectAll: "എല്ലാം സെലക്ട് ചെയ്യുക",
+      histSelectCard: "ഈ കാർഡ് മുഴുവൻ സെലക്ട് ചെയ്യുക",
+      histSelected: "തിരഞ്ഞെടുത്തത്",
+      histDeleteSel: "തിരഞ്ഞെടുത്തവ മായ്ക്കുക",
+      histCancel: "റദ്ദാക്കുക",
+      histClearTitle: "തിരഞ്ഞെടുത്ത ഹിസ്റ്ററി മായ്ക്കണോ?",
+      histClearWarn: "ഇത് തിരിച്ചെടുക്കാൻ കഴിയില്ല. തുകകളുടെ കണക്കിൽ മാറ്റം വരില്ല. ലീഡറുടെ കയ്യിലുള്ള രേഖകൾ മായ്ക്കില്ല.",
+      histKeepNote: "🔒 ലീഡറുടെ കയ്യിലുള്ള പണത്തിന്റെ രേഖകൾ മായ്ക്കാൻ കഴിയില്ല.",
       histMore: "കൂടുതൽ കാണിക്കുക",
       histPledgeWord: "🤝 വാഗ്ദാനം",
       histHandoverWord: "💵 കൈമാറ്റം",
@@ -706,6 +715,15 @@
       histByDate: "By date",
       histByBatch: "By batch",
       histEmpty: "No history yet.",
+      histClearBtn: "🗑️ Clear History",
+      histSelectAll: "Select all",
+      histSelectCard: "Select this whole card",
+      histSelected: "Selected",
+      histDeleteSel: "Delete selected",
+      histCancel: "Cancel",
+      histClearTitle: "Delete the selected history?",
+      histClearWarn: "This cannot be undone. Totals are not changed. Records still with a leader are never deleted.",
+      histKeepNote: "🔒 Records of money still with a leader cannot be deleted.",
       histMore: "Show more",
       histPledgeWord: "🤝 Pledge",
       histHandoverWord: "💵 Handover",
@@ -1078,6 +1096,15 @@
       histByDate: "ದಿನಾಂಕದ ಪ್ರಕಾರ",
       histByBatch: "ಬ್ಯಾಚ್ ಪ್ರಕಾರ",
       histEmpty: "ಇತಿಹಾಸ ಇಲ್ಲ.",
+      histClearBtn: "🗑️ ಇತಿಹಾಸ ಅಳಿಸಿ",
+      histSelectAll: "ಎಲ್ಲವನ್ನೂ ಆಯ್ಕೆಮಾಡಿ",
+      histSelectCard: "ಈ ಕಾರ್ಡ್ ಪೂರ್ತಿ ಆಯ್ಕೆಮಾಡಿ",
+      histSelected: "ಆಯ್ಕೆಯಾದವು",
+      histDeleteSel: "ಆಯ್ಕೆಯಾದವನ್ನು ಅಳಿಸಿ",
+      histCancel: "ರದ್ದುಮಾಡಿ",
+      histClearTitle: "ಆಯ್ಕೆಯಾದ ಇತಿಹಾಸ ಅಳಿಸಬೇಕೆ?",
+      histClearWarn: "ಇದನ್ನು ಹಿಂತಿರುಗಿಸಲಾಗುವುದಿಲ್ಲ. ಮೊತ್ತಗಳ ಲೆಕ್ಕದಲ್ಲಿ ಬದಲಾವಣೆ ಇಲ್ಲ. ಲೀಡರ್ ಬಳಿ ಇರುವ ದಾಖಲೆಗಳನ್ನು ಅಳಿಸುವುದಿಲ್ಲ.",
+      histKeepNote: "🔒 ಲೀಡರ್ ಬಳಿ ಇರುವ ಹಣದ ದಾಖಲೆಗಳನ್ನು ಅಳಿಸಲಾಗುವುದಿಲ್ಲ.",
       histMore: "ಇನ್ನಷ್ಟು ತೋರಿಸಿ",
       histPledgeWord: "🤝 ವಾಗ್ದಾನ",
       histHandoverWord: "💵 ಹಸ್ತಾಂತರ",
@@ -3060,14 +3087,51 @@
     return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), hh, Number(m[5])).getTime();
   };
   const atDate = a => String(a || "").split("·")[0].trim() || "—";
+  const pkey = (p, i) => "p:" + (p.id || "#" + i);
   function histView() {
     const col = view.col;
     let items = [];
-    if (view.hType !== "handover") (db.pledgeLogs || []).filter(p => p.colId === col).forEach((p, i) => items.push({ k: "p", id: p.id, batch: p.batch, name: (db.donors.find(x => x.id === p.donorId) || {}).name || p.donorName || t("removedTag"), amount: Number(p.amount || 0), at: p.at, ms: atMs(p.at), seq: i, by: p.by }));
-    if (view.hType !== "pledge") (db.entries || []).filter(e => e.colId === col).forEach((e, i) => items.push({ k: "h", id: e.id, batch: e.batch, name: (db.donors.find(x => x.id === e.donorId) || {}).name || t("removedTag"), amount: Number(e.amount || 0), at: e.at, ms: atMs(e.at), seq: 1e6 + i, held: e.status === "held", note: e.note }));
+    if (view.hType !== "handover") (db.pledgeLogs || []).forEach((p, i) => { if (p.colId !== col) return; items.push({ k: "p", key: pkey(p, i), id: p.id, batch: p.batch, name: (db.donors.find(x => x.id === p.donorId) || {}).name || p.donorName || t("removedTag"), amount: Number(p.amount || 0), at: p.at, ms: atMs(p.at), seq: i, by: p.by }); });
+    if (view.hType !== "pledge") (db.entries || []).filter(e => e.colId === col).forEach((e, i) => items.push({ k: "h", key: "h:" + e.id, id: e.id, batch: e.batch, name: (db.donors.find(x => x.id === e.donorId) || {}).name || t("removedTag"), amount: Number(e.amount || 0), at: e.at, ms: atMs(e.at), seq: 1e6 + i, held: e.status === "held", note: e.note }));
     items.sort((a, b) => (b.ms - a.ms) || (b.seq - a.seq));
+    const all = items.slice();
+    const deletable = all.filter(x => !x.held);
+    const selMap = view.hSel || {};
+    const chosen = deletable.filter(x => selMap[x.key]);
     const total = items.length;
     items = items.slice(0, view.hN);
+    const gkey = it => view.hBy === "batch" ? it.batch : atDate(it.at);
+    const tog = (list, on) => {
+      view.hSel = view.hSel || {};
+      list.forEach(x => { if (on) view.hSel[x.key] = 1; else delete view.hSel[x.key]; });
+      const y = window.scrollY; render(); window.scrollTo(0, y);
+    };
+    const chk = (checked, onChange) => {
+      const c = h("input", { type: "checkbox", checked: checked ? "checked" : null, style: "width:22px;height:22px;margin:0;flex:none" });
+      c.addEventListener("change", () => onChange(c.checked));
+      return c;
+    };
+    const lbl = (c, text) => h("label", { style: "display:flex;align-items:center;gap:8px;font-weight:600;margin:0" }, c, h("span", null, text));
+    const clearBar = () => h("div", { class: "card" },
+      lbl(chk(deletable.length > 0 && chosen.length === deletable.length, on => tog(deletable, on)), t("histSelectAll")),
+      h("div", { class: "mut" }, t("histSelected") + ": " + chosen.length + " / " + deletable.length),
+      all.some(x => x.held) && h("div", { class: "mut" }, t("histKeepNote")),
+      h("div", { class: "row" },
+        h("button", { class: "dng", disabled: chosen.length ? null : "true", on: { click: () => {
+          const keys = chosen.map(x => x.key);
+          ask({
+            title: t("histClearTitle"),
+            lines: [t("histSelected") + ": " + keys.length, t("histClearWarn")],
+            needPw: true,
+            run: () => {
+              const ks = new Set(keys);
+              db.pledgeLogs = (db.pledgeLogs || []).filter((pl, gi) => !ks.has(pkey(pl, gi)));
+              db.entries = (db.entries || []).filter(e => !(ks.has("h:" + e.id) && e.status !== "held"));
+              view.hSel = {}; view.hClear = false; view.hN = 100;
+            }
+          });
+        } } }, t("histDeleteSel")),
+        h("button", { class: "sec", on: { click: () => { view.hClear = false; view.hSel = {}; render(); } } }, t("histCancel"))));
     const typeSel = h("select", { style: "width:auto;margin:0", "aria-label": t("pageHist") },
       ...[["all", "histAll"], ["pledge", "histPledge"], ["handover", "histHandover"]].map(([k, lk]) => { const o = h("option", { value: k }, t(lk)); if (view.hType === k) o.selected = true; return o; }));
     typeSel.addEventListener("change", () => { view.hType = typeSel.value; view.hN = 100; render(); });
@@ -3075,7 +3139,9 @@
       ...[["date", "histByDate"], ["batch", "histByBatch"]].map(([k, lk]) => { const o = h("option", { value: k }, t(lk)); if (view.hBy === k) o.selected = true; return o; }));
     bySel.addEventListener("change", () => { view.hBy = bySel.value; view.hN = 100; render(); });
     const out = [h("div", { class: "card" }, h("div", { class: "row" }, typeSel, h("div", { style: "display:flex;align-items:center;gap:6px" }, h("span", { class: "mut" }, t("histFilter") + ":"), bySel)))];
+    if (view.hClear && all.length) out.push(clearBar());
     const row = it => h("div", { class: "ent" },
+      view.hClear && h("div", { style: "flex:none" }, it.held ? h("span", { title: t("histKeepNote") }, "🔒") : chk(!!selMap[it.key], on => tog([it], on))),
       h("div", { style: "min-width:0" },
         h("div", { class: "num" }, h("b", null, it.name), " · " + t("batch") + " " + it.batch),
         h("div", { class: "mut num" }, (view.hBy === "batch" ? it.at : String(it.at || "").split("·")[1] || it.at || "") + (it.by ? " · " + it.by : "") + (it.note ? " · " + it.note : ""))),
@@ -3096,10 +3162,13 @@
         const list = groups.get(g);
         out.push(h("div", { class: "card" },
           h("h2", null, view.hBy === "batch" ? t("batch") + " " + g : "📅 " + g),
+          view.hClear && (() => { const cd = deletable.filter(x => String(gkey(x)) === String(g)); return cd.length ? lbl(chk(cd.every(x => selMap[x.key]), on => tog(cd, on)), t("histSelectCard")) : null; })(),
           sums(list),
           ...list.map(row)));
       });
       if (total > view.hN) out.push(h("button", { class: "sec", on: { click: () => { view.hN += 100; render(); } } }, t("histMore") + " (" + (total - view.hN) + ")"));
+      if (view.hClear) out.push(clearBar());
+      else out.push(h("button", { class: "dng", style: "width:100%", on: { click: () => { view.hClear = true; view.hSel = {}; render(); window.scrollTo(0, 0); } } }, t("histClearBtn")));
     }
     return out;
   }
