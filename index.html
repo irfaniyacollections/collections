@@ -355,6 +355,10 @@
       histHandoverWord: "💵 കൈമാറ്റം",
       histPledgeSum: "വാഗ്ദാനം",
       histHandoverSum: "കൈമാറ്റം",
+      errRemoveHasMoney: (a, b) => `ഈ അംഗത്തിന് പണം ലഭിച്ചിട്ടുണ്ട് (കേന്ദ്രത്തിന് ${a}, ലീഡറുടെ കയ്യിൽ ${b}). അതിനാൽ നീക്കം ചെയ്യാൻ കഴിയില്ല.`,
+      removeWarnPledge: a => `ഈ അംഗത്തിന്റെ വാഗ്ദാനം ${a} ഇല്ലാതാകും.`,
+      loginsUsedHour: (n, m) => `ഈ ഉപകരണത്തിൽ കഴിഞ്ഞ 1 മണിക്കൂറിൽ ഉണ്ടാക്കിയത്: ${n} / ${m} (Firebase പരിധി മണിക്കൂറിൽ 100).`,
+      loginsWaitHour: "ഈ മണിക്കൂറിലെ പരിധി എത്തി. ഒരു മണിക്കൂർ കഴിഞ്ഞ് (അല്ലെങ്കിൽ മറ്റൊരു നെറ്റ്‌വർക്കിൽ) വീണ്ടും ശ്രമിക്കുക.",
       batchMembersCount: (b, n) => `ബാച്ച് ${b} മെമ്പർമാർ (${n})`,
       noMembersYet: "ഇതുവരെ മെമ്പർമാരെ ചേർത്തിട്ടില്ല.",
       batchesInfoTitle: "ബാച്ചുകളുടെ വിവരങ്ങൾ",
@@ -738,6 +742,10 @@
       histHandoverWord: "💵 Handover",
       histPledgeSum: "Pledges",
       histHandoverSum: "Handovers",
+      errRemoveHasMoney: (a, b) => `This member has received money (central ${a}, with leader ${b}), so cannot be removed.`,
+      removeWarnPledge: a => `This member's pledge of ${a} will be erased.`,
+      loginsUsedHour: (n, m) => `Created on this device in the last hour: ${n} / ${m} (Firebase limit is 100 per hour).`,
+      loginsWaitHour: "Hourly limit reached. Try again after an hour (or from another network).",
       batchMembersCount: (b, n) => `Batch ${b} Members (${n})`,
       noMembersYet: "No members added yet.",
       batchesInfoTitle: "Batches Overview",
@@ -1121,6 +1129,10 @@
       histHandoverWord: "💵 ಹಸ್ತಾಂತರ",
       histPledgeSum: "ವಾಗ್ದಾನಗಳು",
       histHandoverSum: "ಹಸ್ತಾಂತರಗಳು",
+      errRemoveHasMoney: (a, b) => `ಈ ಸದಸ್ಯರಿಂದ ಹಣ ಬಂದಿದೆ (ಕೇಂದ್ರಕ್ಕೆ ${a}, ಲೀಡರ್ ಬಳಿ ${b}). ಆದ್ದರಿಂದ ತೆಗೆದುಹಾಕಲಾಗುವುದಿಲ್ಲ.`,
+      removeWarnPledge: a => `ಈ ಸದಸ್ಯರ ವಾಗ್ದಾನ ${a} ಅಳಿಸಲ್ಪಡುತ್ತದೆ.`,
+      loginsUsedHour: (n, m) => `ಈ ಸಾಧನದಲ್ಲಿ ಕಳೆದ 1 ಗಂಟೆಯಲ್ಲಿ ರಚಿಸಿದ್ದು: ${n} / ${m} (Firebase ಮಿತಿ ಗಂಟೆಗೆ 100).`,
+      loginsWaitHour: "ಈ ಗಂಟೆಯ ಮಿತಿ ತಲುಪಿದೆ. ಒಂದು ಗಂಟೆಯ ನಂತರ (ಅಥವಾ ಬೇರೆ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ) ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.",
       batchMembersCount: (b, n) => `ಬ್ಯಾಚ್ ${b} ಸದಸ್ಯರು (${n})`,
       noMembersYet: "ಇನ್ನೂ ಸದಸ್ಯರನ್ನು ಸೇರಿಸಲಾಗಿಲ್ಲ.",
       batchesInfoTitle: "ಬ್ಯಾಚ್‌ಗಳ ವಿವರಗಳು",
@@ -1373,6 +1385,7 @@
         if (e && e.code === "auth/email-already-in-use") { v++; continue; }
         throw e;
       }
+      provNote();
       try { await signOut(secondary()); } catch (e) {}
       await setDoc(doc(cloudFs, "ver", key), { v });
       await setDoc(doc(cloudFs, "users", uid), { ...prof, mustChange: true });
@@ -1380,6 +1393,9 @@
     }
     throw new Error("provision-exhausted");
   };
+  const PROV_KEY = "collections_prov_log_v1";
+  const provUsed = () => { try { const now = Date.now(); return JSON.parse(localStorage.getItem(PROV_KEY) || "[]").filter(x => now - x < 3600000).length; } catch (e) { return 0; } };
+  const provNote = () => { try { const now = Date.now(), a = JSON.parse(localStorage.getItem(PROV_KEY) || "[]").filter(x => now - x < 3600000); a.push(now); localStorage.setItem(PROV_KEY, JSON.stringify(a)); } catch (e) {} };
   const dropProfile = async uid => { if (!uid) return; try { await deleteDoc(doc(cloudFs, "users", uid)); } catch (e) { console.error(e); } };
   const reauth = async pw => {
     try {
@@ -1485,7 +1501,7 @@
     entries: []
   });
 
-  let isCloudSaving = false;
+  let isCloudSaving = false, lastConflict = false, saveReloaded = false;
   const dbSize = () => new Blob([JSON.stringify(db)]).size;
   const reloadFromCloud = async () => {
     const sn = await getDoc(cloudRef);
@@ -1498,7 +1514,9 @@
       return true;
     }
     const prevRev = Number(db.rev || 0);
+    lastConflict = false; saveReloaded = false;
     if (dbSize() > 950000) {
+      saveReloaded = true;
       try { await reloadFromCloud(); } catch (_) {}
       view.flash = t("flashTooBig"); view.edit = null; view.ledit = null; view.confirm = null;
       return false;
@@ -1516,6 +1534,7 @@
     } catch (e) {
       db.rev = prevRev;
       if (e && e.conflict) {
+        lastConflict = true; saveReloaded = true;
         try { await reloadFromCloud(); } catch (_) {}
         view.flash = t("flashConflict"); view.edit = null; view.ledit = null; view.confirm = null;
       } else {
@@ -2214,9 +2233,19 @@
         c._done = true;
         view.confirm = null;
         view.cerr = "";
-        const rr = await c.run(val);
+        const snap = JSON.stringify(db);
+        let rr = await c.run(val);
         if (rr === false) { render(); return; }
-        const okSave = await save();
+        let okSave = await save();
+        // another person saved at the same moment: re-apply this (idempotent) action on the fresh data, up to 3 times
+        for (let i = 0; !okSave && lastConflict && c.retry && i < 3; i++) {
+          view.flash = "";
+          rr = await c.run(val);
+          if (rr === false) { render(); return; }
+          okSave = await save();
+        }
+        if (okSave) { if (view.flash === t("flashConflict")) view.flash = ""; }
+        else if (!saveReloaded) { try { db = JSON.parse(snap); } catch (_) {} }   // network/other failure: do not keep unsaved changes on screen
         if (okSave && c.after) { try { await c.after(); } catch (e) { console.error(e); view.flash = t("flashSaveFail"); } }
         render();
       } finally {
@@ -2273,10 +2302,10 @@
   function editForm() {
     const e = view.edit, f = {}, lead = view.role === "leader", LB = lead ? me().batch : null;
     const isEnglishOnly = s => /^[A-Za-z0-9\s.,'()\-/&]+$/.test(s);
-    f.name = h("input", { id: "en", placeholder: "Full Name (English only)", value: e.name || "" });
+    f.name = h("input", { id: "en", style: "text-transform:uppercase", placeholder: "Full Name (English only)", value: e.name || "" });
     f.mobile = h("input", { id: "em", type: "tel", inputmode: "numeric", placeholder: t("mobileNum"), value: e.mobile || "" });
-    f.place = h("input", { id: "epl", placeholder: "Place (e.g. Irikkur)", value: e.place || "" });
-    f.dist = h("input", { id: "eds", placeholder: "District (e.g. Kannur)", value: e.district || "" });
+    f.place = h("input", { id: "epl", style: "text-transform:uppercase", placeholder: "Place (e.g. Irikkur)", value: e.place || "" });
+    f.dist = h("input", { id: "eds", style: "text-transform:uppercase", placeholder: "District (e.g. Kannur)", value: e.district || "" });
     f.batch = h("select", { id: "eb" }, ...(lead ? [LB] : db.batches).map(b => { const o = h("option", { value: b }, t("batch") + " " + b); if (b === Number(e.batch)) o.selected = true; return o; }));
     f.offer = h("input", { id: "eo", type: "number", inputmode: "numeric", min: 0, value: e.offer });
     f.rec = h("input", { id: "er", type: "number", inputmode: "numeric", min: 0, value: e.received });
@@ -2288,11 +2317,12 @@
         submit: ev => {
           ev.preventDefault();
           const old = e.id ? db.donors.find(x => x.id === e.id) : null;
+          const up = (v, ov) => (old && v === String(ov || "")) ? v : v.toUpperCase();   // new/changed text becomes CAPITALS; untouched old values stay as they are
           const rec = {
-            name: f.name.value.trim(),
+            name: up(f.name.value.trim(), old && old.name),
             mobile: f.mobile.value.trim(),
-            place: f.place.value.trim(),
-            district: f.dist.value.trim(),
+            place: up(f.place.value.trim(), old && old.place),
+            district: up(f.dist.value.trim(), old && old.district),
             batch: lead ? LB : Number(f.batch.value),
             offer: Number(f.offer.value) || 0,
             received: lead ? (old ? R(old) : 0) : (Number(f.rec.value) || 0)
@@ -2366,7 +2396,13 @@
       h("div", { class: "row" },
         h("button", { type: "submit" }, "Save"),
         h("button", { type: "button", class: "sec", on: { click: () => { view.edit = null; view.editErr = ""; render(); } } }, "Cancel"),
-        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveMember"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`], needPw: true, run: () => { db.donors = db.donors.filter(x => x.id !== e.id); db.entries = db.entries.filter(x => x.donorId !== e.id); db.gpayEntries = (db.gpayEntries || []).filter(x => x.donorId !== e.id); db.pledgeLogs = (db.pledgeLogs || []).filter(x => x.donorId !== e.id); view.edit = null; }, after: async () => { const cur = (db.donors || []); await dropProfile(e.uid); } }) } }, "Remove"),
+        e.id && h("button", { type: "button", class: "dng", on: { click: () => {
+          const dn = db.donors.find(x => x.id === e.id);
+          let rc = 0, hd = 0, of = 0;
+          if (dn) (db.collections || []).forEach(c => withCol(c.id, () => { rc += R(dn); of += O(dn); hd += heldD(dn.id); }));
+          if (rc > 0 || hd > 0) { view.editErr = t("errRemoveHasMoney", fmt(rc), fmt(hd)); render(); return; }
+          ask({ title: t("confirmRemoveMember"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`, ...(of > 0 ? [t("removeWarnPledge", fmt(of))] : [])], needPw: true, run: () => { db.donors = db.donors.filter(x => x.id !== e.id); db.entries = db.entries.filter(x => x.donorId !== e.id); db.gpayEntries = (db.gpayEntries || []).filter(x => x.donorId !== e.id); db.pledgeLogs = (db.pledgeLogs || []).filter(x => x.donorId !== e.id); view.edit = null; }, after: async () => { await dropProfile(e.uid); } });
+        } } }, "Remove"),
         e.id && e.uid && h("button", { type: "button", class: "sec", on: { click: () => ask({ title: t("confirmResetPw"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`, t("initPwNote")], needPw: true, run: async () => {
           try {
             const dn = db.donors.find(x => x.id === e.id); if (!dn) return false;
@@ -2469,7 +2505,7 @@
                   d.name + " → " + fmt(a) + (note.value ? " · " + note.value : ""),
                   nextOffer > curOffer ? t("willRecordWithLeaderAndOffer", fmt(curOffer), fmt(nextOffer)) : t("willRecordWithLeader")
                 ],
-                needPw: false,
+                needPw: false, retry: true,
                 run: () => {
                   const dd = db.donors.find(x => x.id === d.id);
                   if (!dd || db.entries.some(x => x.id === opId)) return;
@@ -2512,7 +2548,7 @@
                   d.name + " → +" + fmt(a),
                   t("willAddPledgeNote", fmt(curOffer), fmt(newOffer))
                 ],
-                needPw: false,
+                needPw: false, retry: true,
                 run: () => {
                   db.pledgeLogs = db.pledgeLogs || [];
                   if (db.pledgeLogs.some(x => x.id === opId)) return;
@@ -2917,11 +2953,13 @@
       h("h2", null, t("loginsTitle")),
       h("p", { class: "sub" }, t("loginsNote")),
       h("div", { class: "err" }, t("loginsMissing", miss.length, missL.length)),
+      h("div", { class: "mut" }, t("loginsUsedHour", provUsed(), 100)),
       h("button", { on: { click: () => ask({
         title: t("loginsConfirm"), lines: [t("loginsMissing", miss.length, missL.length), t("initPwNote")], needPw: true,
         run: async () => {
           let ok = 0, bad = 0, stop = false;
-          let left = 40;
+          let left = Math.min(40, 95 - provUsed());
+          if (left <= 0) { view.flash = t("loginsWaitHour"); return false; }
           for (const d of db.donors.filter(x => !x.uid)) {
             if (left <= 0) break; left--;
             if (stop) { bad++; continue; }
@@ -3045,7 +3083,7 @@
         const have = new Set(db.donors.map(d => d.batch + "|" + d.mobile));
         const add = []; let exist = 0, bad = 0;
         rows.slice(1).forEach(r => {
-          const batch = Number((r[0] || "").trim()), name = (r[1] || "").replace(/\s+/g, " ").trim(), mobile = (r[2] || "").replace(/\D/g, ""), place = (r[3] || "").replace(/\s+/g, " ").trim();
+          const batch = Number((r[0] || "").trim()), name = (r[1] || "").replace(/\s+/g, " ").trim().toUpperCase(), mobile = (r[2] || "").replace(/\D/g, ""), place = (r[3] || "").replace(/\s+/g, " ").trim().toUpperCase();
           if (!(db.batches || []).includes(batch) || !name || !goodMobile(mobile)) { bad++; return; }
           const k = batch + "|" + mobile;
           if (have.has(k)) { exist++; return; }
@@ -3276,7 +3314,7 @@
         const confirmE = list => ask({
           title: t("confirmHandoverTitle"),
           lines: [...list.map(en => (db.donors.find(x => x.id === en.donorId) || { name: "?" }).name + " · " + fmt(en.amount)), t("confirmHandoverLine", fmt(sum(list, "amount")), b)],
-          needPw: false,
+          needPw: false, retry: true,
           run: () => {
             list.forEach(en => {
               const curEntry = (db.entries || []).find(x => x.id === en.id);
@@ -3299,7 +3337,7 @@
       for (const b of db.batches) {
         const bl = db.donors.filter(x => x.batch === b), bo = sumO(bl), br = sumR(bl), open = view.open === b;
         const w = h("div", { class: "card" },
-          h("div", { class: "row" }, h("b", null, "Batch " + b), h("span", { class: "mut num" }, fmt(br) + " / " + fmt(bo))),
+          h("div", { class: "row" }, h("b", null, "Batch " + b), h("span", { class: "mut num" }, t("membersWord") + ": " + bl.length)),
           h("div", { class: "row", style: "justify-content:flex-start;flex-wrap:nowrap" },
             h("button", { class: "sec sm", on: { click: () => { view.open = open ? null : b; render(); } } }, open ? "Close" : "Show Members"),
             open && fltBar("a" + b, bl),
