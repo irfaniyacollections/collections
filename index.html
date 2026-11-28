@@ -95,6 +95,8 @@
     .vfill{width:100%;border-radius:6px;background:var(--ok);transition:height .25s ease}
     .vfill.mid{background:var(--acc)}
     .vfill.low{background:var(--warn)}
+    .vcnt{font:600 10.5px/1 Inter,sans-serif;color:var(--mut);margin-top:-2px}
+    .vcol:active{opacity:.75}
     .vlbl{font:700 11.5px/1.1 Inter,sans-serif;color:var(--fg);white-space:nowrap}
     .vaxis-note{font-size:11.5px;color:var(--mut);font-weight:600;margin-top:2px}
     .peer{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px}.peer.me{font-weight:600}
@@ -336,6 +338,7 @@
       histByDate: "ബൈ ഡേറ്റ്",
       histByBatch: "ബൈ ബാച്ച്",
       histEmpty: "ഹിസ്റ്ററി ഒന്നുമില്ല.",
+      membersWord: "അംഗങ്ങൾ",
       histClearBtn: "🗑️ ഹിസ്റ്ററി ക്ലിയർ ചെയ്യുക",
       histSelectAll: "എല്ലാം സെലക്ട് ചെയ്യുക",
       histSelectCard: "ഈ കാർഡ് മുഴുവൻ സെലക്ട് ചെയ്യുക",
@@ -717,6 +720,7 @@
       histByDate: "By date",
       histByBatch: "By batch",
       histEmpty: "No history yet.",
+      membersWord: "Members",
       histClearBtn: "🗑️ Clear History",
       histSelectAll: "Select all",
       histSelectCard: "Select this whole card",
@@ -1098,6 +1102,7 @@
       histByDate: "ದಿನಾಂಕದ ಪ್ರಕಾರ",
       histByBatch: "ಬ್ಯಾಚ್ ಪ್ರಕಾರ",
       histEmpty: "ಇತಿಹಾಸ ಇಲ್ಲ.",
+      membersWord: "ಸದಸ್ಯರು",
       histClearBtn: "🗑️ ಇತಿಹಾಸ ಅಳಿಸಿ",
       histSelectAll: "ಎಲ್ಲವನ್ನೂ ಆಯ್ಕೆಮಾಡಿ",
       histSelectCard: "ಈ ಕಾರ್ಡ್ ಪೂರ್ತಿ ಆಯ್ಕೆಮಾಡಿ",
@@ -1537,7 +1542,7 @@
     const cnt = { all: list.length, done: 0, pend: 0, none: 0 };
     list.forEach(d => { cnt[stOf(d)]++; });
     const cur = (view.flt && view.flt[key]) || "all";
-    const sel = h("select", { class: "fsel", style: "width:auto;max-width:100%;margin:0", "aria-label": "filter" });
+    const sel = h("select", { class: "fsel", style: "width:auto;max-width:100%;margin:0;font-size:12px;padding:5px 8px", "aria-label": "filter" });
     [["all", "fltAll"], ["done", "fltDone"], ["pend", "fltPend"], ["none", "fltNone"]].forEach(([k, lk]) => {
       const o = h("option", { value: k }, t(lk) + " (" + cnt[k] + ")"); if (k === cur) o.selected = true; sel.append(o);
     });
@@ -1619,7 +1624,7 @@
         return opt;
       })
     );
-    const langGrp = h("div", { class: "lgrp" }, h("span", null, "🌐 " + t("selectLang") + ":"), sel);
+    const langGrp = h("div", { class: "lgrp" }, h("span", null, "🌐 Language:"), sel);
     if (left) return h("div", { class: "lbar", style: "justify-content:space-between" }, left, langGrp);
     return h("div", { class: "lbar" }, langGrp);
   }
@@ -1728,6 +1733,10 @@
       )
     );
   };
+  const goBatch = b => {
+    if (view.role === "owner" && view.oSec !== "batches") { view.oSec = "batches"; view.edit = null; view.ledit = null; render(); }
+    setTimeout(() => { const el = document.getElementById("bc-" + b); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }, 80);
+  };
   const batchCoopGraph = batches => {
     return h("div", { class: "card" },
       h("div", { class: "row" },
@@ -1742,12 +1751,13 @@
             const coop = list.filter(z => O(z) > 0).length;
             const pct = tot > 0 ? Math.min(100, Math.round((coop / tot) * 100)) : 0;
             const toneClass = pct >= 70 ? "" : (pct >= 35 ? " mid" : " low");
-            return h("div", { class: "vcol" },
+            return h("div", { class: "vcol", style: "cursor:pointer", role: "button", tabindex: "0", "aria-label": "Batch " + b, on: { click: () => goBatch(b), keydown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goBatch(b); } } } },
               h("span", { class: "vpct" }, pct + "%"),
               h("div", { class: "vtrack", role: "progressbar", "aria-valuenow": String(pct), "aria-valuemin": "0", "aria-valuemax": "100" },
                 h("i", { class: "vfill" + toneClass, style: "height:" + pct + "%" })
               ),
-              h("span", { class: "vlbl" }, "B" + b)
+              h("span", { class: "vlbl" }, "B" + b),
+              h("span", { class: "vcnt" }, String(tot))
             );
           })
         )
@@ -1903,10 +1913,13 @@
     } }
   }, t("logoutBtn"));
 
+  const memHead = (b, n, key, list) => h("div", { style: "display:grid;gap:6px;padding:0 4px" },
+    h("h2", null, "Batch " + b),
+    h("div", { class: "row", style: "flex-wrap:nowrap" }, h("span", { class: "mut", style: "font-size:13px;font-weight:600" }, t("membersWord") + " " + n), fltBar(key, list)));
   function peerRow(p, isMe) {
     const hd = heldD(p.id), pd = Math.max(0, O(p) - R(p) - hd);
     const loc = [p.place, p.district].filter(Boolean).join(", ");
-    return h("div", { class: "peer" + (isMe ? " me" : "") },
+    return h("div", { class: "card" + (isMe ? " mine" : ""), style: "gap:8px" + (isMe ? ";font-weight:600" : "") },
       h("div", { class: "row" }, h("b", null, p.name + (isMe ? t("youTag") : "")), pd <= 0 && O(p) > 0 ? h("span", { class: "pill ok" }, t("completed")) : h("span", { class: "pill" }, t("pending") + " " + fmt(pd))),
       loc && h("div", { class: "mut" }, "📍 " + loc),
       personMiniBoxes(p)
@@ -2015,7 +2028,7 @@
         ...db.batches.map(x => {
           const l = db.donors.filter(z => z.batch === x);
           const o = sumO(l), r = sumR(l), bh = heldB(x), mine = x === d.batch;
-          return h("div", { class: "card" + (mine ? " mine" : "") },
+          return h("div", { class: "card" + (mine ? " mine" : ""), id: "bc-" + x, style: "scroll-margin-top:80px" },
             h("div", { class: "row" },
               h("span", { style: "font-size:17px;font-weight:700;line-height:1.25" }, t("batch") + " " + x + (mine ? t("yoursTag") : "")),
               h("span", { class: "mut", style: "font-size:13px" }, batchLeaderText(x))
@@ -2036,10 +2049,8 @@
           bar(bo, br + bh),
           coopBoxes(bl)
         ),
-        h("div", { class: "card" },
-          h("div", { class: "row" }, h("h2", { style: "margin:0" }, t("batchMembersList", d.batch)), fltBar("m", bl)),
-          ...fltApply("m", bl).map(p => peerRow(p, p.id === d.id))
-        )
+        memHead(d.batch, bl.length, "m", bl),
+        ...fltApply("m", bl).map(p => peerRow(p, p.id === d.id))
       );
     }
 
@@ -2220,9 +2231,9 @@
     );
   }
 
-  function memberRow(d, showBatch) {
+  function memberRow(d, showBatch, asCard) {
     const loc = [d.place, d.district].filter(Boolean).join(", ");
-    return h("div", { style: "border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px" },
+    return h("div", asCard ? { class: "card", style: "gap:8px" } : { style: "border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px" },
       h("div", { class: "row" },
         h("div", { style: "min-width:0" },
           h("div", null, h("b", null, d.name), showBatch ? " · " + t("batch") + " " + d.batch : null),
@@ -2349,9 +2360,9 @@
       !e.id && h("div", { class: "mut" }, t("initPwNote")),
       view.editErr && h("div", { class: "err", role: "alert" }, view.editErr),
       h("div", { class: "row" },
-        h("button", { type: "submit" }, t("saveBtn")),
-        h("button", { type: "button", class: "sec", on: { click: () => { view.edit = null; view.editErr = ""; render(); } } }, t("cancelBtn")),
-        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveMember"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`], needPw: true, run: () => { db.donors = db.donors.filter(x => x.id !== e.id); db.entries = db.entries.filter(x => x.donorId !== e.id); db.gpayEntries = (db.gpayEntries || []).filter(x => x.donorId !== e.id); db.pledgeLogs = (db.pledgeLogs || []).filter(x => x.donorId !== e.id); view.edit = null; }, after: async () => { const cur = (db.donors || []); await dropProfile(e.uid); } }) } }, t("removeBtn")),
+        h("button", { type: "submit" }, "Save"),
+        h("button", { type: "button", class: "sec", on: { click: () => { view.edit = null; view.editErr = ""; render(); } } }, "Cancel"),
+        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveMember"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`], needPw: true, run: () => { db.donors = db.donors.filter(x => x.id !== e.id); db.entries = db.entries.filter(x => x.donorId !== e.id); db.gpayEntries = (db.gpayEntries || []).filter(x => x.donorId !== e.id); db.pledgeLogs = (db.pledgeLogs || []).filter(x => x.donorId !== e.id); view.edit = null; }, after: async () => { const cur = (db.donors || []); await dropProfile(e.uid); } }) } }, "Remove"),
         e.id && e.uid && h("button", { type: "button", class: "sec", on: { click: () => ask({ title: t("confirmResetPw"), lines: [`${e.name} · ${t("batch")} ${e.batch} · ${e.mobile}`, t("initPwNote")], needPw: true, run: async () => {
           try {
             const dn = db.donors.find(x => x.id === e.id); if (!dn) return false;
@@ -2551,10 +2562,8 @@
       out.push(
         addMemberUI(b),
         searchCard(b),
-        h("div", { class: "card" },
-          h("div", { class: "row" }, h("h2", { style: "margin:0" }, t("batchMembersCount", b, bl.length)), fltBar("l", bl)),
-          bl.length ? fltApply("l", bl).map(d => memberRow(d, false)) : h("div", { class: "mut" }, t("noMembersYet"))
-        )
+        memHead(b, bl.length, "l", bl),
+        ...(bl.length ? fltApply("l", bl).map(d => memberRow(d, false, true)) : [h("div", { class: "card" }, h("div", { class: "mut" }, t("noMembersYet")))])
       );
     } 
     else if (view.lSec === "batches") {
@@ -2572,7 +2581,7 @@
         ),
         ...db.batches.map(x => {
           const l = db.donors.filter(z => z.batch === x), o = sumO(l), r = sumR(l), xh = heldB(x), mine = x === b;
-          return h("div", { class: "card" + (mine ? " mine" : "") },
+          return h("div", { class: "card" + (mine ? " mine" : ""), id: "bc-" + x, style: "scroll-margin-top:80px" },
             h("div", { class: "row" },
               h("span", { style: "font-size:17px;font-weight:700;line-height:1.25" }, t("batch") + " " + x + (mine ? t("yourBatchTag") : "")),
               h("span", { class: "mut", style: "font-size:13px" }, batchLeaderText(x))
@@ -2739,9 +2748,9 @@
       !e.id && h("div", { class: "mut" }, t("initPwNote")),
       view.lErr && h("div", { class: "err", role: "alert" }, view.lErr),
       h("div", { class: "row" },
-        h("button", { type: "submit" }, t("saveBtn")),
-        h("button", { type: "button", class: "sec", on: { click: () => { view.ledit = null; view.lErr = ""; render(); } } }, t("cancelBtn")),
-        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveLeader"), lines: [`${e.username} · ${t("batch")} ${e.batch}`], needPw: true, run: () => { db.leaders = db.leaders.filter(x => x.id !== e.id); view.ledit = null; }, after: async () => { await dropProfile(e.uid); } }) } }, t("removeBtn")),
+        h("button", { type: "submit" }, "Save"),
+        h("button", { type: "button", class: "sec", on: { click: () => { view.ledit = null; view.lErr = ""; render(); } } }, "Cancel"),
+        e.id && h("button", { type: "button", class: "dng", on: { click: () => ask({ title: t("confirmRemoveLeader"), lines: [`${e.username} · ${t("batch")} ${e.batch}`], needPw: true, run: () => { db.leaders = db.leaders.filter(x => x.id !== e.id); view.ledit = null; }, after: async () => { await dropProfile(e.uid); } }) } }, "Remove"),
         e.id && e.uid && h("button", { type: "button", class: "sec", on: { click: () => ask({ title: t("confirmResetPw"), lines: [`${e.username} · ${t("batch")} ${e.batch}`, t("initPwNote")], needPw: true, run: async () => {
           try {
             const l = db.leaders.find(x => x.id === e.id); if (!l) return false;
@@ -3234,7 +3243,7 @@
           const ldMember = ld ? db.donors.find(x => x.batch === b && x.mobile === ld.mobile) : null;
           const ldName = ld ? (ldMember ? `${ldMember.name} (${ld.username})` : ld.username) + ` · ${ld.mobile}` : t("leaderNotAssigned");
 
-          return h("div", { class: "card" },
+          return h("div", { class: "card", id: "bc-" + b, style: "scroll-margin-top:80px" },
             h("div", { class: "row" },
               h("div", null,
                 h("h2", null, t("batch") + " " + b),
@@ -3286,13 +3295,14 @@
       for (const b of db.batches) {
         const bl = db.donors.filter(x => x.batch === b), bo = sumO(bl), br = sumR(bl), open = view.open === b;
         const w = h("div", { class: "card" },
-          h("div", { class: "row" }, h("b", null, t("batch") + " " + b), h("span", { class: "mut num" }, fmt(br) + " / " + fmt(bo))),
-          h("div", { class: "row", style: "justify-content:flex-start" },
-            h("button", { class: "sec sm", on: { click: () => { view.open = open ? null : b; render(); } } }, open ? t("closeBtn") : t("viewMembersBtn", bl.length)),
+          h("div", { class: "row" }, h("b", null, "Batch " + b), h("span", { class: "mut num" }, fmt(br) + " / " + fmt(bo))),
+          h("div", { class: "row", style: "justify-content:flex-start;flex-wrap:nowrap" },
+            h("button", { class: "sec sm", on: { click: () => { view.open = open ? null : b; render(); } } }, open ? "Close" : "Show Members"),
+            open && fltBar("a" + b, bl),
             !bl.length && h("button", { class: "dng sm", on: { click: () => ask({ title: t("confirmDelBatch"), lines: [t("delBatchLine", b)], needPw: true, run: () => { db.batches = db.batches.filter(z => z !== b); } }) } }, t("removeBtn"))
           )
         );
-        if (open) { w.append(h("div", { class: "row", style: "justify-content:flex-end" }, fltBar("a" + b, bl))); fltApply("a" + b, bl).forEach(d => w.append(memberRow(d, false))); }
+        if (open) { fltApply("a" + b, bl).forEach(d => w.append(memberRow(d, false))); }
         out.push(w);
       }
     } 
