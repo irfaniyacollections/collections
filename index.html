@@ -275,7 +275,7 @@
       nothingFound: "ഒന്നും കണ്ടെത്തിയില്ല.",
       first30Only: "ആദ്യത്തെ 30 ഫലങ്ങൾ മാത്രം. തിരച്ചിൽ കൂടുതൽ വ്യക്തമാക്കുക.",
       addNewMemberBtn: "+ പുതിയ അംഗത്തെ ചേർക്കുക",
-      editMemberTitle: "അംഗത്തെ തിരുത്തുക",
+      editMemberTitle: "Edit Member",
       newMemberTitle: "പുതിയ അംഗം",
       appliesToCol: "വാഗ്ദാനം, ലഭിച്ച തുക എന്നിവ ബാധകമാകുന്നത്: ",
       nameEnLabel: "പേര് (English)",
@@ -356,7 +356,7 @@
       batchMembersCount: (b, n) => `ബാച്ച് ${b} അംഗങ്ങൾ (${n})`,
       noMembersYet: "ഇതുവരെ അംഗങ്ങളെ ചേർത്തിട്ടില്ല.",
       batchesInfoTitle: "ബാച്ചുകളുടെ വിവരങ്ങൾ",
-      editLeaderTitle: "ലീഡറെ തിരുത്തുക",
+      editLeaderTitle: "Edit Leader",
       newLeaderTitle: "പുതിയ ബാച്ച് ലീഡർ",
       step1SelectBatch: "1. ബാച്ച് തിരഞ്ഞെടുക്കുക",
       step2SelectMember: "2. ബാച്ചിലെ അംഗത്തെ തിരഞ്ഞെടുക്കുക",
@@ -1911,7 +1911,7 @@
       try { teardown(); if (auth) await signOut(auth); } catch (e) { console.error(e); }
       view = { ...V0 }; db = null; profile = null; render();
     } }
-  }, t("logoutBtn"));
+  }, "Logout");
 
   const memHead = (b, n, key, list) => h("div", { style: "display:grid;gap:6px;padding:0 4px" },
     h("h2", null, "Batch " + b),
@@ -2239,7 +2239,7 @@
           h("div", null, h("b", null, d.name), showBatch ? " · " + t("batch") + " " + d.batch : null),
           h("div", { class: "mut num" }, d.mobile + (loc ? " · 📍 " + loc : ""))
         ),
-        h("button", { class: "sec sm", on: { click: () => { view.edit = { ...d, offer: O(d), received: R(d) }; view.editPw = ""; view.editErr = ""; view.scroll = true; render(); } } }, t("editBtn"))
+        h("button", { class: "sec sm", on: { click: () => { view.edit = { ...d, offer: O(d), received: R(d) }; view.editPw = ""; view.editErr = ""; view.scroll = true; render(); } } }, "Edit")
       ),
       personMiniBoxes(d)
     );
@@ -3316,7 +3316,7 @@
             h("div", null, h("b", null, t("batch") + " " + l.batch), " · " + (mInfo ? mInfo.name + " (" + l.username + ")" : l.username)),
             h("div", { class: "mut num" }, l.mobile)
           ),
-          h("button", { class: "sec sm", on: { click: () => { view.ledit = { ...l, pwText: "" }; view.lErr = ""; view.lscroll = true; render(); } } }, t("editBtn"))
+          h("button", { class: "sec sm", on: { click: () => { view.ledit = { ...l, pwText: "" }; view.lErr = ""; view.lscroll = true; render(); } } }, "Edit")
         ));
       });
       if (!view.ledit) lc.append(h("button", { on: { click: () => { const b0 = db.batches[0] || 1, m0 = db.donors.find(d => d.batch === b0); view.ledit = { id: null, username: "", mobile: m0 ? m0.mobile : "", donorId: m0 ? m0.id : "", batch: b0, pwText: "" }; view.lErr = ""; view.lscroll = true; render(); } } }, t("addNewLeaderBtn")));
