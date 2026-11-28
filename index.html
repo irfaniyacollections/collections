@@ -3121,10 +3121,10 @@
       { k: "settings", ic: "⚙️", l: t("tabSettings") }
     ], view.oSec, k => { view.oSec = k; view.edit = null; view.ledit = null; render(); });
 
-    const pageSel = h("select", { style: "width:auto;margin:0", "aria-label": t("pageLbl") },
-      ...[["main", "pageMain"], ["hist", "pageHist"]].map(([k, lk]) => { const o = h("option", { value: k }, t(lk)); if (view.oPage === k) o.selected = true; return o; }));
+    const pageSel = h("select", { style: "width:auto;margin:0", "aria-label": "Select Page" },
+      ...[["main", "Home"], ["hist", "History"]].map(([k, lk]) => { const o = h("option", { value: k }, lk); if (view.oPage === k) o.selected = true; return o; }));
     pageSel.addEventListener("change", () => { view.oPage = pageSel.value; view.edit = null; view.ledit = null; view.hN = 100; render(); window.scrollTo(0, 0); });
-    const pageBox = h("div", { style: "display:flex;align-items:center;gap:8px" }, h("span", null, "📄 " + t("pageLbl") + ":"), pageSel);
+    const pageBox = h("div", { style: "display:flex;align-items:center;gap:8px" }, h("span", null, "📄 Select Page:"), pageSel);
     if (view.oPage === "hist") return [langBar(pageBox), top, collTabs(t("selectCol")), ...histView()];
     const out = [langBar(pageBox), top, collTabs(t("selectCol")), nav];
 
