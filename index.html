@@ -177,6 +177,7 @@
       setPwAndLogin: "പാസ്‌വേഡ് സെറ്റ് ചെയ്ത് ലോഗിൻ ചെയ്യുക",
       loginBtn: "ലോഗിൻ",
       logoutBtn: "ലോഗൗട്ട്",
+      logoutAsk: "ലോഗൗട്ട് ചെയ്യണോ?",
       errPwMin6: "പാസ്‌വേഡിന് കുറഞ്ഞത് 6 അക്ഷരം വേണം.",
       errPwMismatch: "രണ്ട് പാസ്‌വേഡും ഒരുപോലെയല്ല.",
       errWrongPw: "പാസ്‌വേഡ് തെറ്റാണ്.",
@@ -548,6 +549,7 @@
       setPwAndLogin: "Set Password & Login",
       loginBtn: "Login",
       logoutBtn: "Logout",
+      logoutAsk: "Do you want to log out?",
       errPwMin6: "Password must be at least 6 characters.",
       errPwMismatch: "Passwords do not match.",
       errWrongPw: "Incorrect password.",
@@ -919,6 +921,7 @@
       setPwAndLogin: "ಪಾಸ್‌ವರ್ಡ್ ಹೊಂದಿಸಿ ಲಾಗಿನ್ ಮಾಡಿ",
       loginBtn: "ಲಾಗಿನ್",
       logoutBtn: "ಲಾಗೌಟ್",
+      logoutAsk: "ಲಾಗೌಟ್ ಮಾಡಬೇಕೆ?",
       errPwMin6: "ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳನ್ನು ಹೊಂದಿರಬೇಕು.",
       errPwMismatch: "ಎರಡೂ ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಒಂದೇ ಆಗಿಲ್ಲ.",
       errWrongPw: "ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ.",
@@ -1868,6 +1871,7 @@
   const logout = () => h("button", {
     class: "sec sm",
     on: { click: async () => {
+      if (!window.confirm(t("logoutAsk"))) return;
       try { teardown(); if (auth) await signOut(auth); } catch (e) { console.error(e); }
       view = { ...V0 }; db = null; profile = null; render();
     } }
