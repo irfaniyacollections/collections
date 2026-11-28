@@ -4,8 +4,8 @@
   "description": "കണ്യാല മൗല ആണ്ട് 2026 - Alumni Collection Management",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f3f5f8",
-  "theme_color": "#1f3a5f",
+  "background_color": "#eaf5ee",
+  "theme_color": "#14683a",
   "orientation": "portrait",
   "icons": [
     {
