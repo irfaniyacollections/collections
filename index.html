@@ -40,6 +40,9 @@
     .lform .hint{font-size:12.5px;color:var(--mut);line-height:1.5;text-align:center}
     .pwrap{position:relative}.pwrap input{padding-right:50px}
     .pwrap .eye{position:absolute;right:3px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:var(--mut);padding:8px 11px;font-size:18px;line-height:1}
+    .lg .tabs{grid-template-columns:1fr 1fr}
+    .lbtn{font:inherit;font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:8px;background:var(--card);color:var(--fg);border:1px solid var(--line)}
+    .lbtn.on{background:var(--pri);color:var(--onpri);border-color:var(--pri)}
     .tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.tabs button{background:transparent;color:var(--pri)}.tabs button.on{background:var(--pri);color:var(--onpri)}
     
     /* Language Switcher Bar */
@@ -471,7 +474,30 @@
       pledgeDone: "വാഗ്ദാനം രേഖപ്പെടുത്തി. തുക നിങ്ങളുടെ വാഗ്ദാനത്തിൽ ചേർന്നിട്ടുണ്ട്.",
       reqInvalid: "ഈ അഭ്യർത്ഥന അസാധുവാണ്; ഒഴിവാക്കി.",
       reqMine: "അംഗീകാരം കാത്തിരിക്കുന്ന നിങ്ങളുടെ അഭ്യർത്ഥനകൾ",
-      selfPledgeReqMsg: "ഇത് വാഗ്ദാനത്തിനുള്ള അഭ്യർത്ഥനയാണ്. ലീഡറോ അഡ്മിനോ അംഗീകരിച്ച ശേഷമേ തുക നിങ്ങളുടെ വാഗ്ദാനത്തിൽ ചേരൂ."
+      selfPledgeReqMsg: "ഇത് വാഗ്ദാനത്തിനുള്ള അഭ്യർത്ഥനയാണ്. ലീഡറോ അഡ്മിനോ അംഗീകരിച്ച ശേഷമേ തുക നിങ്ങളുടെ വാഗ്ദാനത്തിൽ ചേരൂ.",
+      importTitle: "അംഗങ്ങളെ ഫയലിൽ നിന്ന് ചേർക്കുക (CSV)",
+      importNote: "CSV ഫയലിൽ ബാച്ച്, പേര്, മൊബൈൽ, സ്ഥലം എന്നിവ വേണം. നിലവിലുള്ളവർ ഇരട്ടിക്കില്ല.",
+      importPick: "ഫയൽ തിരഞ്ഞെടുക്കുക",
+      importBtn: "പരിശോധിച്ച് ചേർക്കുക",
+      importConfirm: "ഈ അംഗങ്ങളെ ചേർക്കണോ?",
+      importLine: (n, e, b) => `പുതിയ അംഗങ്ങൾ: ${n} · നിലവിലുള്ളത് (ഒഴിവാക്കും): ${e} · തെറ്റായ വരികൾ (ഒഴിവാക്കും): ${b}`,
+      importAfter: "ചേർത്ത ശേഷം ഡാഷ്ബോർഡിലെ 'ലോഗിനുകൾ ഉണ്ടാക്കുക' അമർത്തുക.",
+      importDone: n => `${n} അംഗങ്ങളെ ചേർത്തു. ഇനി ഡാഷ്ബോർഡിൽ 'ലോഗിനുകൾ ഉണ്ടാക്കുക' അമർത്തുക.`,
+      importNone: "ചേർക്കാൻ പുതിയ അംഗങ്ങൾ ഇല്ല.",
+      adminLogin: "🔐 അഡ്മിൻ ലോഗിൻ",
+      errCheckAdmin: "ഉപയോക്തൃനാമം, മൊബൈൽ നമ്പർ, പാസ്‌വേഡ് എന്നിവ പരിശോധിക്കുക.",
+      adminsTitle: "അഡ്മിൻമാർ",
+      adminsNote: "പ്രധാന അഡ്മിന് മറ്റ് അഡ്മിൻമാരെ ചേർക്കാം. ആദ്യ പാസ്‌വേഡ് = മൊബൈൽ നമ്പർ. ഒരേ മൊബൈൽ നമ്പർ രണ്ട് അഡ്മിൻമാർക്ക് പാടില്ല.",
+      adminMainLabel: "പ്രധാന അഡ്മിൻ (ഉപയോക്തൃനാമം: admin)",
+      adminSaveMobile: "മൊബൈൽ സേവ് ചെയ്യുക",
+      adminSaveConfirm: "പ്രധാന അഡ്മിന്റെ മൊബൈൽ സേവ് ചെയ്യണോ?",
+      adminAddTitle: "പുതിയ അഡ്മിനെ ചേർക്കുക",
+      adminAddBtn: "അഡ്മിനെ ചേർക്കുക",
+      adminAddConfirm: "ഈ അഡ്മിനെ ചേർക്കണോ?",
+      adminRemoveConfirm: "ഈ അഡ്മിനെ നീക്കം ചെയ്യണോ?",
+      errAdminName: "ഉപയോക്തൃനാമം 3 അക്ഷരമെങ്കിലും വേണം ('admin' പാടില്ല, സ്പേസ് പാടില്ല).",
+      errAdminNameDup: "ഈ ഉപയോക്തൃനാമം ഇതിനകം ഉണ്ട്.",
+      errAdminMobileDup: "ഈ മൊബൈൽ നമ്പർ മറ്റൊരു അഡ്മിനുണ്ട്."
     },
     en: {
       selectLang: "Select Language",
@@ -800,7 +826,30 @@
       pledgeDone: "Pledge recorded. The amount has been added to your pledge.",
       reqInvalid: "This request is invalid and was discarded.",
       reqMine: "Your requests awaiting approval",
-      selfPledgeReqMsg: "This is a request. The amount is added to your pledge only after your leader or admin approves."
+      selfPledgeReqMsg: "This is a request. The amount is added to your pledge only after your leader or admin approves.",
+      importTitle: "Import members from file (CSV)",
+      importNote: "The CSV needs batch, name, mobile and place. Existing members are not duplicated.",
+      importPick: "Choose file",
+      importBtn: "Check and import",
+      importConfirm: "Import these members?",
+      importLine: (n, e, b) => `New members: ${n} · Already present (skipped): ${e} · Bad rows (skipped): ${b}`,
+      importAfter: "After importing, press 'Create logins' on the dashboard.",
+      importDone: n => `${n} members added. Now press 'Create logins' on the dashboard.`,
+      importNone: "No new members to import.",
+      adminLogin: "🔐 Admin login",
+      errCheckAdmin: "Check username, mobile number and password.",
+      adminsTitle: "Admins",
+      adminsNote: "The main admin can add other admins. Initial password = mobile number. Two admins cannot share a mobile number.",
+      adminMainLabel: "Main admin (username: admin)",
+      adminSaveMobile: "Save mobile",
+      adminSaveConfirm: "Save the main admin's mobile number?",
+      adminAddTitle: "Add a new admin",
+      adminAddBtn: "Add admin",
+      adminAddConfirm: "Add this admin?",
+      adminRemoveConfirm: "Remove this admin?",
+      errAdminName: "Username must be at least 3 characters (not 'admin', no spaces).",
+      errAdminNameDup: "This username already exists.",
+      errAdminMobileDup: "Another admin already has this mobile number."
     },
     kn: {
       selectLang: "Select Language",
@@ -1130,7 +1179,30 @@
       pledgeDone: "ವಾಗ್ದಾನ ದಾಖಲಾಗಿದೆ. ಮೊತ್ತ ನಿಮ್ಮ ವಾಗ್ದಾನಕ್ಕೆ ಸೇರಿದೆ.",
       reqInvalid: "ಈ ವಿನಂತಿ ಅಮಾನ್ಯ; ತೆಗೆದುಹಾಕಲಾಗಿದೆ.",
       reqMine: "ಅನುಮೋದನೆಗೆ ಕಾಯುತ್ತಿರುವ ನಿಮ್ಮ ವಿನಂತಿಗಳು",
-      selfPledgeReqMsg: "ಇದು ವಿನಂತಿ. ಲೀಡರ್ ಅಥವಾ ಅಡ್ಮಿನ್ ಒಪ್ಪಿದ ನಂತರವೇ ಮೊತ್ತ ನಿಮ್ಮ ವಾಗ್ದಾನಕ್ಕೆ ಸೇರುತ್ತದೆ."
+      selfPledgeReqMsg: "ಇದು ವಿನಂತಿ. ಲೀಡರ್ ಅಥವಾ ಅಡ್ಮಿನ್ ಒಪ್ಪಿದ ನಂತರವೇ ಮೊತ್ತ ನಿಮ್ಮ ವಾಗ್ದಾನಕ್ಕೆ ಸೇರುತ್ತದೆ.",
+      importTitle: "ಫೈಲ್‌ನಿಂದ ಸದಸ್ಯರನ್ನು ಸೇರಿಸಿ (CSV)",
+      importNote: "CSV ಯಲ್ಲಿ ಬ್ಯಾಚ್, ಹೆಸರು, ಮೊಬೈಲ್, ಸ್ಥಳ ಇರಬೇಕು. ಈಗಿರುವವರು ಪುನರಾವರ್ತನೆಯಾಗುವುದಿಲ್ಲ.",
+      importPick: "ಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ",
+      importBtn: "ಪರಿಶೀಲಿಸಿ ಸೇರಿಸಿ",
+      importConfirm: "ಈ ಸದಸ್ಯರನ್ನು ಸೇರಿಸಬೇಕೇ?",
+      importLine: (n, e, b) => `ಹೊಸ ಸದಸ್ಯರು: ${n} · ಈಗಾಗಲೇ ಇರುವವರು (ಬಿಡಲಾಗುತ್ತದೆ): ${e} · ತಪ್ಪು ಸಾಲುಗಳು (ಬಿಡಲಾಗುತ್ತದೆ): ${b}`,
+      importAfter: "ಸೇರಿಸಿದ ನಂತರ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನ 'ಲಾಗಿನ್‌ಗಳನ್ನು ರಚಿಸಿ' ಒತ್ತಿ.",
+      importDone: n => `${n} ಸದಸ್ಯರನ್ನು ಸೇರಿಸಲಾಗಿದೆ. ಈಗ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ನಲ್ಲಿ 'ಲಾಗಿನ್‌ಗಳನ್ನು ರಚಿಸಿ' ಒತ್ತಿ.`,
+      importNone: "ಸೇರಿಸಲು ಹೊಸ ಸದಸ್ಯರು ಇಲ್ಲ.",
+      adminLogin: "🔐 ಅಡ್ಮಿನ್ ಲಾಗಿನ್",
+      errCheckAdmin: "ಬಳಕೆದಾರ ಹೆಸರು, ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಮತ್ತು ಪಾಸ್‌ವರ್ಡ್ ಪರಿಶೀಲಿಸಿ.",
+      adminsTitle: "ಅಡ್ಮಿನ್‌ಗಳು",
+      adminsNote: "ಮುಖ್ಯ ಅಡ್ಮಿನ್ ಇತರ ಅಡ್ಮಿನ್‌ಗಳನ್ನು ಸೇರಿಸಬಹುದು. ಆರಂಭಿಕ ಪಾಸ್‌ವರ್ಡ್ = ಮೊಬೈಲ್ ಸಂಖ್ಯೆ. ಇಬ್ಬರು ಅಡ್ಮಿನ್‌ಗಳಿಗೆ ಒಂದೇ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಇರಬಾರದು.",
+      adminMainLabel: "ಮುಖ್ಯ ಅಡ್ಮಿನ್ (ಬಳಕೆದಾರ ಹೆಸರು: admin)",
+      adminSaveMobile: "ಮೊಬೈಲ್ ಉಳಿಸಿ",
+      adminSaveConfirm: "ಮುಖ್ಯ ಅಡ್ಮಿನ್ ಮೊಬೈಲ್ ಉಳಿಸಬೇಕೇ?",
+      adminAddTitle: "ಹೊಸ ಅಡ್ಮಿನ್ ಸೇರಿಸಿ",
+      adminAddBtn: "ಅಡ್ಮಿನ್ ಸೇರಿಸಿ",
+      adminAddConfirm: "ಈ ಅಡ್ಮಿನ್ ಅನ್ನು ಸೇರಿಸಬೇಕೇ?",
+      adminRemoveConfirm: "ಈ ಅಡ್ಮಿನ್ ಅನ್ನು ತೆಗೆದುಹಾಕಬೇಕೇ?",
+      errAdminName: "ಬಳಕೆದಾರ ಹೆಸರು ಕನಿಷ್ಠ 3 ಅಕ್ಷರ ಇರಬೇಕು ('admin' ಬೇಡ, ಖಾಲಿ ಜಾಗ ಬೇಡ).",
+      errAdminNameDup: "ಈ ಬಳಕೆದಾರ ಹೆಸರು ಈಗಾಗಲೇ ಇದೆ.",
+      errAdminMobileDup: "ಈ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಬೇರೆ ಅಡ್ಮಿನ್‌ಗೆ ಇದೆ."
     }
   };
 
@@ -1177,6 +1249,7 @@
   let reqs = [], unsubReqs = null;
   const keyH = async s => (await sha(s)).slice(0, 24);
   const keyM = (b, m) => keyH("M|" + Number(b) + "|" + String(m).trim());
+  const keyA = u => keyH("A|" + String(u).trim().toLowerCase());
   const keyL = u => keyH("L|" + String(u).trim().toLowerCase());
   const mailOf = (key, v) => "u" + key + "_v" + v + MAIL_DOM;
   const goodMobile = m => /^\d{6,15}$/.test(String(m || ""));
@@ -1240,8 +1313,8 @@
     const bail = async msg => { view.err = msg; try { await signOut(auth); } catch (e) {} };
     try {
       if (!user) {
-        teardown(); const e0 = view.err;
-        view = { ...V0, err: e0 || "" }; db = null; profile = null; authReady = true; render(); return;
+        teardown(); const e0 = view.err, tab0 = view.tab;
+        view = { ...V0, err: e0 || "", tab: e0 && tab0 ? tab0 : V0.tab }; db = null; profile = null; authReady = true; render(); return;
       }
       let prof, sn;
       if (user.email === ADMIN_EMAIL) { prof = { role: "owner" }; sn = await getDoc(cloudRef); }
@@ -1271,17 +1344,23 @@
         const pm = view.pendingMobile;
         if (pm && l.mobile !== pm) { db = null; profile = null; await bail(t("errCheckLeader")); return; }
       }
+      if (prof.role === "admin") {
+        const a = (db.admins || []).find(x => x.id === prof.id);
+        if (!a) { db = null; profile = null; await bail(t("errNoProfile")); return; }
+        if (view.pendingMobile && a.mobile !== view.pendingMobile) { db = null; profile = null; await bail(t("errCheckAdmin")); return; }
+      }
       if (prof.role === "owner") {
+        if (view.pendingMobile && db.adminMobile && db.adminMobile !== view.pendingMobile) { db = null; profile = null; await bail(t("errCheckAdmin")); return; }
         const dirty = ("admin" in db) || db.donors.some(d => "pw" in d) || db.leaders.some(l => "pw" in l);
         if (dirty) { delete db.admin; db.donors.forEach(d => { delete d.pw; }); db.leaders.forEach(l => { delete l.pw; }); await save(); }
       }
       view.pendingMobile = null;
-      view.role = prof.role; view.user = prof.id || null; view.err = "";
+      view.role = prof.role === "admin" ? "owner" : prof.role; view.user = prof.id || null; view.err = "";
       view.mustChange = !!prof.mustChange;
       view.oSec = "dash"; view.lSec = "total"; view.mSec = "me";
       authReady = true; cloudError = false;
       render();
-      if (prof.role !== "owner" && prof.role !== "leader") refreshReqs();
+      if (view.role !== "owner" && view.role !== "leader") refreshReqs();
     } catch (e) {
       console.error("Auth/load error:", e);
       db = null; profile = null; cloudError = true; authReady = true; render();
@@ -1423,7 +1502,7 @@
     return e;
   }
 
-  function langBar() {
+  function langBar(left) {
     const sel = h("select", {
       id: "langSel",
       "aria-label": t("selectLang"),
@@ -1435,6 +1514,8 @@
         return opt;
       })
     );
+    if (left) return h("div", { class: "lbar", style: "justify-content:space-between" }, left,
+      h("div", { style: "display:flex;align-items:center;gap:8px" }, h("span", null, "🌐 " + t("selectLang") + ":"), sel));
     return h("div", { class: "lbar" },
       h("span", null, "🌐 " + t("selectLang") + ":"),
       sel
@@ -1641,6 +1722,8 @@
     f.uid = h("input", { id: "ui", autocomplete: "username" });
     f.lm = h("input", { id: "lmb", type: "tel", inputmode: "numeric", autocomplete: "tel" });
     f.pw = h("input", { id: "pw", type: "password", autocomplete: "current-password" });
+    f.ou = h("input", { id: "ou", autocomplete: "username" });
+    f.om = h("input", { id: "om", type: "tel", inputmode: "numeric", autocomplete: "tel" });
 
     const go = async () => {
       if (loginBusy || !auth) return;
@@ -1652,7 +1735,15 @@
         let email, bad = t("errWrongPw");
         view.pendingMobile = null;
         if (!pwv) { view.err = bad; return; }
-        if (tab === "owner") email = ADMIN_EMAIL;
+        if (tab === "owner") {
+          const un = f.ou.value.trim().toLowerCase(), om = f.om.value.trim(); bad = t("errCheckAdmin");
+          if (!un) { view.err = bad; return; }
+          if (un === "admin") { email = ADMIN_EMAIL; view.pendingMobile = om || null; }
+          else {
+            if (!om) { view.err = bad; return; }
+            const key = await keyA(un); email = mailOf(key, await getVer(key)); view.pendingMobile = om;
+          }
+        }
         else if (tab === "leader") {
           const un = f.uid.value.trim(), lm = f.lm.value.trim(); bad = t("errCheckLeader");
           if (!un || !lm) { view.err = bad; return; }
@@ -1676,20 +1767,23 @@
     const tb = (k, l) => h("button", { type: "button", class: tab === k ? "on" : "", on: { click: () => { view.tab = k; view.err = ""; render(); } } }, l);
 
     const eye = h("button", { type: "button", class: "eye", "aria-label": "show password", on: { click: () => { f.pw.type = f.pw.type === "password" ? "text" : "password"; } } }, "👁");
+    const adminBtn = h("button", { type: "button", class: "lbtn" + (tab === "owner" ? " on" : ""), on: { click: () => { view.tab = tab === "owner" ? "member" : "owner"; view.err = ""; render(); } } }, t("adminLogin"));
     return [
-      langBar(),
+      langBar(adminBtn),
       h("div", { class: "card lg" },
         h("div", { class: "brand" }, h("div", { class: "logo" }, "₹"), h("h1", null, "COLLECTIONS"), h("div", { class: "mut" }, t("loginSub"))),
-        h("div", { class: "tabs" }, tb("member", t("member")), tb("leader", t("batchLeader")), tb("owner", t("admin"))),
+        h("div", { class: "tabs" }, tb("member", t("member")), tb("leader", t("batchLeader"))),
+        tab === "owner" && h("h2", { style: "text-align:center" }, t("adminLogin")),
         h("form", { class: "lform", on: { submit: e => { e.preventDefault(); go(); } } },
           tab === "member" && mk("bt", t("batchNum"), f.batch),
           tab === "member" && mk("mb", t("mobileNum"), f.mobile),
           tab === "leader" && mk("ui", t("username"), f.uid),
           tab === "leader" && mk("lmb", t("mobileNum"), f.lm),
+          tab === "owner" && mk("ou", t("username"), f.ou),
+          tab === "owner" && mk("om", t("mobileNum"), f.om),
           mk("pw", t("password"), h("div", { class: "pwrap" }, f.pw, eye)),
           view.err && h("div", { class: "err", role: "alert" }, view.err),
-          h("button", { type: "submit", id: "loginGo" }, t("loginBtn")),
-          tab !== "owner" && h("div", { class: "hint" }, t("initPwNote"))
+          h("button", { type: "submit", id: "loginGo" }, t("loginBtn"))
         )
       )
     ];
@@ -2562,7 +2656,7 @@
     const L = (i, t, c) => h("label", { for: i }, t, c);
     const msg = view.pwMsg; view.pwMsg = null;
     let busy = false;
-    const myMobile = () => view.role === "leader" ? (me() || {}).mobile : (curDonor() || {}).mobile;
+    const myMobile = () => view.role === "leader" ? (me() || {}).mobile : view.role === "owner" ? (profile && profile.role === "admin" ? ((db.admins || []).find(x => x.id === profile.id) || {}).mobile : db.adminMobile) : (curDonor() || {}).mobile;
     return h("form", { class: "card", on: { submit: async ev => {
       ev.preventDefault();
       if (busy) return;
@@ -2573,7 +2667,7 @@
         if (n1.value.length < 6) return fail(t("errPwMin6"));
         if (n1.value !== n2.value) return fail(t("errPwMismatch"));
         if (n1.value === cur.value) return fail(t("errPwSame"));
-        if (view.role !== "owner" && n1.value === String(myMobile() || "")) return fail(t("errPwMobile"));
+        if (myMobile() && n1.value === String(myMobile())) return fail(t("errPwMobile"));
         try { await updatePassword(auth.currentUser, n1.value); }
         catch (e) { console.error(e); return fail(t("errPwChangeFail")); }
         if (profile && profile.mustChange) {
@@ -2710,12 +2804,15 @@
         title: t("loginsConfirm"), lines: [t("loginsMissing", miss.length, missL.length), t("initPwNote")], needPw: true,
         run: async () => {
           let ok = 0, bad = 0, stop = false;
+          let left = 40;
           for (const d of db.donors.filter(x => !x.uid)) {
+            if (left <= 0) break; left--;
             if (stop) { bad++; continue; }
             try { d.uid = await provision(await keyM(d.batch, d.mobile), d.mobile, { role: "member", id: d.id, batch: d.batch }); ok++; }
             catch (e) { bad++; console.error(e); if (e && e.code === "auth/too-many-requests") stop = true; }
           }
           for (const l of db.leaders.filter(x => !x.uid)) {
+            if (left <= 0) break; left--;
             if (stop) { bad++; continue; }
             try { l.uid = await provision(await keyL(l.username), l.mobile, { role: "leader", id: l.id, batch: l.batch }); ok++; }
             catch (e) { bad++; console.error(e); if (e && e.code === "auth/too-many-requests") stop = true; }
@@ -2726,6 +2823,61 @@
     );
   }
 
+  function adminsCard() {
+    if (!profile || profile.role !== "owner") return null;
+    const list = db.admins || [];
+    const mob = h("input", { id: "amain", type: "tel", inputmode: "numeric", value: db.adminMobile || "" });
+    const nu = h("input", { id: "anu", autocomplete: "off" });
+    const nm = h("input", { id: "anm", type: "tel", inputmode: "numeric", autocomplete: "off" });
+    const used = (m, exceptId) => (m === (db.adminMobile || "") && exceptId !== "main") || list.some(a => a.mobile === m && a.id !== exceptId);
+    return h("div", { class: "card" },
+      h("h2", null, t("adminsTitle")),
+      h("p", { class: "sub" }, t("adminsNote")),
+      h("label", { for: "amain" }, t("adminMainLabel") + " · " + t("mobileNum"), mob),
+      h("button", { class: "sec", on: { click: () => {
+        const m = mob.value.replace(/\D/g, "");
+        if (!goodMobile(m)) { view.flash = t("errMobileFmt"); render(); return; }
+        if (used(m, "main")) { view.flash = t("errAdminMobileDup"); render(); return; }
+        ask({ title: t("adminSaveConfirm"), lines: [m], needPw: true, run: () => { db.adminMobile = m; } });
+      } } }, t("adminSaveMobile")),
+      ...list.map(a => h("div", { style: "border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:6px" },
+        h("div", { class: "num" }, a.username + " · " + a.mobile),
+        h("div", { class: "row", style: "justify-content:flex-start" },
+          h("button", { class: "sec sm", on: { click: () => ask({ title: t("confirmResetPw"), lines: [a.username + " · " + a.mobile, t("initPwNote")], needPw: true, run: async () => {
+            try {
+              const cur = (db.admins || []).find(x => x.id === a.id); if (!cur) return false;
+              const nuid = await provision(await keyA(cur.username), cur.mobile, { role: "admin", id: cur.id });
+              await dropProfile(cur.uid); cur.uid = nuid;
+            } catch (er) { console.error(er); view.flash = t("errAcctFail"); return false; }
+          } }) } }, t("resetPwBtn")),
+          h("button", { class: "dng sm", on: { click: () => ask({ title: t("adminRemoveConfirm"), lines: [a.username + " · " + a.mobile], needPw: true,
+            run: () => { db.admins = (db.admins || []).filter(x => x.id !== a.id); },
+            after: async () => { await dropProfile(a.uid); } }) } }, t("removeBtn"))
+        ))),
+      h("hr", { style: "border:0;border-top:1px dashed var(--line);width:100%" }),
+      h("h2", null, t("adminAddTitle")),
+      h("label", { for: "anu" }, t("username"), nu),
+      h("label", { for: "anm" }, t("mobileNum"), nm),
+      h("div", { class: "mut" }, t("initPwNote")),
+      h("button", { on: { click: () => {
+        const un = nu.value.trim(), m = nm.value.replace(/\D/g, "");
+        if (un.length < 3 || /\s/.test(un) || un.toLowerCase() === "admin") { view.flash = t("errAdminName"); render(); return; }
+        if (list.some(a => a.username.toLowerCase() === un.toLowerCase())) { view.flash = t("errAdminNameDup"); render(); return; }
+        if (!goodMobile(m)) { view.flash = t("errMobileFmt"); render(); return; }
+        if (used(m, null)) { view.flash = t("errAdminMobileDup"); render(); return; }
+        ask({ title: t("adminAddConfirm"), lines: [un + " · " + m, t("initPwNote")], needPw: true, run: async () => {
+          try {
+            db.admins = db.admins || [];
+            if (db.admins.some(a => a.username.toLowerCase() === un.toLowerCase() || a.mobile === m) || db.adminMobile === m) { view.flash = t("errAdminMobileDup"); return false; }
+            const id = newId("a");
+            const uid = await provision(await keyA(un), m, { role: "admin", id });
+            db.admins.push({ id, username: un, mobile: m, uid });
+          } catch (er) { console.error(er); view.flash = t("errAcctFail"); return false; }
+        } });
+      } } }, t("adminAddBtn"))
+    );
+  }
+
   function exportBackup() {
     const blob = new Blob([JSON.stringify(db, null, 1)], { type: "application/json" });
     const a = document.createElement("a");
@@ -2733,6 +2885,54 @@
     a.download = "COLLECTIONS_backup_" + new Date().toISOString().slice(0, 10) + ".json";
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }
+
+  const parseCsv = txt => {
+    txt = String(txt || "").replace(/^\uFEFF/, "");
+    const rows = []; let row = [], cur = "", q = false;
+    for (let i = 0; i < txt.length; i++) {
+      const c = txt[i];
+      if (q) { if (c === '"') { if (txt[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+      else if (c === '"') q = true;
+      else if (c === ",") { row.push(cur); cur = ""; }
+      else if (c === "\n" || c === "\r") { if (c === "\r" && txt[i + 1] === "\n") i++; row.push(cur); cur = ""; if (row.some(x => x.trim())) rows.push(row); row = []; }
+      else cur += c;
+    }
+    row.push(cur); if (row.some(x => x.trim())) rows.push(row);
+    return rows;
+  };
+  function importCard() {
+    const fileIn = h("input", { id: "imp", type: "file", accept: ".csv,text/csv,text/plain" });
+    return h("div", { class: "card" },
+      h("h2", null, t("importTitle")),
+      h("p", { class: "sub" }, t("importNote")),
+      h("label", { for: "imp" }, t("importPick"), fileIn),
+      h("button", { on: { click: async () => {
+        const f = fileIn.files && fileIn.files[0];
+        if (!f) { view.flash = t("errPickFile"); render(); return; }
+        let rows = [];
+        try { rows = parseCsv(await f.text()); } catch (e) {}
+        const have = new Set(db.donors.map(d => d.batch + "|" + d.mobile));
+        const add = []; let exist = 0, bad = 0;
+        rows.slice(1).forEach(r => {
+          const batch = Number((r[0] || "").trim()), name = (r[1] || "").replace(/\s+/g, " ").trim(), mobile = (r[2] || "").replace(/\D/g, ""), place = (r[3] || "").replace(/\s+/g, " ").trim();
+          if (!(db.batches || []).includes(batch) || !name || !goodMobile(mobile)) { bad++; return; }
+          const k = batch + "|" + mobile;
+          if (have.has(k)) { exist++; return; }
+          have.add(k); add.push({ id: newId("d"), name, mobile, place, district: "", batch, cols: {} });
+        });
+        if (!add.length) { view.flash = t("importNone"); render(); return; }
+        ask({
+          title: t("importConfirm"), lines: [t("importLine", add.length, exist, bad), t("importAfter")], needPw: true,
+          run: () => {
+            const ex = new Set(db.donors.map(d => d.batch + "|" + d.mobile));
+            const fresh = add.filter(d => !ex.has(d.batch + "|" + d.mobile));
+            fresh.forEach(d => db.donors.push(d));
+            view.flash = t("importDone", fresh.length);
+          }
+        });
+      } } }, t("importBtn"))
+    );
   }
 
   function backupCard() {
@@ -2899,8 +3099,10 @@
       if (view.ledit) out.push(leaderForm());
 
       out.push(collManager());
+      out.push(importCard());
       out.push(backupCard());
       out.push(pwChangeCard(true, false));
+      { const ac = adminsCard(); if (ac) out.push(ac); }
 
       const nb = h("input", { id: "nb", type: "number", inputmode: "numeric", min: 1 });
       out.push(h("form", {
